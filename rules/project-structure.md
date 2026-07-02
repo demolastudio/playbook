@@ -1,35 +1,30 @@
 # Project Structure
 
-> How I organize my Next.js projects. AI agents must follow this layout.
+> Stack-agnostic structure rules. Concrete folder layouts live in each
+> stack profile — see `.playbook/stacks/<stack>/STACK.md`.
 
 ## Naming
 
-- **Kebab-case everything.** Files, folders, routes — all kebab-case.
+- **Kebab-case everything.** Files, folders, routes — all kebab-case, in every language and framework.
   ```
   ✅ booking-form/booking-form.tsx
   ✅ use-booking.ts
-  ✅ booking-schema.ts
+  ✅ booking-schema.py
   ❌ BookingForm/BookingForm.tsx
   ❌ useBooking.ts
   ```
 
 ## Code Splitting
 
-Split by concern, not by feature. Dedicated folders for each type of code:
+Split by concern, not by convenience. Every type of code gets a dedicated home:
 
-```
-app/
-├── (public)/             ← Public-facing pages
-├── (admin)/              ← Admin/dashboard pages
-└── api/                  ← API routes (webhooks only)
-
-types/                    ← All TypeScript types/interfaces
-schemas/                  ← All Zod validation schemas
-actions/                  ← All Server Actions
-hooks/                    ← All custom React hooks
-lib/                      ← Utility functions, helpers
-components/               ← UI components
-```
+| Concern | Next.js | FastAPI | NestJS |
+| ------- | ------- | ------- | ------ |
+| Type definitions | `types/` | `models/` (Pydantic) | `interfaces/` |
+| Validation schemas | `schemas/` (Zod) | `schemas/` (Pydantic) | `dto/` (class-validator) |
+| Mutations / handlers | `actions/` | `routers/` | `controllers/` |
+| Business logic | `lib/` | `services/` | `services/` |
+| Reusable client logic | `hooks/` | — | — |
 
 ## Principles
 

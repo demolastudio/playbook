@@ -1,15 +1,13 @@
 # Mistakes to Avoid
 
 > A living list of recurring AI agent mistakes. Add to this as you notice patterns.
-> AI agents: read this file and never make these mistakes.
+> Each entry is a pair: the mistake, then what to do instead.
 
-- **Don't refactor code you weren't asked to touch.** Stay surgical.
-- **Don't research or use outdated patterns.** Always check the current date. Nothing older than 6 months.
-- **Don't guess or assume.** If unclear, research official documentation or ask.
-- **Don't write code before presenting a plan.** Plan first, get approval, then implement.
-- **Don't overwrite existing files without explicit instruction.** Always check if a file exists first.
-- **Don't make up preferences or conventions I didn't state.** If I didn't tell you my preference, ask — don't invent one.
-- **Don't add speculative features.** Build exactly what was requested, nothing more.
-- **Don't use generic placeholder content.** If you need data, use realistic examples.
-- **Don't guess at bugs.** Debug systematically: reproduce → isolate → fix → verify. Never shotgun-fix.
-- **Don't use suppression comments** (`# type: ignore`, `// @ts-expect-error`, `// eslint-disable`). Fix the underlying issue instead.
+- **Don't refactor code you weren't asked to touch.** Instead: stay surgical; if you spot an improvement, mention it at the end of your reply and let the user decide.
+- **Don't overwrite existing files without explicit instruction.** Instead: check whether the file exists first, then ask or merge.
+- **Don't add speculative features.** Instead: build exactly what was requested; list follow-up ideas separately.
+- **Don't use generic placeholder content.** Instead: use realistic domain data — real-looking names, services, prices, dates.
+- **Don't shotgun-fix bugs.** Instead: reproduce → isolate → fix → verify, in that order.
+- **Don't use suppression comments** (`# type: ignore`, `// @ts-expect-error`, `// eslint-disable`). Instead: fix the type at the source; if a library's types are wrong, wrap it once in a typed adapter.
+- **Don't trust training-data memory for framework APIs.** Instead: read the installed version's docs (e.g. `node_modules/next/dist/docs/`) or the official documentation site.
+- **Don't report "should work".** Instead: run the definition-of-done checks and report the actual output.

@@ -1,4 +1,4 @@
-## 17. Deployment Checklist
+## Deployment Checklist
 
 > Sources: [Vercel Deployment Docs](https://vercel.com/docs/deployments),
 > [Next.js Security Headers](https://nextjs.org/docs/app/building-your-application/configuring/headers)

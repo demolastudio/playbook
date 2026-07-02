@@ -1,4 +1,4 @@
-## 14. Testing
+## Testing
 
 ### Testing Priority for Booking Systems
 

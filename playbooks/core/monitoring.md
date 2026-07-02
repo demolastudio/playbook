@@ -1,4 +1,4 @@
-## 18. Monitoring & Observability
+## Monitoring & Observability
 
 > **Sources:** [OpenTelemetry docs](https://opentelemetry.io/docs/),
 > [Sentry Next.js SDK](https://docs.sentry.io/platforms/javascript/guides/nextjs/),

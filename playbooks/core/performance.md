@@ -1,4 +1,4 @@
-## 16. Performance Budgets
+## Performance Budgets
 
 > **Source:** [web.dev — Core Web Vitals](https://web.dev/articles/vitals)
 > Google uses the **75th percentile** of real-user data (CrUX) for ranking.

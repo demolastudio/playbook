@@ -5,24 +5,26 @@ description: Security and performance audit of the current codebase
 # Audit
 
 When triggered, perform a full audit against the playbook standards.
+First read `.playbook/stacks/<stack>/STACK.md` for the project's stack — it names
+the concrete tools each check refers to (examples below use the Next.js stack).
 
 ## Security Checks
 
 1. **BOLA** — Every query that reads/updates/deletes a record includes an ownership filter
-2. **Rate limiting** — Arcjet is installed and configured in `middleware.ts`
-3. **CSRF** — Server Actions have CSRF protection, API routes have anti-CSRF tokens
+2. **Rate limiting** — middleware is installed and active (Next.js: Arcjet in `middleware.ts`)
+3. **CSRF** — All mutation endpoints have CSRF protection (Next.js: Server Actions built-in, API routes need tokens)
 4. **Cookies** — All session cookies are `httpOnly`, `secure`, `sameSite=lax`
-5. **Input validation** — Three layers: client → server (Zod) → database constraints
+5. **Input validation** — Three layers: client → server schema (Zod / Pydantic / DTO) → database constraints
 6. **Secrets** — No hardcoded secrets in source code, all in env vars
 7. **CSP headers** — Content Security Policy is configured
 8. **Suppression comments** — No `// @ts-expect-error`, `// eslint-disable`, `# type: ignore`
 
 ## Performance Checks
 
-1. **Bundle size** — No unnecessary client-side JavaScript, use Server Components
+1. **Payload size** — No unnecessary client-side JavaScript (Next.js: prefer Server Components)
 2. **Database** — Indexes on frequently queried columns, no N+1 queries
-3. **Images** — Using `next/image` with proper sizing
-4. **Caching** — Static pages use ISR or static generation where possible
+3. **Images** — Optimized and properly sized (Next.js: `next/image`)
+4. **Caching** — Static or cacheable responses where possible (Next.js: ISR/static generation)
 
 ## Output
 

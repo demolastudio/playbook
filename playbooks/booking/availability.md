@@ -1,4 +1,4 @@
-## 6. Availability & Scheduling
+## Availability & Scheduling
 
 ### The Core Problem
 
@@ -91,8 +91,6 @@ For each day in the generation window:
 
 **Generation frequency:** Run daily for the next N months. Also trigger on-demand when rules or exceptions change.
 
-**Minimum time unit:** Pick a granularity (5, 10, or 15 minutes) early. This determines slot boundaries and prevents micro-gaps between appointments.
-
 ---
 
 ### Buffer Time
@@ -107,13 +105,7 @@ For each day in the generation window:
 
 #### Implementation Approaches
 
-**Extended Duration (simpler):** Treat buffer as part of the total blocked time. The customer sees "60 min appointment" but the system blocks 75 minutes.
-
-```
-Customer sees:   10:00 – 11:00 (60 min service)
-System blocks:   10:00 – 11:15 (60 min + 15 min post-buffer)
-Next available:  11:15
-```
+**Extended Duration (simpler):** Treat buffer as part of the total blocked time. Customer sees 10:00–11:00 (60 min service); system blocks 10:00–11:15; next available slot starts 11:15.
 
 **Non-Bookable Block (more flexible):** Create a separate "buffer" record adjacent to each booking. More complex but allows different buffer types and durations.
 
@@ -138,13 +130,7 @@ For capacity-based slots (classes, group events, tables):
 
 #### Overbooking (When Appropriate)
 
-Some industries intentionally overbook based on historical no-show rates:
-
-```
-If historical no-show rate = 10% and capacity = 20:
-  Allow up to 22 bookings (110% capacity)
-  Expected actual attendance = ~20
-```
+Some industries intentionally overbook based on historical no-show rates. Example: 10% historical no-show rate on capacity 20 → allow 22 bookings (110%), expected attendance ≈ 20.
 
 - **Only use for specific business types** where no-shows are predictable (fitness classes, restaurants)
 - **Have a clear overflow policy** — what happens if everyone shows up? (Waitlist priority, voucher, reschedule)
@@ -183,60 +169,12 @@ A resource's availability is built from layers, applied in priority order:
 
 ---
 
-### Calendar Integration (Bi-Directional Sync)
-
-| Direction | What Happens | Why |
-| --------- | ------------ | --- |
-| **Outbound** (your system → external) | Push confirmed bookings to Google/Outlook/iCal | Provider sees their schedule in their personal calendar |
-| **Inbound** (external → your system) | Pull busy events back into your availability engine | Prevents booking when provider has a personal commitment |
-
-#### Sync Mechanisms
-
-| Method | Speed | Reliability | Use For |
-| ------ | ----- | ----------- | ------- |
-| **Webhooks (push)** | Near real-time (seconds) | Can fail silently | Primary sync channel |
-| **Incremental polling (sync tokens)** | Minutes (5–15 min interval) | Reliable fallback | Catches missed webhooks |
-| **iCal / .ics feeds** | Hours (12+ hour lag typical) | Unreliable for real-time | Read-only legacy calendars |
-
-**Recommended:** Webhooks as primary, incremental polling as fallback. Never rely solely on iCal feeds for live availability.
-
-#### Deduplication
-
-Bi-directional sync creates infinite loop risk (Sync A triggers Sync B, which triggers Sync A...):
-
-- **Tag events with a custom metadata field** (e.g., `x-booking-id`) to identify events your system created
-- **Ignore updates to your own events** — if the metadata matches your system, skip processing
-- Use event IDs consistently across systems for matching
-
-#### Conflict Resolution
-
-If inbound sync reveals a conflict (external event blocks a slot that's already booked):
-
-- **Never auto-cancel a confirmed booking** based on an external calendar event
-- **Flag it for manual resolution** — notify the provider with options: cancel the booking, move the personal event, or keep both (overlap)
-- Log the conflict in the audit trail
-
----
-
 ### Availability Search Optimization
 
 The "what's open?" query is the most-hit endpoint. It must be fast.
 
-#### For Materialized Slots
-
-```
-Index on: (resource_id, status, start_time)
-Query:    WHERE resource_id = :id AND status = 'AVAILABLE' AND start_time BETWEEN :start AND :end
-```
-
-#### For "Any Available" (Resource Pool)
-
-```
-1. Filter resources by criteria (service type, location, skills)
-2. For each resource, query available slots in the date range
-3. Merge results, deduplicate, sort by time
-4. Return paginated results
-```
+- **Materialized slots:** index on `(resource_id, status, start_time)`; query by resource + status + time range only
+- **Resource pool ("any available"):** filter resources by criteria → query each resource's slots in range → merge, dedupe, sort, paginate
 
 #### Performance Strategies
 
@@ -248,27 +186,13 @@ Query:    WHERE resource_id = :id AND status = 'AVAILABLE' AND start_time BETWEE
 
 ---
 
-### No-Show Prevention
-
-No-shows waste capacity and revenue. Reduce them with:
-
-| Strategy | Impact |
-| -------- | ------ |
-| **Multi-channel reminders** | Send at booking, 2 days before, and day-of (email + SMS) |
-| **Active confirmation** | "Click to confirm attendance" — builds psychological commitment |
-| **Deposit/prepayment** | Financial friction filters low-intent bookings |
-| **Easy rescheduling** | A self-service reschedule link in the confirmation email reduces cancellations and no-shows |
-| **Track no-show rate per customer** | Flag repeat offenders; consider requiring prepayment for future bookings |
-
----
-
 ### Rules
 
 - **Slot generation is a background concern** — never generate slots synchronously during a user request.
 - **Buffer time is non-negotiable** — without it, providers burn out and quality drops. Store buffers on the service type.
 - **Overrides always win** — a one-off block overrides any recurring rule, no exceptions.
 - **The availability query must be fast** — it's the most-hit endpoint. Cache aggressively, paginate results.
-- **Calendar sync is a mirror, not a source** — your database is the source of truth. External calendars reflect it.
 - **Capacity = 0 is not "unavailable"** — a full slot can still have a waitlist. Design for it.
+- **Calendar sync and no-shows have their own chapters** — [calendar-sync.md](./calendar-sync.md), [rescheduling.md](./rescheduling.md).
 - **Customer sees service duration, system blocks service + buffer** — never expose internal scheduling constraints to the customer.
 - **Minimum time unit** — pick 5, 10, or 15 minute granularity early. Mixing granularities creates micro-gaps.

@@ -1,15 +1,13 @@
 # Code Style
 
-> These rules are non-negotiable. AI agents must follow every single one.
+> The global rules in [global-rules.md](./global-rules.md) always apply.
+> This file adds the principles behind them — the "why" and the deeper habits.
 
-## My Rules
+## Principles
 
-- **No comments in code.** The code must be readable without them.
 - **One source of truth.** Every function, every business rule — defined in one place, called from everywhere. Never duplicate logic.
-- **Code splitting.** Separate concerns into dedicated folders: `types/`, `schemas/`, `actions/`, `hooks/`, etc. Readability and scalability over convenience.
-- **Don't assume. Don't guess.** If something is unclear or you're stuck, research using official docs. Never silently pick an interpretation.
-- **Plan first, code after approval.** Always present a plan before writing any code. Wait for explicit approval before implementing.
-- **Date/time awareness.** Always check the current date. Never research or reference anything older than 6 months. We are building with the latest tools — not legacy patterns.
+- **Readable without comments.** If code needs a comment to be understood, rename or restructure it until it doesn't.
+- **Split by concern.** Dedicated folders per type of code (`types/`, `schemas/`, `actions/`, `hooks/`). Readability and scalability over convenience.
 
 ---
 
@@ -31,5 +29,5 @@ The unit of engineering in 2026 is the **loop**, not the prompt.
   1. **Trigger** — what starts the loop
   2. **Evaluation cycle** — agent checks if the goal is met after each action
   3. **Stop condition** — guardrails that prevent infinite loops, goal drift, and runaway costs
-- **Verification is the critical step.** Never assume something works — check it. Run the test, read the output, confirm the result.
+- **Verification is the critical step.** Never assume something works — check it. The concrete verification gate for this playbook is [definition-of-done.md](./definition-of-done.md).
 - **The quality of the system is limited by the design of the loop, not the model.**

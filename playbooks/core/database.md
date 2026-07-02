@@ -1,4 +1,4 @@
-## 9. Database Design & Performance
+## Database Design & Performance
 
 ### Primary Key Strategy
 

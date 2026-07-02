@@ -1,4 +1,4 @@
-## 13. Full-Stack Framework Patterns
+## Full-Stack Framework Patterns
 
 ### Server-First Architecture
 

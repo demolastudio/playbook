@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # my-playbook setup script
-# Clones the playbook into .playbook/ and creates an AGENTS.md config file.
+# Clones the playbook into .playbook/, detects the project stack,
+# and generates an AGENTS.md that all AGENTS.md-aware tools read.
 #
 # Usage:
 #   bash setup.sh /path/to/project             ← project setup
@@ -26,30 +27,61 @@ done
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_URL="https://github.com/signordemola/my-playbook.git"
 
-# ─── Global-only mode (no project dir) ────────────────────────────
-if [ "$INSTALL_GLOBAL" = true ] && [ -z "$PROJECT_DIR" ]; then
-  echo "🌍 Updating global rules for all AI tools..."
+# ─── Helpers ───────────────────────────────────────────────────────
 
-  GLOBAL_RULES_FILE="$SCRIPT_DIR/rules/global-rules.md"
-  if [ ! -f "$GLOBAL_RULES_FILE" ]; then
-    echo "   ❌ Error: $GLOBAL_RULES_FILE not found"
+install_global_rules() {
+  local rules_file="$1"
+  if [ ! -f "$rules_file" ]; then
+    echo "   ❌ Error: $rules_file not found"
     exit 1
   fi
 
+  echo "🌍 Updating global rules for all AI tools..."
+
   mkdir -p "$HOME/.claude"
-  cp "$GLOBAL_RULES_FILE" "$HOME/.claude/CLAUDE.md"
+  cp "$rules_file" "$HOME/.claude/CLAUDE.md"
   echo "   ✅ Claude Code  → ~/.claude/CLAUDE.md"
 
   mkdir -p "$HOME/.gemini"
-  cp "$GLOBAL_RULES_FILE" "$HOME/.gemini/GEMINI.md"
+  cp "$rules_file" "$HOME/.gemini/GEMINI.md"
   echo "   ✅ Gemini CLI   → ~/.gemini/GEMINI.md"
+  echo "      💡 Tip: add \"AGENTS.md\" to context.fileName in ~/.gemini/settings.json"
+  echo "         so Gemini CLI also reads project AGENTS.md files."
 
   mkdir -p "$HOME/.codex"
-  cp "$GLOBAL_RULES_FILE" "$HOME/.codex/AGENTS.md"
+  cp "$rules_file" "$HOME/.codex/AGENTS.md"
   echo "   ✅ OpenAI Codex → ~/.codex/AGENTS.md"
 
   echo ""
-  echo "   ⚠️  Cursor: paste rules/cursor-rules.md into Settings → Rules for AI"
+  echo "   ⚠️  Cursor: paste rules/global-rules.md into Settings → Rules for AI"
+}
+
+copy_if_newer() {
+  local src="$1" dest="$2"
+  if [ ! -f "$dest" ] || [ "$src" -nt "$dest" ]; then
+    cp "$src" "$dest"
+  fi
+}
+
+strip_frontmatter() {
+  awk 'NR==1 && $0=="---" {infm=1; next}
+       infm && $0=="---" {infm=0; next}
+       infm {next}
+       {print}' "$1"
+}
+
+add_gitignore_entry() {
+  local gitignore="$1" entry="$2"
+  if [ ! -f "$gitignore" ]; then
+    echo "$entry" > "$gitignore"
+  elif ! grep -qxF "$entry" "$gitignore"; then
+    echo "$entry" >> "$gitignore"
+  fi
+}
+
+# ─── Global-only mode (no project dir) ────────────────────────────
+if [ "$INSTALL_GLOBAL" = true ] && [ -z "$PROJECT_DIR" ]; then
+  install_global_rules "$SCRIPT_DIR/rules/global-rules.md"
   echo ""
   echo "✅ Global rules updated."
   exit 0
@@ -61,7 +93,6 @@ PLAYBOOK_DIR="$PROJECT_DIR/.playbook"
 
 echo "🔧 Setting up my-playbook in $PROJECT_DIR"
 
-# Clone or update
 if [ -d "$PLAYBOOK_DIR" ]; then
   echo "📦 Playbook already exists. Pulling latest..."
   git -C "$PLAYBOOK_DIR" pull --quiet
@@ -70,66 +101,114 @@ else
   git clone --quiet "$REPO_URL" "$PLAYBOOK_DIR"
 fi
 
-# Add .playbook to .gitignore
-GITIGNORE="$PROJECT_DIR/.gitignore"
-if [ -f "$GITIGNORE" ]; then
-  if ! grep -q "^\.playbook" "$GITIGNORE"; then
-    echo ".playbook/" >> "$GITIGNORE"
-    echo "📋 Added .playbook/ to .gitignore"
-  fi
-else
-  echo ".playbook/" > "$GITIGNORE"
-  echo "📋 Created .gitignore with .playbook/"
+# ─── Detect project stacks ─────────────────────────────────────────
+STACKS=()
+PKG_JSON="$PROJECT_DIR/package.json"
+
+if [ -f "$PROJECT_DIR/turbo.json" ]; then
+  STACKS+=("turborepo")
 fi
+if [ -f "$PKG_JSON" ] && grep -q '"next"' "$PKG_JSON"; then
+  STACKS+=("nextjs")
+fi
+if [ -f "$PKG_JSON" ] && grep -q '"@nestjs/core"' "$PKG_JSON"; then
+  STACKS+=("nestjs")
+fi
+if grep -qs "fastapi" "$PROJECT_DIR/pyproject.toml" "$PROJECT_DIR"/requirements*.txt 2>/dev/null; then
+  STACKS+=("fastapi")
+fi
+
+if [ ${#STACKS[@]} -gt 0 ]; then
+  echo "🔍 Detected stack(s): ${STACKS[*]}"
+else
+  echo "🔍 No known stack detected — AGENTS.md will list available profiles."
+fi
+
+# ─── Gitignore playbook artifacts ──────────────────────────────────
+GITIGNORE="$PROJECT_DIR/.gitignore"
+for entry in ".playbook/" ".agents/workflows/" ".claude/commands/" ".cursor/rules/"; do
+  add_gitignore_entry "$GITIGNORE" "$entry"
+done
+echo "📋 Ensured playbook artifacts are gitignored"
 
 # ─── Copy workflows to all AI tool paths ──────────────────────────
 WORKFLOWS_SRC="$PLAYBOOK_DIR/workflows"
 
 if [ -d "$WORKFLOWS_SRC" ]; then
-  # Antigravity: .agents/workflows/
-  mkdir -p "$PROJECT_DIR/.agents/workflows"
-  cp -u "$WORKFLOWS_SRC"/*.md "$PROJECT_DIR/.agents/workflows/" 2>/dev/null
-  echo "📂 Antigravity  → .agents/workflows/"
+  mkdir -p "$PROJECT_DIR/.agents/workflows" "$PROJECT_DIR/.claude/commands" "$PROJECT_DIR/.cursor/rules"
 
-  # Claude Code: .claude/commands/
-  mkdir -p "$PROJECT_DIR/.claude/commands"
-  cp -u "$WORKFLOWS_SRC"/*.md "$PROJECT_DIR/.claude/commands/" 2>/dev/null
-  echo "📂 Claude Code  → .claude/commands/"
-
-  # Cursor: .cursor/rules/ (convert .md to .mdc with alwaysApply: false)
-  mkdir -p "$PROJECT_DIR/.cursor/rules"
   for f in "$WORKFLOWS_SRC"/*.md; do
-    basename=$(basename "$f" .md)
-    target="$PROJECT_DIR/.cursor/rules/$basename.mdc"
+    [ -f "$f" ] || continue
+    name="$(basename "$f")"
+    copy_if_newer "$f" "$PROJECT_DIR/.agents/workflows/$name"
+    copy_if_newer "$f" "$PROJECT_DIR/.claude/commands/$name"
+
+    target="$PROJECT_DIR/.cursor/rules/${name%.md}.mdc"
     if [ ! -f "$target" ] || [ "$f" -nt "$target" ]; then
-      desc=$(grep "^description:" "$f" | head -1 | sed 's/description: *//')
+      desc="$(grep "^description:" "$f" | head -1 | sed 's/description: *//')"
       {
         echo "---"
         echo "description: \"$desc\""
         echo "alwaysApply: false"
         echo "---"
         echo ""
-        sed '1,/^---$/{ /^---$/,/^---$/d }' "$f"
+        strip_frontmatter "$f"
       } > "$target"
     fi
   done
+
+  echo "📂 Antigravity  → .agents/workflows/"
+  echo "📂 Claude Code  → .claude/commands/"
   echo "📂 Cursor       → .cursor/rules/ (.mdc)"
 fi
 
-# Create AGENTS.md
+# ─── Generate AGENTS.md ────────────────────────────────────────────
 AGENTS_FILE="$PROJECT_DIR/AGENTS.md"
 
 if [ ! -f "$AGENTS_FILE" ] || [ "$FORCE" = true ]; then
-  cat > "$AGENTS_FILE" << 'EOF'
-# MANDATORY: Read these before ANY action
+  {
+    cat << 'EOF'
+# Project Instructions for AI Agents
 
-1. **Read `.playbook/rules/`** — code-style.md, project-structure.md, mistakes.md. Follow every rule strictly.
-2. **Read `node_modules/next/dist/docs/`** — Local docs are the source of truth for the stack.
-3. **Read `.playbook/playbooks/*/INDEX.md`** for the relevant domain (e.g., `booking`, `core`).
-4. **Check `.playbook/recommended-skills.md`** — Install any relevant package skills for this project.
+## Core Principles — apply to EVERY change
 
-NEVER guess on architecture or naming. Consult the Playbook first.
+1. **Single Source of Truth** — one function per business rule, defined once, called from everywhere.
+2. **Database as Safety Net** — application logic validates first, DB constraints are the final defence.
+3. **Never Trust the Client** — re-validate all inputs server-side; authenticate and authorize all mutations.
+4. **Audit Everything** — every state transition, charge, and permission change gets logged. Append-only.
+5. **Idempotency by Default** — every external side effect uses a business-derived idempotency key.
+
+## Required Reading, in Order
+
+1. `.playbook/rules/` — global-rules, code-style, project-structure, mistakes, definition-of-done
 EOF
+
+    step=2
+    if [ ${#STACKS[@]} -gt 0 ]; then
+      for stack in "${STACKS[@]}"; do
+        echo "$step. \`.playbook/stacks/$stack/STACK.md\` — stack conventions, templates, and check commands"
+        step=$((step + 1))
+      done
+    else
+      echo "$step. \`.playbook/stacks/\` — identify the closest profile (nextjs, nestjs, fastapi, turborepo) and read its STACK.md; if none fits, proceed with the agnostic rules only"
+      step=$((step + 1))
+    fi
+
+    echo "$step. \`.playbook/playbooks/<domain>/INDEX.md\` — for the relevant domain (e.g. \`booking\`, \`core\`)"
+    step=$((step + 1))
+    echo "$step. \`.playbook/recommended-skills.md\` — install any relevant package skills"
+
+    cat << 'EOF'
+
+## Completion Gate
+
+A task is complete ONLY when `.playbook/rules/definition-of-done.md` passes.
+Run the stack's check commands and report actual output.
+
+NEVER guess on architecture or naming. Consult the playbook first.
+EOF
+  } > "$AGENTS_FILE"
+
   if [ "$FORCE" = true ]; then
     echo "📝 Regenerated AGENTS.md (--force)"
   else
@@ -139,34 +218,13 @@ else
   echo "⏭️  AGENTS.md already exists (use --force to regenerate)"
 fi
 
-# Global rules (if --global passed with a project dir)
+# ─── Global rules (if --global passed with a project dir) ─────────
 if [ "$INSTALL_GLOBAL" = true ]; then
   echo ""
-  echo "🌍 Installing global rules for all AI tools..."
-
-  GLOBAL_RULES_FILE="$PLAYBOOK_DIR/rules/global-rules.md"
-  if [ ! -f "$GLOBAL_RULES_FILE" ]; then
-    echo "   ❌ Error: $GLOBAL_RULES_FILE not found"
-    exit 1
-  fi
-
-  mkdir -p "$HOME/.claude"
-  cp "$GLOBAL_RULES_FILE" "$HOME/.claude/CLAUDE.md"
-  echo "   ✅ Claude Code  → ~/.claude/CLAUDE.md"
-
-  mkdir -p "$HOME/.gemini"
-  cp "$GLOBAL_RULES_FILE" "$HOME/.gemini/GEMINI.md"
-  echo "   ✅ Gemini CLI   → ~/.gemini/GEMINI.md"
-
-  mkdir -p "$HOME/.codex"
-  cp "$GLOBAL_RULES_FILE" "$HOME/.codex/AGENTS.md"
-  echo "   ✅ OpenAI Codex → ~/.codex/AGENTS.md"
-
-  echo ""
-  echo "   ⚠️  Cursor: paste rules/cursor-rules.md into Settings → Rules for AI"
+  install_global_rules "$PLAYBOOK_DIR/rules/global-rules.md"
 fi
 
-# Done
+# ─── Done ──────────────────────────────────────────────────────────
 echo ""
 echo "✅ Done! Your playbook is set up."
 echo ""

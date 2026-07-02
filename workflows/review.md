@@ -11,6 +11,7 @@ When triggered, review the most recent changes against playbook rules.
 1. Read `.playbook/rules/` — all rule files
 2. Identify all recently changed files (check git diff or ask which files)
 3. Review each file against every applicable rule
+4. Run the automated gates from `.playbook/rules/definition-of-done.md` and include the results
 
 ## What to Check
 

@@ -1,4 +1,4 @@
-## 10. Email Deliverability & Notifications
+## Email Deliverability & Notifications
 
 ### Email is Infrastructure, Not a Feature
 

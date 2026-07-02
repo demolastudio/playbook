@@ -1,4 +1,4 @@
-## 8. Cancellation Policy Engines
+## Cancellation Policy Engines
 
 ### Cancellation ≠ Just a Status Change
 
@@ -135,14 +135,7 @@ If a dispute does occur, your audit trail (see `core/audit-trails.md`) should co
 
 ### Rescheduling as an Alternative
 
-Before applying a cancellation fee, offer rescheduling:
-
-- Customer keeps their booking, just moves it to a new date/time
-- Business retains the revenue
-- The original slot is freed for someone else
-- Limit the number of reschedules (e.g., 2 max) to prevent abuse
-
-**Rescheduling should follow the same availability rules as a new booking** (see `booking/availability.md`). The customer can't reschedule to a slot that doesn't exist.
+Before applying a cancellation fee, always offer rescheduling — the customer keeps their booking, the business keeps the revenue. The full flow, policy limits, and no-show handling live in [rescheduling.md](./rescheduling.md).
 
 ---
 

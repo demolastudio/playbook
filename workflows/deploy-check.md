@@ -5,6 +5,9 @@ description: Pre-deployment checklist before going to production
 # Deploy Check
 
 When triggered, verify all deployment requirements are met.
+Run `.playbook/rules/definition-of-done.md` first — deploy-check assumes those
+gates already pass and adds production-only concerns. Read
+`.playbook/stacks/<stack>/checks.md` for the stack's concrete commands.
 
 ## Checklist
 
@@ -20,14 +23,14 @@ When triggered, verify all deployment requirements are met.
 - [ ] Seed data is not present in production
 
 ### Code Quality
-- [ ] Build passes: `npm run build` with zero errors
+- [ ] Production build passes with zero errors (stack build command from `checks.md`)
 - [ ] No `TODO`, `FIXME`, or `HACK` in production code
-- [ ] No `console.log` in production code
-- [ ] No suppression comments (`@ts-expect-error`, `eslint-disable`)
+- [ ] No debug logging (`console.log`, `print`) in production code
+- [ ] No suppression comments (`@ts-expect-error`, `eslint-disable`, `# type: ignore`)
 - [ ] No hardcoded localhost URLs
 
 ### Security
-- [ ] Arcjet is configured in `middleware.ts`
+- [ ] Rate-limiting middleware is configured (Next.js: Arcjet in `middleware.ts`)
 - [ ] CSRF protection is active on all mutations
 - [ ] Session cookies have correct flags
 - [ ] CSP headers are configured

@@ -1,4 +1,4 @@
-## 15. Accessibility Patterns
+## Accessibility Patterns
 
 > **Legal context:** The European Accessibility Act (EAA) enforcement began June 2025.
 > WCAG 2.2 AA is the current compliance target.

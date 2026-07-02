@@ -1,29 +1,33 @@
 # UI/UX Playbook — Index
 
 > Design patterns, component architecture, and aesthetic preferences.
-> For general patterns (accessibility, performance, etc.), see `core/INDEX.md`.
+> For accessibility and performance, see `core/INDEX.md`.
 >
-> **Status:** Outline only. Chapters to be written.
+> **For AI agents:** Read this INDEX, then ONLY the routed chapter for your task.
+> The Design Taste section below always applies.
 
-## Design Taste
-
-My personal design preferences for AI agents to follow:
+## Design Taste (always applies)
 
 - **Dark mode first** — premium, modern feel. Light mode as secondary.
 - **Typography** — Inter or Outfit from Google Fonts. Never browser defaults.
-- **Color palette** — Curated, harmonious. No generic red/blue/green. Use HSL-tuned palettes.
-- **Glassmorphism** — frosted glass cards, subtle transparency, backdrop blur.
-- **Micro-animations** — Framer Motion for transitions, hover effects, loading states.
-- **Spacing** — generous whitespace. Dense UIs feel cheap.
-- **shadcn/ui** — as component base. Customize, don't use raw defaults.
+- **Color palette** — curated, harmonious, 60/30/10 (dominant/neutral/accent). No generic red/blue/green. HSL-tuned.
+- **Glassmorphism** — frosted glass as an *accent* (nav, modals, feature cards) — never on every surface.
+- **Micro-animations** — Framer Motion for transitions, hover, loading. Subtle, fast (150–300ms).
+- **Spacing** — generous whitespace on marketing/public pages; controlled density on dashboards (see dashboards.md).
+- **shadcn/ui** — as component base. Customize the tokens, never ship raw defaults.
+
+## Routing Table
+
+| File | Covers | Read when you are... |
+| ---- | ------ | -------------------- |
+| [anti-ai-design.md](./anti-ai-design.md) | Slop patterns, DESIGN.md token lock, direction commitment | Starting ANY new UI, or the design "looks AI-generated" |
+| [responsive.md](./responsive.md) | Mobile-first breakpoints, touch targets, adaptive layouts | Building any user-facing page |
+| [dashboards.md](./dashboards.md) | Layout anatomy, data tables, filters, density, states | Building admin/dashboard UIs |
 
 ## Planned Chapters
 
-- [ ] **components.md** — Component architecture, composition patterns, prop design
-- [ ] **responsive.md** — Mobile-first, breakpoints, touch targets, adaptive layouts
-- [ ] **animations.md** — Framer Motion patterns, page transitions, micro-interactions
-- [ ] **dark-mode.md** — Theme system, CSS variables, color schemes
+- [ ] **components.md** — Component architecture, composition, prop design
+- [ ] **animations.md** — Framer Motion patterns, page transitions
 - [ ] **forms.md** — Form UX, validation feedback, multi-step flows
-- [ ] **data-display.md** — Tables, cards, lists, empty states, loading skeletons
 - [ ] **navigation.md** — Sidebar, breadcrumbs, tabs, mobile nav
-- [ ] **anti-patterns.md** — UI/UX mistakes (layout shift, poor contrast, missing feedback)
+- [ ] **anti-patterns.md** — Layout shift, poor contrast, missing feedback

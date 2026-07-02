@@ -1,4 +1,4 @@
-## 1. Concurrency & Double-Booking Prevention
+## Concurrency & Double-Booking Prevention
 
 ### Two-Phase Reservation
 

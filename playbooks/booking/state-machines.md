@@ -1,4 +1,4 @@
-## 2. State Machine Design
+## State Machine Design
 
 ### Never Use Boolean Flags for Status
 

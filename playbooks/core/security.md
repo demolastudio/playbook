@@ -1,4 +1,4 @@
-## 11. Security
+## Security
 
 ### BOLA Prevention (OWASP #1 Risk)
 

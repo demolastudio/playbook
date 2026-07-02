@@ -1,6 +1,8 @@
 # Dashboard Playbook — Index
 
-> Patterns for building admin panels and data dashboards.
+> Patterns for building admin panels and data dashboards — the *functionality*
+> (pagination, RBAC, exports). For dashboard *design* (layout anatomy, tables,
+> density, states), read `ui-ux/dashboards.md` — that chapter is written.
 > For general patterns (database, auth, security, etc.), see `core/INDEX.md`.
 >
 > **Status:** Outline only. Chapters to be written.

@@ -1,4 +1,4 @@
-## 22. File Uploads
+## File Uploads
 
 > **Sources:** [OWASP File Upload Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html),
 > [Vercel Blob docs](https://vercel.com/docs/storage/vercel-blob),

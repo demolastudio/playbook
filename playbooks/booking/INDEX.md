@@ -18,7 +18,9 @@ recurring services, cancellation policies, and booking-specific payment flows.
 | ---- | ------ | -------------------- |
 | [concurrency.md](./concurrency.md) | Double-booking prevention, slot locking, GiST constraints | Preventing race conditions on slots/capacity |
 | [state-machines.md](./state-machines.md) | Booking/plan/visit lifecycle, transition maps | Managing booking status lifecycle |
-| [availability.md](./availability.md) | Slot generation, buffer time, capacity, calendar sync | Building the availability engine |
+| [availability.md](./availability.md) | Slot generation, buffer time, capacity, waitlists | Building the availability engine |
+| [rescheduling.md](./rescheduling.md) | Reschedule flow (not cancel+rebook), no-show prevention | Moving bookings, reducing no-shows |
+| [calendar-sync.md](./calendar-sync.md) | Google/Outlook/iCal sync, dedup, conflict resolution | Integrating external calendars |
 | [cancellation.md](./cancellation.md) | Time-based fees, grace periods, refund policies, timezone math | Implementing cancellation/refund logic |
 | [billing.md](./billing.md) | Deposit/balance model, post-service charging | Booking-specific payment flows |
 | [events.md](./events.md) | Booking fan-out, reserve→charge→confirm saga | Building booking side-effect workflows |
@@ -27,12 +29,5 @@ recurring services, cancellation policies, and booking-specific payment flows.
 
 ## Also Read (from Core)
 
-These core chapters are essential for any booking platform:
-
-| Core File | Why It's Relevant |
-| --------- | ----------------- |
-| `core/billing.md` | General Stripe integration (webhooks, dunning, idempotency) |
-| `core/idempotency.md` | Prevent duplicate charges, emails, and bookings |
-| `core/audit-trails.md` | Log every booking state change for dispute resolution |
-| `core/security.md` | Protect booking endpoints, rate limit submissions |
-| `core/database.md` | Prisma patterns, N+1 prevention for booking queries |
+Route through `core/INDEX.md` as usual — for booking platforms, `idempotency`,
+`billing`, `audit-trails`, `security`, and `database` are almost always relevant.

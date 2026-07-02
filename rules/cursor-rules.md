@@ -1,15 +1,12 @@
-# Cursor Global Rules (Copy-Paste)
+# Cursor Global Rules
 
-> Cursor has no file-based global config. Paste these into:
+> Cursor has no file-based global config. Paste the **numbered list from
+> [global-rules.md](./global-rules.md)** into:
 > **Cursor Settings → General → Rules for AI**
+>
+> That file is the single source of truth — this one is only the pointer.
+> Whenever `global-rules.md` changes, re-paste it into Cursor.
 
-```
-ALWAYS read .playbook/rules/ before writing any code.
-ALWAYS plan first. NEVER code without explicit approval.
-NEVER add comments to code.
-NEVER guess or assume. Research official docs when stuck.
-NEVER research or use anything older than 6 months. Check the current date.
-ALWAYS use kebab-case for file and folder names.
-ALWAYS split by concern: types/, schemas/, actions/, hooks/.
-NEVER make up preferences I did not state. Ask if unclear.
-```
+For project-level rules, `setup.sh` already converts the playbook workflows
+into `.cursor/rules/*.mdc` automatically, and Cursor reads the generated
+`AGENTS.md` natively.

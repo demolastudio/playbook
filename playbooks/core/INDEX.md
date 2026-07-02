@@ -5,7 +5,7 @@
 >
 > **For AI agents:** Read this file FIRST. Use the routing table below to find
 > the right reference for your current task. Do NOT read all files — only the
-> ones relevant to your task.
+> ones relevant to your task. Token discipline: INDEX + routed chapter(s) only.
 
 ## Core Principles
 

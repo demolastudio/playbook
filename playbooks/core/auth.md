@@ -1,4 +1,4 @@
-## 21. Auth & Authorization
+## Auth & Authorization
 
 > **Sources:** [Better Auth docs](https://www.better-auth.com/docs),
 > [Better Auth Next.js guide](https://www.better-auth.com/docs/integrations/next-js)
