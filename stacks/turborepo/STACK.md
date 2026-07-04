@@ -15,5 +15,5 @@
 ## Planned Sections
 
 - [ ] Package boundaries — what earns its own package vs. stays in an app
-- [ ] `checks.md` with turbo pipeline commands
+- [x] [checks.md](./checks.md) — turbo pipeline commands
 - [ ] Versioning/publishing conventions for internal packages

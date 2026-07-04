@@ -23,6 +23,7 @@ Before declaring done, confirm each of these against the actual diff:
 - [ ] Error, loading, and empty states are handled
 - [ ] No secrets or server-only values reach the client
 - [ ] State transitions that matter to the business are audit-logged
+- [ ] UI changes: verified at 375px width and desktop (see `playbooks/ui-ux/responsive.md`)
 
 ## Reporting
 

@@ -7,17 +7,7 @@
 
 ### Why Better Auth (2026)
 
-| Feature | Better Auth | Clerk | Auth.js v5 |
-| ------- | ----------- | ----- | ---------- |
-| **Self-hosted** | ✅ Full ownership | ❌ Managed | ✅ |
-| **TypeScript-first** | ✅ Full inference | ✅ | Partial |
-| **Database adapter** | ✅ Prisma, Drizzle | N/A (managed) | ✅ |
-| **CSRF built-in** | ✅ | ✅ | ✅ |
-| **Session in your DB** | ✅ | ❌ (their DB) | ✅ |
-| **Plugin ecosystem** | ✅ Rich | N/A | Limited |
-| **Free** | ✅ Open source | Paid at scale | ✅ |
-
-Better Auth is the recommended choice when you need full control over your data, schema, and infrastructure. Use Clerk if you need managed enterprise features (SSO, org management) and don't mind vendor lock-in.
+Self-hosted, TypeScript-first, sessions in your own database via the Prisma adapter, CSRF built-in, rich plugin ecosystem, open source. The recommended choice when the client owns their data and infrastructure — which is every custom SME platform. Managed providers (Clerk) only make sense when someone else's enterprise SSO requirements pay for the lock-in.
 
 ---
 
@@ -204,25 +194,6 @@ In 2025, a **middleware bypass vulnerability** was discovered in Next.js. An att
 
 ---
 
-### Token-Based Access (Client Portal)
+### Token-Based Access (No-Account Clients)
 
-For public-facing portals where clients don't create accounts:
-
-```typescript
-// Portal access uses opaque tokens, not sessions
-// Client clicks a link: /my/{portalToken}/plan
-
-export async function validatePortalToken(token: string) {
-  const client = await prisma.client.findUnique({
-    where: { portalToken: token },
-  })
-  if (!client) return null
-  return client
-}
-
-// Rules:
-// - Tokens are nanoid(21) — ~125 bits of entropy
-// - Never expose client database IDs in URLs
-// - Rate limit portal token lookups (see `core/security.md`)
-// - Tokens don't expire but can be rotated by the owner
-```
+For public-facing self-service where clients don't create accounts, use signed link tokens — **scoped to one purpose + one entity, stored hashed, expiring, revocable**. The full token design (scopes, TTLs, enumeration defense, guest-first checkout) lives in `playbooks/booking/customer-access.md`; the security rules (rate limiting lookups, uniform error responses) in `core/security.md`. Never use raw, non-expiring, database-stored tokens as long-lived credentials.

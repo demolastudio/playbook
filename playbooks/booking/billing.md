@@ -26,6 +26,7 @@ Most booking platforms split payment into two phases:
 #### Edge Cases
 
 - **Customer doesn't pay balance:** Send reminders at Day -7, Day -3, Day -1. If still unpaid at service time, decide: deliver and chase payment, or cancel with policy-based fee.
+- **Off-session charge fails with `authentication_required` (SCA):** The bank demands the customer authenticate. Don't retry blindly — send a login-free payment link so the customer completes authentication on-session.
 - **Balance paid but service cancelled:** Refund balance, keep deposit (or apply cancellation policy from `booking/cancellation.md`).
 - **Partial refunds:** After service, if quality issue — refund a % of the balance, never the deposit.
 

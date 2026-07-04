@@ -1,5 +1,5 @@
 ---
-description: Guided refactoring — explain why, show impact, verify tests
+description: Use when restructuring existing code without changing its behavior
 ---
 
 # Refactor
@@ -13,7 +13,7 @@ When triggered, follow this structured refactoring process.
 3. **Present the plan** — Show before/after for the key changes
 4. **Wait for approval** — Do NOT proceed without explicit go-ahead
 5. **Implement** — Make surgical changes only
-6. **Verify** — Run tests, confirm nothing broke
+6. **Verify** — Run the gates from `.playbook/rules/definition-of-done.md`; behavior must be unchanged
 
 ## Rules
 

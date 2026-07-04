@@ -37,15 +37,13 @@ Server Component (page)
 
 ### Data Access Layer (DAL)
 
-**All database access must go through a centralized Data Access Layer** — never call the database directly from components, actions, or route handlers.
+**All database access must go through a centralized Data Access Layer** — never call the database directly from components, actions, or route handlers. Folders split by concern, per `rules/project-structure.md`:
 
 ```
-features/
-  bookings/
-    dal.ts          → DB queries (the "service" layer)
-    schemas.ts      → Validation schemas (the "DTO" layer)
-    actions.ts      → Server actions (the "controller" layer)
-    components/     → UI components
+lib/bookings/       → DB queries + business logic (the DAL)
+schemas/            → Validation schemas
+actions/            → Server actions (thin: auth → validate → call DAL)
+components/         → UI components
 ```
 
 #### Why
@@ -120,11 +118,11 @@ Every route group needs:
 
 ### Server Action Return Pattern
 
-Standardize how server actions communicate results:
+Standardize how server actions communicate results — the canonical shape is `stacks/nextjs/templates/server-action.ts`:
 
 ```
-Success: { success: true, data: <result> }
-Failure: { success: false, errors: { fieldName: ["error message"] } }
+Success: { ok: true, data: <result> }
+Failure: { ok: false, error: <message>, issues?: <field errors> }
 ```
 
 - **Never throw from a server action** unless it's a redirect — thrown errors are harder to handle gracefully in the UI

@@ -62,34 +62,15 @@ logger.error({
 ### OpenTelemetry Integration
 
 ```typescript
-// instrumentation.ts (root of project)
-export async function register() {
-  if (process.env.NEXT_RUNTIME === "nodejs") {
-    // Initialise OTel SDK before app code runs
-    const { NodeSDK } = await import("@opentelemetry/sdk-node")
-    const { getNodeAutoInstrumentations } = await import(
-      "@opentelemetry/auto-instrumentations-node"
-    )
-
-    const sdk = new NodeSDK({
-      instrumentations: [getNodeAutoInstrumentations()],
-      // Export to Sentry, Jaeger, SigNoz, etc.
-    })
-
-    sdk.start()
-  }
-}
-```
-
-**Or with Vercel's zero-config package:**
-```typescript
-// instrumentation.ts
+// instrumentation.ts — Vercel zero-config (Next.js stack example)
 import { registerOTel } from "@vercel/otel"
 
 export function register() {
-  registerOTel({ serviceName: "greenleaf-web" })
+  registerOTel({ serviceName: "booking-web" })
 }
 ```
+
+Off Vercel: initialise `@opentelemetry/sdk-node` with auto-instrumentations in the same `instrumentation.ts` hook, exporting to Sentry/Jaeger/SigNoz.
 
 ---
 
@@ -196,8 +177,7 @@ export async function GET() {
 }
 ```
 
-> **Note:** On Neon free tier, avoid hitting `/api/health` too frequently — each call
-> wakes the database and consumes compute hours. Use a 5-minute interval, not 30 seconds.
+> **Note:** On serverless Postgres free tiers, poll health at 5-minute intervals — each call wakes the database and burns compute hours.
 
 ---
 
@@ -215,15 +195,6 @@ export async function GET() {
 
 ---
 
-### Cost-Conscious Monitoring (Free Tier Stack)
+### Cost-Conscious Monitoring
 
-| Service | Free Tier | Good Enough For |
-| ------- | --------- | --------------- |
-| **Sentry** | 5K errors/month | Error tracking + basic performance |
-| **Better Stack** | 5 monitors | Uptime checks from multiple regions |
-| **Vercel Analytics** | Included with Hobby | Web Vitals + basic traffic data |
-| **Vercel Logs** | 1 hour retention (Hobby) | Real-time debugging |
-
-> For demo/portfolio projects, the free tiers above are sufficient.
-> For production with paying clients, invest in Sentry Team ($26/mo) for longer retention
-> and alerting, plus Better Stack or Axiom for log retention.
+Free tiers (Sentry 5K errors/mo, Better Stack 5 monitors, Vercel Analytics on Hobby) cover demos and portfolios. Production with paying SME clients: paid Sentry for retention + alerting, plus Better Stack or Axiom for log retention — monitoring is part of what the client is paying for.

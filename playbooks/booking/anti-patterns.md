@@ -36,11 +36,11 @@ if (result === 0) throw new Error("Slot no longer available")
 // ❌ DON'T: Compare dates without timezone context
 const isLate = differenceInHours(booking.startTime, new Date()) < 24
 
-// ✅ DO: All comparisons in the business timezone
-import { utcToZonedTime } from "date-fns-tz"
+// ✅ DO: All comparisons in the business timezone (date-fns-tz v3 — formerly utcToZonedTime)
+import { toZonedTime } from "date-fns-tz"
 const BUSINESS_TZ = env.BUSINESS_TIMEZONE
-const now = utcToZonedTime(new Date(), BUSINESS_TZ)
-const start = utcToZonedTime(booking.startTime, BUSINESS_TZ)
+const now = toZonedTime(new Date(), BUSINESS_TZ)
+const start = toZonedTime(booking.startTime, BUSINESS_TZ)
 const isLate = differenceInHours(start, now) < 24
 ```
 
@@ -76,3 +76,52 @@ const handleBooking = async (formData: FormData) => {
 ```
 
 **Rule:** If a function touches shared state (slots, crew capacity, payment status), it needs a concurrency test.
+
+---
+
+### 5. Unbounded Visit Generation
+
+```
+❌ DON'T: Generate all visits for the plan's lifetime on creation
+   Weekly plan → 52+ rows/year, orphaned en masse on every plan change
+
+✅ DO: Rolling window (4–8 weeks) via background job,
+   unique constraint on (planId, occurrenceDate) so re-runs are idempotent
+```
+
+See `booking/recurring-services.md`.
+
+---
+
+### 6. Floating-Point Money
+
+```typescript
+// ❌ DON'T: price: 156.82  →  0.1 + 0.2 === 0.30000000000000004
+// ✅ DO: amountCents: 15682 (integer minor units) + explicit currency
+```
+
+Round once, at the final total. See `booking/pricing.md`.
+
+---
+
+### 7. Recomputing Price from Current Rates
+
+```
+❌ DON'T: charge = quote(service, attrs, ...) at charge time
+   Rates changed since booking → client charged more than they agreed to
+
+✅ DO: copy the line-item breakdown onto the booking at creation;
+   charge reads the stored snapshot, never the live rate table
+```
+
+---
+
+### 8. Reminders Without Idempotency
+
+```
+❌ DON'T: cron finds tomorrow's visits → sends reminders
+   Cron reruns after a crash → every client reminded twice
+
+✅ DO: email_log guard per side effect
+   key: reminder:24hr:{visitId} — check, send, record (see core/idempotency.md)
+```

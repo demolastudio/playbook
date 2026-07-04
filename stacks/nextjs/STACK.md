@@ -40,6 +40,10 @@ New code copies the matching template — same structure, same error handling, s
 | Transaction with idempotency | [templates/prisma-idempotent-transaction.ts](./templates/prisma-idempotent-transaction.ts) |
 | Validation schema | [templates/zod-schema.ts](./templates/zod-schema.ts) |
 
+## Performance
+
+Next.js-specific implementation of the core performance budgets (PPR, `use cache`, next/image, next/font, bundle analysis): [performance.md](./performance.md).
+
 ## Definition-of-Done Commands
 
 See [checks.md](./checks.md).

@@ -1,5 +1,5 @@
 ---
-description: Post-project knowledge capture for playbook improvement
+description: Use at the end of a project to capture learnings that improve the playbook
 ---
 
 # Learnings
@@ -9,7 +9,7 @@ When triggered, generate a `LEARNINGS.md` using the template at `.playbook/learn
 ## Process
 
 1. Read `.playbook/learnings-template.md` for the structure
-2. Review the project codebase and recent history
+2. Review the project codebase and recent history, plus `CONTEXT.md` and `docs/adr/` — reference recorded decisions, never restate them
 3. Fill in every section with specific, actionable insights
 4. Save as `LEARNINGS.md` in the project root
 

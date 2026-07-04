@@ -21,5 +21,5 @@ idempotency, audit everything) apply unchanged — only the tools differ.
 
 - [ ] Folder layout (`routers/`, `schemas/`, `services/`, `models/`, `core/`)
 - [ ] Dependency-injection conventions (auth, DB session per request)
-- [ ] `checks.md` with the gate commands above
+- [x] [checks.md](./checks.md) — gate commands
 - [ ] `templates/` — router endpoint, Pydantic schema, idempotent service function

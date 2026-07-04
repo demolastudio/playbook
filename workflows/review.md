@@ -1,43 +1,60 @@
 ---
-description: Review recent changes against playbook rules
+description: Use to review recent changes on two axes - playbook standards and the originating spec
 ---
 
 # Review
 
-When triggered, review the most recent changes against playbook rules.
+Review the diff on two independent axes. Code can pass every standard while implementing the wrong thing, and vice versa — never merge the axes, so one cannot mask the other.
 
 ## Process
 
-1. Read `.playbook/rules/` — all rule files
-2. Identify all recently changed files (check git diff or ask which files)
-3. Review each file against every applicable rule
-4. Run the automated gates from `.playbook/rules/definition-of-done.md` and include the results
+1. Identify the changed files (git diff, or ask which files)
+2. Read `.playbook/rules/` — all rule files
+3. Find the originating spec: a spec/PRD document, the issue, or the user's original request. If none exists, the Spec axis reports "no spec available" and is skipped.
+4. Run both axes. If your harness supports parallel sub-agents, run each axis in one and keep each report under 400 words; otherwise run them sequentially with the same word cap.
+5. Run the automated gates from `.playbook/rules/definition-of-done.md` and include the results.
 
-## What to Check
+## Axis 1: Standards
 
-### Code Style (code-style.md)
-- No comments in code
-- No duplicate logic — one source of truth
-- Code split by concern (types/, schemas/, actions/, hooks/)
-- No assumptions or guessed patterns
+Check the diff against every applicable rule:
 
-### Structure (project-structure.md)
-- Kebab-case for all file and folder names
-- Files are in the correct folders (types in types/, schemas in schemas/, etc.)
-- No feature-folder mixing
+- **Code style** — no comments, no duplicate logic (one source of truth), split by concern
+- **Structure** — kebab-case names, files in the correct folders, stack profile followed, templates used for new code
+- **Mistakes** — no suppression comments, no speculative features, no placeholder content, no refactoring of untouched code
 
-### Mistakes (mistakes.md)
-- No suppression comments
-- No speculative features
-- No placeholder content
-- No refactoring of untouched code
+Plus the smell baseline below — each is a judgment call ("possible feature envy"), never a hard violation; a documented project standard overrides it; skip anything tooling already enforces:
+
+| Smell | It is → fix |
+| ----- | ----------- |
+| Mysterious name | Name doesn't reveal purpose → rename; if no honest name comes, the design is murky |
+| Duplicated code | Same logic shape in two places → extract, call from both |
+| Feature envy | Method uses another module's data more than its own → move it there |
+| Data clumps | Same fields always travel together → bundle into one type |
+| Primitive obsession | String/number standing in for a domain concept → give it a type |
+| Repeated switches | Same if/switch cascade recurring → polymorphism or one shared map |
+| Shotgun surgery | One logical change scattered across many files → gather into one module |
+| Divergent change | One module edited for unrelated reasons → split by reason |
+| Speculative generality | Abstraction for needs the spec doesn't have → delete, inline back |
+| Message chains | Long a.b().c().d() navigation → hide behind one method |
+| Middle man | Module that mostly delegates → cut it, call the target |
+| Refused bequest | Implementer ignoring most of what it inherits → composition instead |
+
+## Axis 2: Spec
+
+Compare the diff against what was actually asked:
+
+- **Missing** — requirements asked for but absent or partial
+- **Scope creep** — behavior in the diff nobody asked for
+- **Wrong** — requirements that look implemented but whose implementation looks incorrect
+
+Quote the spec line (or the user's words) for each finding.
 
 ## Output
 
-Present as a list of issues, grouped by severity:
+Present `## Standards` and `## Spec` sections separately, then one line each: finding count and worst issue per axis. Never pick a single winner across axes. Group by severity within each axis:
 
-**🔴 Critical** — Must fix before commit
-**🟡 Warning** — Should fix
-**✅ Clean** — No issues
+**🔴 Critical** — must fix before commit
+**🟡 Warning** — should fix
+**✅ Clean** — no issues
 
-Include file path and line number for each issue.
+Include file path and line number for every finding.

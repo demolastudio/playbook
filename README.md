@@ -33,17 +33,23 @@ my-playbook/
 │
 ├── playbooks/                 ← Domain knowledge (stack-independent)
 │   ├── core/                  ← Universal patterns (18 chapters + INDEX.md)
-│   ├── booking/               ← Booking platform patterns (8 chapters)
-│   ├── ecommerce/             ← Outline
-│   ├── ui-ux/                 ← Outline
-│   └── dashboard/             ← Outline
+│   ├── booking/               ← Booking platform patterns (17 chapters — the specialty)
+│   ├── ui-ux/                 ← Design taste + anti-AI design, responsive, dashboards
+│   ├── dashboard/             ← Admin functionality: tables, CRUD, RBAC, exports
+│   └── ecommerce/             ← Outline
 │
-├── workflows/                 ← Slash commands / reusable workflows
+├── workflows/                 ← Slash commands (/flow is the router — start there)
+├── formats/                   ← Artifact templates: CONTEXT.md glossary, ADRs
 ├── recommended-skills.md      ← Package skills to install per project
 ├── learnings-template.md      ← Post-project knowledge capture template
+├── MAINTENANCE.md             ← Invariants for editing this repo
+├── CLAUDE.md                  ← Points agents editing this repo at MAINTENANCE.md
+├── out-of-scope.md            ← Rejected ideas, with reasons
 ├── setup.sh                   ← One-command install (detects the stack)
 └── README.md                  ← This file
 ```
+
+Projects grow two durable artifacts alongside the code: **`CONTEXT.md`** (the domain glossary — one concept, one word, used in all naming) and **`docs/adr/`** (one-paragraph decision records, gated by the three-question test). Both are built during `/spec` interviews; see `formats/`.
 
 ## How the Layers Fit
 
@@ -81,6 +87,53 @@ Installs `rules/global-rules.md` into:
 | **Cursor** | Manual — paste `rules/global-rules.md` into Settings → Rules for AI |
 
 Re-running pulls the latest playbook without overwriting your files.
+
+---
+
+## Day-to-Day Use
+
+Once a project is set up, you drive everything with slash commands. Forget which one? Type `/flow` — it's the map.
+
+### The main loop (every feature)
+
+| Step | You type / do | What happens |
+| ---- | ------------- | ------------ |
+| 1 | `/spec` + your idea | The agent interviews you until requirements are unambiguous — and builds `CONTEXT.md` + ADRs as terms and decisions get resolved |
+| 2 | Approve the plan | The agent must present a plan and wait (global rule 2) — read it, push back, then approve |
+| 3 | Let it build | Stack templates + rules govern the code; definition-of-done gates run before it claims "done" |
+| 4 | `/review` | Two-axis review: Standards (playbook rules + code smells) and Spec (did it build what you asked?) |
+| 5 | `/deploy-check` | Production-only checklist, before every deploy |
+| 6 | `/learnings` | End of project: generates `LEARNINGS.md` — you review it and fold the keepers back into this playbook |
+
+### When things come up
+
+| Situation | Type |
+| --------- | ---- |
+| Something is broken | `/debug` — it must reproduce the bug with a failing check before touching code |
+| Health check on an active project | `/audit` — run every few days |
+| Restructure without behavior change | `/refactor` |
+| Session getting long / switching tasks | `/handoff` — then start a fresh session and say "read HANDOFF.md" |
+| Not sure which of these | `/flow` |
+
+### Artifacts that appear in your projects
+
+- **`CONTEXT.md`** — the domain glossary. Commit it; it makes every future session cheaper and naming consistent.
+- **`docs/adr/`** — one-paragraph decision records. Commit them; they stop future sessions from "fixing" deliberate choices.
+- **`HANDOFF.md`** — session bridge. Transient; commit optional.
+- **`LEARNINGS.md`** — post-project. Review, harvest into the playbook, then delete.
+
+### Optional: hard enforcement
+
+Rules are probabilistic; hooks are not. When you want the definition-of-done gate physically enforced (the agent *cannot* finish with failing checks), copy the Stop hook from `stacks/nextjs/checks.md` into the project's `.claude/settings.json`. Recommended: run your first project without it to see how the prose rules perform, then add it.
+
+### Keeping things current
+
+| To update | Run |
+| --------- | --- |
+| The playbook copy inside a project | `cd .playbook && git pull` |
+| A project's `AGENTS.md` after playbook changes | `bash setup.sh /path/to/project --force` |
+| Global rules after editing `rules/global-rules.md` | `bash setup.sh --global` + re-paste into Cursor |
+| This repo itself | Read `MAINTENANCE.md` first; check `out-of-scope.md` before direction changes |
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: Security and performance audit of the current codebase
+description: Use for a periodic security and performance audit of the whole codebase
 ---
 
 # Audit

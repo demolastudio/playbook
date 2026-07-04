@@ -108,19 +108,11 @@ const payment = await stripe.paymentIntents.create({ amount: order.total })
 Centralising ALL logic into one service or one file makes every change high-risk.
 
 ```
-❌ DON'T:
-  lib/order-service.ts  →  2000 lines
-    - calculatePrice()
-    - checkInventory()
-    - createOrder()
-    - processPayment()
-    - sendConfirmation()
-    - handleReturn()
+❌ DON'T: lib/order-service.ts (2000 lines) — pricing, inventory,
+          payments, notifications, returns all in one file
 
 ✅ DO: Separate by domain
-  lib/pricing.ts         →  calculatePrice()
-  lib/inventory.ts       →  checkStock(), reserveItem()
-  lib/notifications.ts   →  sendConfirmation(), sendReceipt()
+  lib/pricing.ts / lib/inventory.ts / lib/notifications.ts
   actions/create-order.ts → orchestrates the above
 ```
 
@@ -131,27 +123,14 @@ Centralising ALL logic into one service or one file makes every change high-risk
 ### 6. Fetching Everything, Showing Little (N+1 & Over-Fetching)
 
 ```typescript
-// ❌ DON'T: Fetch full records when you only need 3 fields for a list view
+// ❌ DON'T: include everything for a list view showing name + status
 const users = await prisma.user.findMany({
-  include: {
-    orders: { include: { items: true, payments: true } },
-    addresses: true,
-    auditLogs: true,
-  },
+  include: { orders: { include: { items: true } }, addresses: true },
 })
-// Returns 50KB of JSON when the UI card only shows name + status
 
-// ✅ DO: Select only what the UI needs
+// ✅ DO: select only what the UI renders
 const users = await prisma.user.findMany({
-  select: {
-    id: true,
-    name: true,
-    orders: {
-      select: { status: true },
-      where: { status: "ACTIVE" },
-      take: 1,
-    },
-  },
+  select: { id: true, name: true, orders: { select: { status: true }, take: 1 } },
 })
 ```
 
@@ -170,16 +149,17 @@ export async function updateOrder(formData: FormData) {
 }
 
 // ✅ DO: Return structured results — the component handles UI feedback
+// (canonical shape: stacks/nextjs/templates/server-action.ts)
 export async function updateOrder(
   prevState: ActionResult<Order>,
   formData: FormData
 ): Promise<ActionResult<Order>> {
   "use server"
   const session = await requireAuth()
-  if (!session) return { success: false, errors: { _form: ["Unauthorized"] } }
+  if (!session) return { ok: false, error: "Unauthorized" }
 
   // ... business logic
-  return { success: true, data: updatedOrder }
+  return { ok: true, data: updatedOrder }
 }
 ```
 

@@ -58,10 +58,10 @@ export async function getUploadUrl(formData: FormData) {
 
   // Server-side validation — never trust the client
   if (!ALLOWED_TYPES.includes(fileType)) {
-    return { success: false, errors: { file: ["File type not allowed"] } }
+    return { ok: false, error: "File type not allowed" }
   }
   if (fileSize > MAX_SIZE) {
-    return { success: false, errors: { file: ["File too large (max 10MB)"] } }
+    return { ok: false, error: "File too large (max 10MB)" }
   }
 
   // Generate a unique key — never use the original filename
@@ -77,7 +77,7 @@ export async function getUploadUrl(formData: FormData) {
 
   const url = await getSignedUrl(s3, command, { expiresIn: 300 }) // 5 min TTL
 
-  return { success: true, data: { url, key } }
+  return { ok: true, data: { url, key } }
 }
 ```
 
@@ -95,7 +95,7 @@ export async function uploadFile(file: File) {
   formData.set("fileSize", String(file.size))
   const result = await getUploadUrl(formData)
 
-  if (!result.success) throw new Error("Upload validation failed")
+  if (!result.ok) throw new Error("Upload validation failed")
 
   // 2. Upload directly to S3 — bypasses the Next.js server entirely
   await fetch(result.data.url, {
@@ -111,32 +111,6 @@ export async function uploadFile(file: File) {
     size: file.size,
     type: file.type,
   })
-}
-```
-
----
-
-### Implementation: Vercel Blob (Simpler)
-
-```typescript
-// actions/upload.ts
-"use server"
-import { put } from "@vercel/blob"
-import { requireSession } from "@/lib/dal"
-
-export async function uploadToBlob(formData: FormData) {
-  const session = await requireSession()
-  const file = formData.get("file") as File
-
-  if (!file || file.size > 10 * 1024 * 1024) {
-    return { success: false, errors: { file: ["Invalid file"] } }
-  }
-
-  const blob = await put(`uploads/${session.user.id}/${file.name}`, file, {
-    access: "public",  // or "private" for sensitive docs
-  })
-
-  return { success: true, data: { url: blob.url } }
 }
 ```
 
@@ -162,22 +136,7 @@ export async function uploadToBlob(formData: FormData) {
 
 ### File Validation: Two Layers
 
-```typescript
-// Client-side — instant UX feedback
-const validateFile = (file: File): string | null => {
-  const ALLOWED = ["image/jpeg", "image/png", "image/webp", "application/pdf"]
-  const MAX_MB = 10
-
-  if (!ALLOWED.includes(file.type)) return "File type not allowed"
-  if (file.size > MAX_MB * 1024 * 1024) return `File too large (max ${MAX_MB}MB)`
-  return null
-}
-
-// Server-side — security (NEVER skip this even if client validates)
-// See the Server Action above — re-validates type + size before generating URL
-```
-
-**Why both?** The client validation gives instant feedback. But the server validation is the security layer — a malicious client can bypass any client-side check.
+Client-side checks (type + size before upload starts) are UX. The Server Action re-validating before generating any URL is the security layer — a malicious client bypasses any client-side check. Same three-layer principle as `core/security.md` input validation.
 
 ---
 

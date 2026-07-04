@@ -1,243 +1,64 @@
 ## Performance Budgets
 
 > **Source:** [web.dev — Core Web Vitals](https://web.dev/articles/vitals)
-> Google uses the **75th percentile** of real-user data (CrUX) for ranking.
-> Always prioritise **field data** (CrUX) over lab/Lighthouse scores.
+> Google ranks on the **75th percentile** of real-user data (CrUX).
+> Always prioritise **field data** over lab/Lighthouse scores.
+> Framework-specific implementation (PPR, `use cache`, next/image, next/font):
+> see `stacks/nextjs/performance.md`.
 
 ---
 
-### Core Web Vitals 2026 Thresholds
+### Core Web Vitals Thresholds
 
-| Metric                              | Measures         | Good    | Needs Work | Poor    |
-| ----------------------------------- | ---------------- | ------- | ---------- | ------- |
-| **LCP** (Largest Contentful Paint)  | Loading speed    | ≤ 2.5s  | ≤ 4.0s     | > 4.0s  |
-| **INP** (Interaction to Next Paint) | Responsiveness   | ≤ 200ms | ≤ 500ms    | > 500ms |
-| **CLS** (Cumulative Layout Shift)   | Visual stability | ≤ 0.1   | ≤ 0.25     | > 0.25  |
+| Metric | Measures | Good | Needs Work | Poor |
+| ------ | -------- | ---- | ---------- | ---- |
+| **LCP** (Largest Contentful Paint) | Loading speed | ≤ 2.5s | ≤ 4.0s | > 4.0s |
+| **INP** (Interaction to Next Paint) | Responsiveness | ≤ 200ms | ≤ 500ms | > 500ms |
+| **CLS** (Cumulative Layout Shift) | Visual stability | ≤ 0.1 | ≤ 0.25 | > 0.25 |
 
-> **INP replaced FID in March 2024.** INP measures ALL interactions (not just the first),
-> making it a much stricter test. If you pass INP, you're genuinely responsive.
+> **INP replaced FID in March 2024.** It measures ALL interactions, not just the first — if you pass INP, you're genuinely responsive.
 
 ---
 
 ### Resource Budgets
 
-| Resource                | Budget                        | Why                                                |
-| ----------------------- | ----------------------------- | -------------------------------------------------- |
-| **Total JS**            | < 170 KB compressed           | #1 cause of poor INP — main thread blocking        |
-| **Total Images**        | < 1000 KB per page            | Use WebP/AVIF + `next/image` for auto-optimization |
-| **Fonts**               | ≤ 2 font families             | Use `next/font` for zero-CLS font loading          |
-| **Third-party scripts** | Defer everything non-critical | Chat widgets, analytics → load after LCP           |
+| Resource | Budget | Why |
+| -------- | ------ | --- |
+| **Total JS** | < 170 KB compressed per route | #1 cause of poor INP — main-thread blocking |
+| **Total images** | < 1000 KB per page | Serve AVIF/WebP via the framework's image component |
+| **Fonts** | ≤ 2 families, self-hosted, metrics-adjusted fallback | Third-party font requests cost LCP and CLS |
+| **Third-party scripts** | Defer everything non-critical | Chat widgets, analytics → load after LCP |
 
 ---
 
-### Next.js 16 Performance Architecture
+### Principles (Any Framework)
 
-#### Partial Prerendering (PPR)
-The single biggest performance feature in Next.js 16. Combines static and dynamic rendering in one route:
-
-1. **Build time:** Next.js generates a static "shell" (header, nav, layout) as HTML
-2. **Request time:** Dynamic content wrapped in `<Suspense>` streams in parallel
-3. **Result:** Instant TTFB + progressive loading of personalised content
-
-```typescript
-// Dashboard page using PPR
-export default async function DashboardPage() {
-  return (
-    <div>
-      {/* Static shell — served instantly from edge */}
-      <h1>Dashboard</h1>
-      <nav><DashboardNav /></nav>
-
-      {/* Dynamic — streams in after initial paint */}
-      <Suspense fallback={<KPICardsSkeleton />}>
-        <KPICards />  {/* Server Component that reads cookies + queries DB */}
-      </Suspense>
-
-      <Suspense fallback={<ScheduleTableSkeleton />}>
-        <TodaySchedule />
-      </Suspense>
-    </div>
-  )
-}
-```
-
-#### Turbopack (Default Bundler)
-- 2–5x faster production builds vs webpack
-- Up to 10x faster Fast Refresh in development
-- File-system caching eliminates redundant work across builds
-- No configuration needed — it's the default in Next.js 16
-
-#### `use cache` Directive
-Replaces the legacy `unstable_cache` and implicit caching. Explicit, fine-grained control:
-
-```typescript
-async function getServicePricing() {
-  "use cache"
-  // This result is cached until manually revalidated
-  return prisma.pricingTier.findMany({ include: { serviceType: true } })
-}
-```
+- **The LCP element loads first.** Hero image/heading is preloaded, never lazy-loaded; everything below the fold is lazy.
+- **Reserve space for everything dynamic.** Explicit dimensions on images, slots, and widgets — CLS is a layout discipline, not a tuning task.
+- **Static shell, streamed data.** Serve the static frame instantly; stream personalised content into placeholders (skeletons match the real layout — see `ui-ux/dashboards.md`).
+- **Heavy widgets load on interaction.** Date pickers, charts, maps: don't ship their JS until the user reaches for them.
+- **Cache aggressively, invalidate on mutation.** Slow-changing data (pricing, settings) is served cached; every mutation invalidates its own cache keys.
+- **Watch the client bundle.** Server-only libraries (ORM, secrets) must never reach the browser; import narrowly, never whole libraries for one function.
 
 ---
 
-### Image Optimization (`next/image`)
+### Booking-Specific Rules
 
-#### Configuration
-```typescript
-// next.config.ts
-const nextConfig = {
-  images: {
-    formats: ['image/avif', 'image/webp'],  // Prefer AVIF (40% smaller than WebP)
-  },
-}
-```
-
-#### Rules
-
-| Scenario | Props | Why |
-| -------- | ----- | --- |
-| **Hero / LCP image** | `priority` | Preloads the image — do NOT lazy load |
-| **Below the fold** | `loading="lazy"` (default) | Defers download until near viewport |
-| **All images** | `width` + `height` or static import | Prevents CLS — required |
-| **Responsive** | `sizes="(max-width: 768px) 100vw, 50vw"` | Avoids downloading oversized images |
-
-```tsx
-// Hero image — preloaded for LCP
-<Image
-  src="/hero-clean-home.jpg"
-  alt="Sparkling clean living room"
-  width={1200}
-  height={600}
-  priority          // ← Preloads — critical for LCP
-  sizes="100vw"
-/>
-
-// Team member photo — lazy loaded
-<Image
-  src={cleaner.photoUrl}
-  alt={`${cleaner.name}, Greenleaf cleaner`}
-  width={80}
-  height={80}
-  className="rounded-full"
-  // loading="lazy" is the default — no need to specify
-/>
-```
+1. **Hero + booking CTA interactive within 2.5s** — the CTA is in the initial viewport.
+2. **Slot containers have fixed dimensions** — the calendar must not jump as availability loads.
+3. **Instant quote must feel instant** — < 200ms perceived: cache rate tables, show a calculating state, snap to the result.
+4. **Skeletons everywhere** — every route ships a content-aware loading state, never a bare spinner.
 
 ---
 
-### Font Loading (`next/font`)
-
-Zero-CLS font loading with automatic self-hosting:
-
-```typescript
-// app/layout.tsx
-import { Inter } from "next/font/google"
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",       // Show fallback immediately, swap when loaded
-  variable: "--font-inter",
-})
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" className={inter.variable}>
-      <body>{children}</body>
-    </html>
-  )
-}
-```
-
-**What `next/font` does automatically:**
-- Downloads font files at build time → self-hosts them (no Google Fonts request at runtime)
-- Applies `size-adjust` to match fallback font metrics → virtually zero CLS
-- Generates CSS `@font-face` declarations with optimal settings
-
-**Rules:**
-- Use **variable fonts** when available (one file covers all weights)
-- Limit to **≤ 2 font families** per site
-- Use `display: "swap"` — text is visible immediately with fallback font
-- Never load fonts via `<link>` tags to Google Fonts — use `next/font` instead
-
----
-
-### Prefetching & Navigation
-
-Next.js automatically prefetches linked routes when `<Link>` components enter the viewport:
-
-```tsx
-import Link from "next/link"
-
-// ✅ Automatically prefetched when visible in viewport
-<Link href="/book">Book a Clean</Link>
-
-// ✅ Disable prefetch for low-priority links (e.g., footer links)
-<Link href="/privacy" prefetch={false}>Privacy Policy</Link>
-```
-
----
-
-### Bundle Size Analysis
-
-```bash
-# Turbopack-based analysis
-npx next experimental-analyze
-
-# Or use the classic bundle analyzer
-pnpm add -D @next/bundle-analyzer
-```
-
-**What to look for:**
-- Client components importing server-only libraries (e.g., Prisma leaking to client bundle)
-- Full library imports instead of modular (`import _ from "lodash"` vs `import debounce from "lodash/debounce"`)
-- Heavy client-side chart libraries — use `next/dynamic` to lazy load them
-
-```typescript
-// Lazy load a heavy chart component — only sent to client when rendered
-import dynamic from "next/dynamic"
-
-const RevenueChart = dynamic(() => import("@/components/dashboard/revenue-chart"), {
-  loading: () => <ChartSkeleton />,
-  ssr: false,  // Don't server-render the chart — it needs browser APIs
-})
-```
-
----
-
-### Booking-Specific Performance Rules
-
-1. **Hero + CTA load first.** The booking button must be in the initial viewport and interactive within 2.5s.
-2. **Reserve space for dynamic UI.** Always set `width` + `height` on images and time slot containers to prevent CLS.
-3. **Calendar widgets: lazy load.** Don't ship the date picker JS until the user interacts with the date field. Use `next/dynamic` or a `<Suspense>` boundary.
-4. **Skeleton loading everywhere.** Every route must have a `loading.tsx` with content-aware skeletons, not generic spinners.
-5. **Instant quote must feel instant.** < 200ms perceived response time. Use Redis cache + optimistic UI (show calculating state, then snap to result).
-
----
-
-### CI/CD Performance Enforcement
-
-```typescript
-// next.config.ts — fail build on bundle size regression
-const nextConfig = {
-  experimental: {
-    outputFileTracingIncludes: { "/**": ["./node_modules/**"] },
-  },
-}
-```
-
-**Manual checks per PR:**
-- Run Lighthouse CI → compare against budgets
-- Block merges that regress LCP or INP past thresholds
-- Monitor `next build` output for "First Load JS" per route — flag any route > 170KB
-
----
-
-### Performance Testing Matrix
+### Enforcement
 
 | Test | Tool | Frequency | Pass Criteria |
 | ---- | ---- | --------- | ------------- |
-| **Build size** | `next build` output | Every PR | No route > 170KB First Load JS |
+| **Build size** | Framework build output | Every PR | No route > 170KB first-load JS |
 | **Lighthouse** | Lighthouse CI | Every PR | Score ≥ 90 on public pages |
-| **CWV (lab)** | Chrome DevTools Performance tab | Weekly | LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1 |
-| **CWV (field)** | CrUX / PageSpeed Insights | Monthly | 75th percentile in "Good" range |
-| **Bundle analysis** | `next experimental-analyze` | Monthly | No unexpected library in client bundle |
+| **CWV (lab)** | DevTools performance panel | Weekly | LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1 |
+| **CWV (field)** | CrUX / PageSpeed Insights | Monthly | 75th percentile "Good" |
+| **Bundle analysis** | Framework analyzer | Monthly | No unexpected library client-side |
+
+Block merges that regress LCP or INP past thresholds — performance is a definition-of-done concern for public pages, not a launch-week scramble.

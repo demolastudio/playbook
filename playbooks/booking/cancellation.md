@@ -42,11 +42,11 @@ Always calculate cancellation deadlines in the **business timezone**, not UTC:
 // ❌ DON'T: Compare in UTC — can be off by a day
 const isLate = differenceInHours(booking.startTime, new Date()) < 48
 
-// ✅ DO: Compare in the business timezone
-import { utcToZonedTime } from "date-fns-tz"
+// ✅ DO: Compare in the business timezone (date-fns-tz v3 — formerly utcToZonedTime)
+import { toZonedTime } from "date-fns-tz"
 const BUSINESS_TZ = env.BUSINESS_TIMEZONE
-const now = utcToZonedTime(new Date(), BUSINESS_TZ)
-const start = utcToZonedTime(booking.startTime, BUSINESS_TZ)
+const now = toZonedTime(new Date(), BUSINESS_TZ)
+const start = toZonedTime(booking.startTime, BUSINESS_TZ)
 const isLate = differenceInHours(start, now) < 48
 ```
 

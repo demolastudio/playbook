@@ -1,20 +1,23 @@
 # Dashboard Playbook — Index
 
-> Patterns for building admin panels and data dashboards — the *functionality*
-> (pagination, RBAC, exports). For dashboard *design* (layout anatomy, tables,
-> density, states), read `ui-ux/dashboards.md` — that chapter is written.
-> For general patterns (database, auth, security, etc.), see `core/INDEX.md`.
+> Admin panel *functionality* — data flow, permissions, exports. Dashboard
+> *design* (layout anatomy, tables' visual rules, density, states) is
+> `ui-ux/dashboards.md`; read both when building admin UIs.
+> For general patterns (database, auth, security), see `core/INDEX.md`.
 >
-> **Status:** Outline only. Chapters to be written.
+> **For AI agents:** Read this INDEX, then ONLY the routed chapter for your task.
+
+## Routing Table
+
+| File | Covers | Read when you are... |
+| ---- | ------ | -------------------- |
+| [data-tables.md](./data-tables.md) | Server-side pagination/sort/filter, URL state, search | Building any admin list view |
+| [crud.md](./crud.md) | Forms, stale-edit guards, optimistic UI, destructive actions | Building create/edit/delete flows |
+| [rbac.md](./rbac.md) | Owner/Manager/Staff roles, DAL enforcement, row scoping | Adding roles or permission checks |
+| [exports.md](./exports.md) | CSV pipeline, formula-injection safety, reports | Building exports or reports |
 
 ## Planned Chapters
 
-- [ ] **data-tables.md** — Server-side pagination, sorting, filtering, column visibility
-- [ ] **charts.md** — Chart library selection, real-time data, responsive charts
-- [ ] **filters.md** — Filter bar patterns, URL-driven state, search + facets
-- [ ] **rbac.md** — Dashboard-specific RBAC patterns, permission gates, role UI
-- [ ] **crud.md** — CRUD page patterns, inline editing, bulk actions, optimistic updates
-- [ ] **layout.md** — Sidebar navigation, breadcrumbs, collapsible panels, responsive admin
-- [ ] **notifications.md** — Toast system, in-app notifications, alert banners
-- [ ] **exports.md** — CSV/PDF export, report generation, scheduled reports
-- [ ] **anti-patterns.md** — Dashboard mistakes (over-fetching, missing loading states, client-side filtering)
+- [ ] **charts.md** — Chart data endpoints, aggregation queries, real-time updates
+- [ ] **notifications.md** — Toast system, in-app notification feed
+- [ ] **anti-patterns.md** — Dashboard mistakes (client-side filtering, over-fetching)

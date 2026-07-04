@@ -18,7 +18,9 @@
 ### Decisions Made and Why
 
 <!-- List key technical decisions and the reasoning behind them.
-     These might become rules or playbook entries. -->
+     Decisions already recorded in docs/adr/ or CONTEXT.md: reference them,
+     don't restate. Anything ADR-worthy that ISN'T recorded yet is itself
+     a finding — record it now (see .playbook/formats/adr.md). -->
 
 1.
 
@@ -37,9 +39,14 @@
 
 ### Suggested Playbook Updates
 
-<!-- Based on the above, what should be added or changed in the playbook? -->
+<!-- Based on the above, what should be added or changed in the playbook?
+     Route each lesson to its ONE home (see MAINTENANCE.md):
+     universal → rules/ or playbooks/core/; stack-specific → stacks/<stack>/;
+     domain → playbooks/<domain>/; recurring AI mistake → rules/mistakes.md
+     as a don't → instead pair; rejected idea → out-of-scope.md with reasons. -->
 
-- [ ] Add to `rules/`:
-- [ ] Add to `playbooks/core/`:
-- [ ] Add to `playbooks/booking/`:
-- [ ] New anti-pattern:
+- [ ] Add to `rules/` or `playbooks/core/`:
+- [ ] Add to `stacks/<stack>/` (conventions, checks, templates):
+- [ ] Add to `playbooks/<domain>/` (booking, dashboard, ui-ux):
+- [ ] New anti-pattern (don't → instead):
+- [ ] Add to `out-of-scope.md` (tried and rejected):

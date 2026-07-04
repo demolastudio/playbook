@@ -2,6 +2,7 @@
 
 > General quick-reference tables. Domain-specific cheat sheets
 > (e.g., booking state machines) live in their respective playbooks.
+> Stripe/HTTP tables are universal; Prisma/Next.js/Inngest tables are stack examples.
 
 Scan these, don't read them.
 

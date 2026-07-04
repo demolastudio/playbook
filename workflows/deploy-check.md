@@ -1,5 +1,5 @@
 ---
-description: Pre-deployment checklist before going to production
+description: Use before deploying to production to verify environment, database, and security requirements
 ---
 
 # Deploy Check

@@ -1,5 +1,5 @@
 ---
-description: Force requirements gathering before planning — prevent assumptions
+description: Use before planning any feature to gather requirements and resolve ambiguities by interview
 ---
 
 # Spec
@@ -8,11 +8,12 @@ When triggered, do NOT plan or write code. Instead, interview the user.
 
 ## Process
 
-1. Read the user's initial request
+1. Read the user's initial request (and `CONTEXT.md`, if the project has one)
 2. Identify ambiguities, missing requirements, and assumptions
 3. Ask clarifying questions — present them as a numbered list
 4. Wait for answers before proceeding
-5. After answers, produce a short spec document
+5. When an answer resolves a fuzzy or overloaded term, update `CONTEXT.md` inline per `.playbook/formats/context.md`; when a decision passes the three-question gate, offer an ADR per `.playbook/formats/adr.md`
+6. After answers, produce a short spec document
 
 ## Spec Document Structure
 

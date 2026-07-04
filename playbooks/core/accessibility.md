@@ -17,13 +17,12 @@ Use `<form>`, `<label>`, `<button>`, `<input>`, `<select>` — never repurpose `
 
 ### Booking Form Fundamentals
 
-| Principle                         | Rule                                                                                            |
-| --------------------------------- | ----------------------------------------------------------------------------------------------- |
-| **Semantic HTML first**           | Use `<form>`, `<label>`, `<button>`, `<input>`, `<select>` — never repurpose `<div>` as buttons |
-| **Every input needs a `<label>`** | Placeholders are NOT labels. Use `aria-describedby` for format hints.                           |
-| **Keyboard navigation**           | All fields reachable via `Tab` in logical order. Visible focus states required.                 |
-| **Error messages**                | Descriptive: "Please select a date after today" not "Invalid input"                             |
-| **Required fields**               | Don't rely on `*` alone. Use `aria-required="true"` or text labels like "(required)".           |
+| Principle                         | Rule                                                                                  |
+| --------------------------------- | ------------------------------------------------------------------------------------- |
+| **Every input needs a `<label>`** | Placeholders are NOT labels. Use `aria-describedby` for format hints.                 |
+| **Keyboard navigation**           | All fields reachable via `Tab` in logical order. Visible focus states required.       |
+| **Error messages**                | Descriptive: "Please select a date after today" not "Invalid input"                   |
+| **Required fields**               | Don't rely on `*` alone. Use `aria-required="true"` or text labels like "(required)". |
 
 ---
 
@@ -176,19 +175,9 @@ The "Skip to content" link must be the **first focusable element** on every page
 ```
 
 ```css
-.skip-link {
-  position: absolute;
-  left: -9999px;
-  z-index: 999;
-}
-.skip-link:focus {
-  left: 1rem;
-  top: 1rem;
-  padding: 0.5rem 1rem;
-  background: var(--color-primary);
-  color: white;
-  border-radius: 4px;
-}
+.skip-link { position: absolute; left: -9999px; z-index: 999; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.5rem 1rem;
+  background: var(--color-primary); color: white; }
 ```
 
 ---

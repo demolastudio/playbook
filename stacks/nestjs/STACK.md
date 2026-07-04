@@ -19,5 +19,5 @@ The global rules and core playbook principles apply unchanged — only the tools
 
 - [ ] Module organization (one module per domain, shared `common/`)
 - [ ] Guard/interceptor conventions for auth and audit logging
-- [ ] `checks.md` with gate commands
+- [x] [checks.md](./checks.md) — gate commands
 - [ ] `templates/` — controller, service with idempotent transaction, DTO

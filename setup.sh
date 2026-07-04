@@ -181,9 +181,10 @@ if [ ! -f "$AGENTS_FILE" ] || [ "$FORCE" = true ]; then
 ## Required Reading, in Order
 
 1. `.playbook/rules/` — global-rules, code-style, project-structure, mistakes, definition-of-done
+2. `CONTEXT.md` at the project root, if it exists — the domain glossary; use its exact terms in all naming
 EOF
 
-    step=2
+    step=3
     if [ ${#STACKS[@]} -gt 0 ]; then
       for stack in "${STACKS[@]}"; do
         echo "$step. \`.playbook/stacks/$stack/STACK.md\` — stack conventions, templates, and check commands"
@@ -199,6 +200,10 @@ EOF
     echo "$step. \`.playbook/recommended-skills.md\` — install any relevant package skills"
 
     cat << 'EOF'
+
+## Workflows
+
+`.playbook/workflows/flow.md` maps the available workflows (installed as slash commands) — consult it when unsure how to proceed.
 
 ## Completion Gate
 
