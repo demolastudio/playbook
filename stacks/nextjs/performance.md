@@ -8,7 +8,7 @@
 Static shell at build time, dynamic holes stream in per request:
 
 ```tsx
-export default async function DashboardPage() {
+const DashboardPage = async () => {
   return (
     <div>
       <h1>Dashboard</h1>
@@ -23,6 +23,8 @@ export default async function DashboardPage() {
     </div>
   )
 }
+
+export default DashboardPage
 ```
 
 ## Caching — `use cache`
@@ -30,7 +32,7 @@ export default async function DashboardPage() {
 Replaces legacy `unstable_cache` and implicit caching. Requires enabling Cache Components in `next.config.ts` (opt-in while the directive is pre-stable — check the bundled docs for the current flag). Explicit and fine-grained:
 
 ```ts
-async function getServicePricing() {
+const getServicePricing = async () => {
   "use cache"
   return prisma.pricingTier.findMany({ include: { serviceType: true } })
 }

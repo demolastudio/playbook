@@ -49,7 +49,7 @@ const s3 = new S3Client({ region: process.env.AWS_REGION })
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"]
 const MAX_SIZE = 10 * 1024 * 1024  // 10MB
 
-export async function getUploadUrl(formData: FormData) {
+export const getUploadUrl = async (formData: FormData) => {
   const session = await requireSession()
 
   const fileName = formData.get("fileName") as string
@@ -87,7 +87,7 @@ export async function getUploadUrl(formData: FormData) {
 // components/upload-button.tsx
 "use client"
 
-export async function uploadFile(file: File) {
+export const uploadFile = async (file: File) => {
   // 1. Get presigned URL from server
   const formData = new FormData()
   formData.set("fileName", file.name)

@@ -9,9 +9,9 @@ import { createBookingSchema } from "@/schemas/booking-schema";
 import type { ActionResult } from "@/types/action-result";
 import type { Booking } from "@/types/booking";
 
-export async function createBookingAction(
+export const createBookingAction = async (
   input: unknown,
-): Promise<ActionResult<Booking>> {
+): Promise<ActionResult<Booking>> => {
   const session = await requireSession();
 
   const parsed = createBookingSchema.safeParse(input);

@@ -34,6 +34,7 @@ These principles govern every section. Every feature, every file, every decision
 | [testing.md](./testing.md) | Vitest, Playwright, Prisma mocking | Writing tests, setting up CI |
 | [accessibility.md](./accessibility.md) | WCAG 2.2, ARIA rules | Building forms, ensuring compliance |
 | [performance.md](./performance.md) | Core Web Vitals, budgets, enforcement | Optimizing page speed (stack mechanics: `stacks/<stack>/`) |
+| [ci-cd.md](./ci-cd.md) | Gate layers: git hooks → CI → deploy, lifecycle scripts | Setting up hooks, pipelines, or pre* scripts |
 | [deployment.md](./deployment.md) | Env validation, security headers | Deploying to production |
 | [monitoring.md](./monitoring.md) | Pino, OTel, Sentry, SLOs | Setting up error tracking, alerts |
 | [file-uploads.md](./file-uploads.md) | Presigned URLs, security | Adding file/image uploads |

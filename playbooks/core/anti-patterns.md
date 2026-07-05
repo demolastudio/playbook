@@ -142,7 +142,7 @@ const users = await prisma.user.findMany({
 
 ```typescript
 // ❌ DON'T: Throw errors from Server Actions — Next.js shows a generic error page
-export async function updateOrder(formData: FormData) {
+export const updateOrder = async (formData: FormData) => {
   "use server"
   const session = await requireAuth()
   if (!session) throw new Error("Unauthorized") // User sees a blank error page
@@ -150,10 +150,10 @@ export async function updateOrder(formData: FormData) {
 
 // ✅ DO: Return structured results — the component handles UI feedback
 // (canonical shape: stacks/nextjs/templates/server-action.ts)
-export async function updateOrder(
+export const updateOrder = async (
   prevState: ActionResult<Order>,
   formData: FormData
-): Promise<ActionResult<Order>> {
+): Promise<ActionResult<Order>> => {
   "use server"
   const session = await requireAuth()
   if (!session) return { ok: false, error: "Unauthorized" }

@@ -5,7 +5,7 @@ import { stripe } from "@/lib/stripe";
 import { handleStripeEvent } from "@/lib/billing/handle-stripe-event";
 import { logger } from "@/lib/logger";
 
-export async function POST(request: Request) {
+export const POST = async (request: Request) => {
   const payload = await request.text();
   const signature = (await headers()).get("stripe-signature");
 

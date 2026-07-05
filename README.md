@@ -32,7 +32,7 @@ my-playbook/
 │   └── turborepo/             ← Outline (composes with app stacks)
 │
 ├── playbooks/                 ← Domain knowledge (stack-independent)
-│   ├── core/                  ← Universal patterns (18 chapters + INDEX.md)
+│   ├── core/                  ← Universal patterns (19 chapters + INDEX.md)
 │   ├── booking/               ← Booking platform patterns (17 chapters — the specialty)
 │   ├── ui-ux/                 ← Design taste + anti-AI design, responsive, dashboards
 │   ├── dashboard/             ← Admin functionality: tables, CRUD, RBAC, exports

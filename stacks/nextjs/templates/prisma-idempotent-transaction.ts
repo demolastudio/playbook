@@ -2,9 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { createStripeCharge } from "@/lib/stripe";
 import type { ChargeBookingInput, ChargeResult } from "@/types/billing";
 
-export async function chargeBookingOnce(
+export const chargeBookingOnce = async (
   input: ChargeBookingInput,
-): Promise<ChargeResult> {
+): Promise<ChargeResult> => {
   const idempotencyKey = `charge:booking:${input.bookingId}`;
 
   const existing = await prisma.idempotencyRecord.findUnique({

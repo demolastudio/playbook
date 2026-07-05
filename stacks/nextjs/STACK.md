@@ -22,6 +22,7 @@ components/               ← UI components
 
 ## Conventions
 
+- **Arrow functions everywhere** (`const fn = async () => {}`) — never `function` declarations. Components export via `const Page = () => ...; export default Page`. (Global rule 9; the templates model it.)
 - **Mutations are Server Actions.** Route handlers exist only for webhooks and endpoints external systems call.
 - **Every mutation follows the same pipeline:** Better Auth session check → Zod parse → single-source-of-truth business function in `lib/` → audit log → typed result. The canonical shape is [templates/server-action.ts](./templates/server-action.ts).
 - **Prisma stays in `lib/`.** No queries in components or actions — actions call business functions, business functions query.
@@ -43,6 +44,10 @@ New code copies the matching template — same structure, same error handling, s
 ## Performance
 
 Next.js-specific implementation of the core performance budgets (PPR, `use cache`, next/image, next/font, bundle analysis): [performance.md](./performance.md).
+
+## CI/CD
+
+Husky v9 hooks, `predev`/`prebuild` env assertion, and the GitHub Actions pipeline: [ci-cd.md](./ci-cd.md).
 
 ## Definition-of-Done Commands
 

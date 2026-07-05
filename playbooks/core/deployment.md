@@ -3,6 +3,7 @@
 > Sources: [Vercel Deployment Docs](https://vercel.com/docs/deployments),
 > [Next.js Security Headers](https://nextjs.org/docs/app/building-your-application/configuring/headers)
 > The principles are universal; code examples use the Next.js/Vercel stack.
+> The pipeline that runs BEFORE deploy (hooks, CI gates): [ci-cd.md](./ci-cd.md).
 
 ---
 
@@ -89,7 +90,7 @@ For production apps that handle payment data, add a CSP:
 import { NextRequest, NextResponse } from "next/server"
 import { nanoid } from "nanoid"
 
-export function middleware(request: NextRequest) {
+export const middleware = (request: NextRequest) => {
   const nonce = nanoid()
   const csp = [
     `default-src 'self'`,

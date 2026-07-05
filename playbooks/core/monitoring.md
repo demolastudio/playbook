@@ -65,7 +65,7 @@ logger.error({
 // instrumentation.ts — Vercel zero-config (Next.js stack example)
 import { registerOTel } from "@vercel/otel"
 
-export function register() {
+export const register = () => {
   registerOTel({ serviceName: "booking-web" })
 }
 ```
@@ -158,7 +158,7 @@ Instead of alerting on absolute thresholds, use **error budgets**:
 // app/api/health/route.ts
 import { prisma } from "@/lib/db"
 
-export async function GET() {
+export const GET = async () => {
   try {
     // Verify database connectivity
     await prisma.$queryRaw`SELECT 1`
