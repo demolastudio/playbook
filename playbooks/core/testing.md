@@ -41,7 +41,7 @@ Test **what** the function does, not **how** it does it. Implementation changes 
 
 #### Test at Seams
 
-A **seam** is the public boundary you test at — the interface, never the internals. Decide the seams under test before writing tests, so effort lands on critical paths instead of every private helper. And never write **tautological tests**: an assertion that recomputes the expected value the same way the code does passes by construction and can never disagree with the code — expected values come from a known-good literal or a worked example.
+A **seam** is the public boundary you test at — the interface, never the internals. Decide the seams under test before writing tests — ideally during `/spec`, where they're agreed with the user — so effort lands on critical paths instead of every private helper. And never write **tautological tests**: an assertion that recomputes the expected value the same way the code does passes by construction and can never disagree with the code — expected values come from a known-good literal or a worked example.
 
 #### Use Factories, Not Fixtures
 

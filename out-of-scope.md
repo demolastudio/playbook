@@ -23,6 +23,18 @@
 
 **Rejected (July 2026).** Git history is a sufficient changelog for a personal playbook consumed via `git pull`.
 
+## Wayfinder-style ticket-map planning
+
+**Rejected (July 2026).** mattpocock's wayfinder plans multi-session work as investigation tickets on an issue tracker — but it presupposes the issue-tracker machinery already declined above. `/handoff` + `/spec` cover the solo-developer version. Revisit together with the issue-tracker entry if collaborators arrive.
+
+## Fintech domain playbook
+
+**Deferred (July 2026).** The Horizon Credit Union project produced strong fintech patterns (client idempotency keys, atomic conditional debits, held-transfer reversal) — preserved in that project's own `docs/adr/`. A `playbooks/fintech/` outline waits on whether fintech becomes a recurring niche rather than a one-off.
+
+## UI-hint cookie pattern (non-httpOnly role cookie)
+
+**Deferred (July 2026).** Clever pattern from Horizon (static marketing pages + auth-aware header via `useSyncExternalStore`), but it's exactly the "clever option" the smallest-change rule warns about. Lives in that project's ADR-0004; promote to `stacks/nextjs/gotchas.md` only if a second project needs it.
+
 ## CONTEXT-MAP (multi-context glossaries)
 
 **Deferred (July 2026).** Solo projects have one bounded context. `formats/context.md` covers the single-context case; add the map format when a real monorepo needs two glossaries.

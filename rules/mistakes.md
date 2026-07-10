@@ -11,3 +11,5 @@
 - **Don't use suppression comments** (`# type: ignore`, `// @ts-expect-error`, `// eslint-disable`). Instead: fix the type at the source; if a library's types are wrong, wrap it once in a typed adapter.
 - **Don't trust training-data memory for framework APIs.** Instead: read the installed version's docs (e.g. `node_modules/next/dist/docs/`) or the official documentation site.
 - **Don't report "should work".** Instead: run the definition-of-done checks and report the actual output.
+- **Don't put auth checks in layouts or wrapper components.** Instead: optimistic cookie check in middleware/proxy, real session verification in the DAL on every data fetch — layouts don't re-render on client-side navigation, so a lapsed session sails through (official Next.js guidance: checks close to the data source).
+- **Don't reach for the clever or heavyweight option when a simpler one satisfies the request.** Instead: make the smallest change that works, name the trade-off, and let the user choose the upgrade.

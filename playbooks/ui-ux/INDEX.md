@@ -15,6 +15,7 @@
 - **Micro-animations** — Framer Motion for transitions, hover, loading. Subtle, fast (150–300ms).
 - **Spacing** — generous whitespace on marketing/public pages; controlled density on dashboards (see dashboards.md).
 - **shadcn/ui** — as component base. Customize the tokens, never ship raw defaults.
+- **Precedence** — this taste list and the project's `DESIGN.md` outrank any installed design skill's defaults (e.g. frontend-design's font bans). Skills execute the direction; they never choose it. See `recommended-skills.md`.
 
 ## Routing Table
 

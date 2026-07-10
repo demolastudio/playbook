@@ -60,6 +60,7 @@ At the start of every project, create a `DESIGN.md` in the project root. It is t
 - Extend the palette only via tints/shades of the locked hues — never new hues
 - New components use existing tokens; a new token requires updating DESIGN.md first
 - If DESIGN.md doesn't exist yet, ask the user for direction + motif before styling — never invent taste (see `rules/global-rules.md` rule 8)
+- Design-skill output (e.g. ui-ux-pro-max's MASTER.md) is *input* to DESIGN.md — merge what survives the taste filter; one lock per project (see `recommended-skills.md` precedence)
 
 ---
 

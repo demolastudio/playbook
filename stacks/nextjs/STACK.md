@@ -49,6 +49,10 @@ Next.js-specific implementation of the core performance budgets (PPR, `use cache
 
 Husky v9 hooks, `predev`/`prebuild` env assertion, and the GitHub Actions pipeline: [ci-cd.md](./ci-cd.md).
 
+## Gotchas
+
+Operational traps (non-interactive Prisma migrations, stale `.next`, React Compiler rules, Decimal serialization): [gotchas.md](./gotchas.md).
+
 ## Definition-of-Done Commands
 
 See [checks.md](./checks.md).

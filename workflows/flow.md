@@ -8,7 +8,7 @@ A map of the workflows and how they chain. Read the situation, route to the work
 
 ## The Main Flow: idea → shipped
 
-1. **/spec** — interview the user until requirements are unambiguous. Resolves fuzzy terms into `CONTEXT.md`, records qualifying decisions as ADRs.
+1. **/spec** — interview the user until requirements are unambiguous. Facts come from the codebase, decisions from the user; resolves fuzzy terms into `CONTEXT.md`, records qualifying decisions as ADRs, agrees the seams under test.
 2. **Plan** — present the implementation plan, wait for approval (global rule 2).
 3. **Implement** — build under the approved plan; the stack profile and templates govern the code.
 4. **/review** — two-axis review of the diff: Standards and Spec.
