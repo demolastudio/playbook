@@ -14,6 +14,7 @@
 - **Driver adapters are the default: `new PrismaClient()` requires an adapter** — for Postgres, `@prisma/adapter-pg` and `new PrismaClient({ adapter: new PrismaPg({ connectionString }) })`. The generated client's own doc comment shows the exact shape.
 
 - **`prisma migrate dev` refuses non-interactive environments** (agents, CI, some shells) — and an `--allow-non-interactive` flag doesn't exist. The workflow that works: hand-write the SQL under `prisma/migrations/<timestamp>_<name>/migration.sql` → `prisma migrate deploy` → `prisma generate`. `migrate deploy` is the officially supported non-interactive command.
+- **Prisma 7 renamed `migrate diff --to-schema-datamodel` → `--to-schema`**, and the CLI prints "Loaded Prisma config from prisma.config.ts." to stdout — it pollutes redirected SQL (`> migration.sql`); strip it (`sed -i '/^Loaded Prisma config/d'`) before `migrate deploy`.
 - **Schema edits need an explicit `prisma generate` before building.** `prebuild` runs `tsc` first, so a schema change surfaces as confusing stale-client type errors, not as "you forgot to generate."
 - **A running dev server holds the old generated client** after a column rename — writes fail with `ColumnNotFound` even on unrelated fields (Prisma returns the full row). Restart dev after schema changes.
 - **`Decimal` fields don't cross the Server→Client Component boundary.** Convert with `Number()` (or format server-side) before passing as props.
