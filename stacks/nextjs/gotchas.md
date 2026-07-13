@@ -21,6 +21,15 @@
 
 ## Next.js
 
+- **Next 16 renamed `middleware.ts` → `proxy.ts`** (middleware convention is
+  deprecated; the file exports a `proxy` function). Optimistic cookie checks
+  go there; the DAL stays the real guard. Build output lists it as
+  "ƒ Proxy (Middleware)".
+- **Killing a backgrounded `pnpm dev` by wrapper PID leaves a zombie
+  `next dev` child holding the port** — the next start silently moves to :3001
+  and requests to :3000 hit the stale process (phantom 500s, hot-reload
+  half-states). Kill with `pkill -f "next dev"` and verify the port is dead
+  before retesting.
 - **Stale `.next` after deleting or renaming a route:** the generated type validator still references the old file (`TS2307: Cannot find module`). Fix: `rm -rf .next`, rebuild. Applies to any route file move/delete.
 - **Auth never goes in layouts** — they don't re-render on client-side navigation, so a lapsed session passes unchecked. DAL is the boundary (`rules/mistakes.md`, official Next.js auth guide).
 
