@@ -50,6 +50,13 @@
 - **shadcn CLI init defaults to the base-nova preset (Base UI)** — `-b` now
   selects the component LIBRARY (base vs radix), not the base color. The
   `form` component is replaced by `field` under base-nova.
+- **base-nova components use Base UI's `render` prop, NOT Radix's `asChild`**
+  — `<SidebarMenuButton render={<Link href=... />}>children</...>`. Old
+  shadcn/Radix snippets with asChild fail typecheck.
+- **shadcn's stock `use-mobile` hook violates the React Compiler lint**
+  (`set-state-in-effect`) — rewrite with `useSyncExternalStore` over
+  `matchMedia` (subscribe + getSnapshot + getServerSnapshot returning false).
+  Expect other registry hooks to need the same treatment.
 
 ## React Compiler
 
