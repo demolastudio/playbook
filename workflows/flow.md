@@ -29,6 +29,7 @@ Situations that generate work, merging back into the main flow:
 ## Standalone
 
 - **/grill** also runs outside the main flow entirely — any idea that needs hardening, code or not. The brief it produces is the artifact; `/spec` is only the next step when the idea ships as software.
+- **/prototype** — a design question that needs throwaway code to answer (does this state model hold up? what should this page look like?). Feeds `/grill` or `/spec` with a verdict instead of a guess; the prototype itself never lands on main.
 
 ## Crossing Sessions
 

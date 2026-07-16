@@ -43,6 +43,10 @@ Test **what** the function does, not **how** it does it. Implementation changes 
 
 A **seam** is the public boundary you test at — the interface, never the internals. Decide the seams under test before writing tests — ideally during `/spec`, where they're agreed with the user — so effort lands on critical paths instead of every private helper. And never write **tautological tests**: an assertion that recomputes the expected value the same way the code does passes by construction and can never disagree with the code — expected values come from a known-good literal or a worked example.
 
+#### The Red → Green Loop
+
+When building test-first, work in **vertical slices**: one failing test → the minimum implementation that passes it → the next test, each slice responding to what the last one taught you. Never slice horizontally (all tests written up front, then all implementation) — bulk-written tests verify imagined behavior and commit to structure before the implementation teaches you anything. Watch the test fail before making it pass; a test that never went red proves nothing. Refactoring is a separate step after green — never mid-loop.
+
 #### Use Factories, Not Fixtures
 
 Generate test data dynamically instead of using static JSON or SQL fixtures:
@@ -169,5 +173,5 @@ This catches N+1 regressions before they reach production (see `core/database.md
 - **Test concurrency with parallel requests.** Single-threaded tests can't find race conditions.
 - **Freeze time in date-sensitive tests.** Non-deterministic tests are worse than no tests.
 - **Set query budgets.** Catch N+1 regressions before they reach production.
-- **Mock externals, never production services.** Tests should never charge real cards or send real emails.
+- **Mock at system boundaries only** (payment APIs, email, time, randomness) — never your own modules or internal collaborators, and never real production services.
 - **Edge case tests are mandatory** for time, concurrency, payment, and user behavior boundaries.

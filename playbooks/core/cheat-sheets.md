@@ -101,13 +101,14 @@ await prisma.$transaction(async (tx) => {
 ```typescript
 import { z } from "zod"
 
-// Common reusable schemas
-const emailSchema = z.string().email("Please enter a valid email")
+// Common reusable schemas — Zod 4: string formats are top-level
+// (z.string().email()/.url()/.uuid() and z.number().int() are deprecated)
+const emailSchema = z.email("Please enter a valid email")
 const phoneSchema = z.string().min(10, "Phone number too short")
-const priceSchema = z.number().int().positive() // Store in cents
+const priceSchema = z.int().positive() // Store in cents
 const dateSchema = z.coerce.date().min(new Date(), "Date must be in the future")
-const urlSchema = z.string().url("Please enter a valid URL")
-const uuidSchema = z.string().uuid("Invalid ID format")
+const urlSchema = z.url("Please enter a valid URL")
+const uuidSchema = z.uuid("Invalid ID format")
 
 // Reuse across client AND server
 export const ContactFormSchema = z.object({

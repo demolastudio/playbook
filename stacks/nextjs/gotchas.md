@@ -58,6 +58,12 @@
   `matchMedia` (subscribe + getSnapshot + getServerSnapshot returning false).
   Expect other registry hooks to need the same treatment.
 
+## Zod 4 (breaking vs v3 tutorial code — see zod.dev/v4/changelog)
+
+- **String formats are top-level functions**: `z.email()`, `z.url()`, `z.uuid()`, `z.cuid()` — the `z.string().email()` method forms are deprecated. Same for numbers: prefer `z.int()` over `z.number().int()` (which now also rejects unsafe integers).
+- **Error params unified under `error`**: `{ message: "..." }` is deprecated (`{ error: "..." }` in `.refine()` and friends); the plain-string shorthand `z.string().min(2, "Too short")` remains valid.
+- `.strict()`/`.passthrough()` are legacy — `z.strictObject()`/`z.looseObject()`; `.merge()` deprecated in favor of `.extend()`.
+
 ## React Compiler
 
 - **`setState` synchronously inside `useEffect` is rejected** (`set-state-in-effect` — cascading renders). For reading client-only values (cookies, `matchMedia`): `useSyncExternalStore`, which integrates synchronously with the render lifecycle.

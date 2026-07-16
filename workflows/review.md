@@ -8,7 +8,7 @@ Review the diff on two independent axes. Code can pass every standard while impl
 
 ## Process
 
-1. Identify the changed files (git diff, or ask which files)
+1. Pin the fixed point the review compares against — a commit, branch, or `main`; ask if unclear. Diff with `git diff <fixed-point>...HEAD` (three-dot: against the merge-base). Confirm the ref resolves and the diff is non-empty before reviewing anything
 2. Read `.playbook/rules/` — all rule files
 3. Find the originating spec: a spec/PRD document, the issue, or the user's original request. If none exists, the Spec axis reports "no spec available" and is skipped.
 4. Run both axes. If your harness supports parallel sub-agents, run each axis in one and keep each report under 400 words; otherwise run them sequentially with the same word cap.

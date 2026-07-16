@@ -10,7 +10,9 @@ A discipline for real bugs. The phases run in order — do NOT skip ahead.
 
 **This is the skill — everything after it is mechanical.** A tight loop is one command that goes red on THIS bug and green when it's fixed. With one, the bug is 90% solved; without one, no amount of reading code will save you.
 
-Ways to construct one, in rough order: a failing test at the nearest seam; a curl against the dev server; a CLI run diffed against known-good output; a headless browser script; replaying a captured payload through the code path in isolation.
+Ways to construct one, in rough order: a failing test at the nearest seam; a curl against the dev server; a CLI run diffed against known-good output; a headless browser script; replaying a captured payload through the code path in isolation; a bisection harness (`git bisect run`) when the bug appeared between two known states; a differential run (old version vs new, diff the outputs); a fuzz loop over random inputs when the symptom is "sometimes wrong".
+
+**Performance regressions:** logs are usually the wrong probe — establish a baseline measurement first (timing harness, profiler, query plan), then bisect. Measure before fixing.
 
 The loop is tight when ALL four hold:
 

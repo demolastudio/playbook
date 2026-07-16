@@ -30,7 +30,7 @@ gates already pass and adds production-only concerns. Read
 - [ ] No hardcoded localhost URLs
 
 ### Security
-- [ ] Rate-limiting middleware is configured (Next.js: Arcjet in `middleware.ts`)
+- [ ] Rate-limiting middleware is configured (Next.js 16: Arcjet in `proxy.ts`)
 - [ ] CSRF protection is active on all mutations
 - [ ] Session cookies have correct flags
 - [ ] CSP headers are configured

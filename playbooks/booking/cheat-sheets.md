@@ -58,11 +58,11 @@ import { z } from "zod"
 
 export const BookingFormSchema = z.object({
   name: z.string().min(2, "Name is required"),
-  email: z.string().email("Please enter a valid email"),
+  email: z.email("Please enter a valid email"),
   phone: z.string().min(10, "Phone number too short"),
   zip: z.string().regex(/^\d{5}$/, "Enter a 5-digit zip code"),
-  bedrooms: z.number().int().min(1).max(10),
-  bathrooms: z.number().int().min(1).max(10),
+  bedrooms: z.int().min(1).max(10),
+  bathrooms: z.int().min(1).max(10),
   frequency: z.enum(["ONE_TIME", "WEEKLY", "BI_WEEKLY", "MONTHLY"]),
   startDate: z.coerce.date().min(new Date(), "Date must be in the future"),
   specialRequests: z.string().max(500).optional(),

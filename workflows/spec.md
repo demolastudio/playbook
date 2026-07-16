@@ -15,7 +15,7 @@ When triggered, do NOT plan or write code. Instead, interview the user.
    - **Decisions** (what the product should do, trade-offs, preferences) — put each one to the user with your recommended answer, and wait. NEVER answer a decision yourself, even when running autonomously — an unanswered decision is a blocker, not a license
 4. Ask the decision questions — present them as a numbered list
 5. Wait for answers before proceeding
-6. When an answer resolves a fuzzy or overloaded term, update `CONTEXT.md` inline per `.playbook/formats/context.md`; when a decision passes the three-question gate, offer an ADR per `.playbook/formats/adr.md`
+6. When an answer resolves a fuzzy or overloaded term, update `CONTEXT.md` inline per `.playbook/formats/context.md`; when a decision passes the three-question gate, offer an ADR per `.playbook/formats/adr.md`. Work the glossary actively: challenge terms that conflict with `CONTEXT.md` ("the glossary defines cancellation as X — you seem to mean Y"), stress-test relationships with edge-case scenarios, and when the code contradicts what the user says, surface the contradiction instead of picking a side
 7. Sketch the **seams under test** — which public boundaries the tests will exercise (see `core/testing.md`). Prefer existing seams; place any new seam as high as possible; fewer is better. Confirm them with the user
 8. After answers, produce a short spec document
 

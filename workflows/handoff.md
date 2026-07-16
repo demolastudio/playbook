@@ -38,7 +38,7 @@ Explicit, actionable items for the next session. Be specific — file paths, fun
 2. Keep it concise — the next agent reads this first, token efficiency matters
 3. **Reference, don't duplicate.** Never restate what already lives in specs, ADRs, CONTEXT.md, commits, or diffs — link the path. Decisions that qualify as ADRs (see `.playbook/formats/adr.md`) go there, not here.
 4. Only include decisions that were explicitly made, not assumptions
-5. Next steps must be actionable, not vague ("implement X in Y file" not "continue working")
+5. Next steps must be actionable, not vague ("implement X in Y file" not "continue working") — and name the workflow the next session should start with when one fits (e.g. "/debug the failing webhook test", "/spec the reminder feature")
 6. Redact secrets and personal data — API keys, passwords, customer information
 7. Overwrite any existing HANDOFF.md
 

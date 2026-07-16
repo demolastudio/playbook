@@ -17,8 +17,8 @@ import { z } from "zod"
 
 const envSchema = z.object({
   // Database
-  DATABASE_URL:            z.string().url(),
-  DIRECT_DATABASE_URL:     z.string().url(),
+  DATABASE_URL:            z.url(),
+  DIRECT_DATABASE_URL:     z.url(),
 
   // Auth
   BETTER_AUTH_SECRET:      z.string().min(32),
@@ -32,7 +32,7 @@ const envSchema = z.object({
   RESEND_API_KEY:          z.string().min(1),
 
   // Redis
-  UPSTASH_REDIS_REST_URL:  z.string().url(),
+  UPSTASH_REDIS_REST_URL:  z.url(),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
 
   // Inngest
@@ -40,7 +40,7 @@ const envSchema = z.object({
   INNGEST_EVENT_KEY:       z.string().optional(),
 
   // App
-  NEXT_PUBLIC_APP_URL:     z.string().url(),
+  NEXT_PUBLIC_APP_URL:     z.url(),
 })
 
 export const env = envSchema.parse(process.env)
@@ -86,11 +86,11 @@ const nextConfig = {
 For production apps that handle payment data, add a CSP:
 
 ```typescript
-// proxy.ts (Next.js 16) or middleware.ts
+// proxy.ts (Next.js 16 — pre-16 projects: middleware.ts exporting `middleware`)
 import { NextRequest, NextResponse } from "next/server"
 import { nanoid } from "nanoid"
 
-export const middleware = (request: NextRequest) => {
+export const proxy = (request: NextRequest) => {
   const nonce = nanoid()
   const csp = [
     `default-src 'self'`,

@@ -80,7 +80,7 @@ Arcjet is a runtime security SDK that handles rate limiting, bot protection, and
 - **Shield** — WAF layer for SQL injection, XSS
 - **Prompt injection detection** — protects LLM endpoints
 - **<1ms latency** — decisions made locally via WebAssembly
-- Place in `middleware.ts` for app-wide protection
+- Place in the request-level middleware for app-wide protection (Next.js 16: `proxy.ts`)
 
 ---
 
