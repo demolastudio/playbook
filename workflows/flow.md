@@ -25,6 +25,7 @@ Situations that generate work, merging back into the main flow:
 - **Something is broken** → **/debug** — refuses to hypothesize until a tight feedback loop reproduces the bug.
 - **Periodic health check** → **/audit** — full security and performance sweep against playbook standards. Run every few days on active projects.
 - **Code needs restructuring without behavior change** → **/refactor**.
+- **A merge or rebase is stuck on conflicts** → **/merge-conflicts** — resolves by intent, never aborts.
 
 ## Standalone
 

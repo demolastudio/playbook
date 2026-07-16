@@ -13,7 +13,8 @@ Interview the user relentlessly about an idea until shared understanding is reac
 3. **Every question carries your recommended answer** — the user reacts faster than they generate.
 4. Facts vs decisions: if something can be looked up (a codebase, this playbook, online research), look it up — never ask. Decisions belong to the user — put each one to them and wait. NEVER answer a decision yourself.
 5. "I don't know yet" is a valid answer — park that branch in the brief's open questions; don't force it.
-6. **Stop-gate:** do NOT plan, spec, or build anything until the user confirms shared understanding has been reached.
+6. **Grilling inside a project: work the docs inline.** As terms and decisions crystallize, resolve fuzzy terms into `CONTEXT.md` and offer an ADR when a decision passes the three-question gate (`.playbook/formats/`) — the same discipline as /spec, so nothing resolved here is lost if /spec runs in a fresh session. Non-code sessions skip this.
+7. **Stop-gate:** do NOT plan, spec, or build anything until the user confirms shared understanding has been reached.
 
 ## Output: The Idea Brief
 
