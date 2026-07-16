@@ -8,6 +8,7 @@ A map of the workflows and how they chain. Read the situation, route to the work
 
 ## The Main Flow: idea → shipped
 
+0. **/grill** (when starting from a raw idea) — relentless one-question-at-a-time interview, each question carrying a recommended answer, until the idea hardens into a brief. Works for any fuzzy idea — feature, package, post, business move. Skip when the work is already well-defined.
 1. **/spec** — interview the user until requirements are unambiguous. Facts come from the codebase, decisions from the user; resolves fuzzy terms into `CONTEXT.md`, records qualifying decisions as ADRs, agrees the seams under test.
 2. **Plan** — present the implementation plan, wait for approval (global rule 2).
 3. **Implement** — build under the approved plan; the stack profile and templates govern the code.
@@ -24,6 +25,10 @@ Situations that generate work, merging back into the main flow:
 - **Something is broken** → **/debug** — refuses to hypothesize until a tight feedback loop reproduces the bug.
 - **Periodic health check** → **/audit** — full security and performance sweep against playbook standards. Run every few days on active projects.
 - **Code needs restructuring without behavior change** → **/refactor**.
+
+## Standalone
+
+- **/grill** also runs outside the main flow entirely — any idea that needs hardening, code or not. The brief it produces is the artifact; `/spec` is only the next step when the idea ships as software.
 
 ## Crossing Sessions
 

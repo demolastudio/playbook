@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# my-playbook setup script
+# playbook setup script (demolastudio/playbook)
 # Clones the playbook into .playbook/, detects the project stack,
 # and generates an AGENTS.md that all AGENTS.md-aware tools read.
 #
@@ -26,7 +26,7 @@ for arg in "$@"; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_URL="https://github.com/signordemola/my-playbook.git"
+REPO_URL="https://github.com/demolastudio/playbook.git"
 
 # ─── Helpers ───────────────────────────────────────────────────────
 
@@ -92,7 +92,7 @@ fi
 PROJECT_DIR="${PROJECT_DIR:-$(pwd)}"
 PLAYBOOK_DIR="$PROJECT_DIR/.playbook"
 
-echo "🔧 Setting up my-playbook in $PROJECT_DIR"
+echo "🔧 Setting up playbook in $PROJECT_DIR"
 
 if [ -d "$PLAYBOOK_DIR" ]; then
   echo "📦 Playbook already exists. Pulling latest..."

@@ -1,4 +1,4 @@
-# My Playbook
+# Playbook
 
 A reusable, AI-readable engineering playbook for building production-ready platforms.
 
@@ -11,7 +11,7 @@ Clone it into any project. Your AI agent reads the rules, follows the stack prof
 ## What's Inside
 
 ```
-my-playbook/
+playbook/
 ├── rules/                     ← Stack-agnostic rules (apply to EVERY project)
 │   ├── global-rules.md        ← The canonical rule list (single source of truth)
 │   ├── definition-of-done.md  ← Completion gates: typecheck, lint, tests, review checklist
@@ -66,7 +66,7 @@ The philosophy: **artifacts and gates over prose.** Templates the agent copies b
 ### Project setup
 
 ```bash
-bash /path/to/my-playbook/setup.sh /path/to/project
+bash /path/to/playbook/setup.sh /path/to/project
 ```
 
 This clones `.playbook/` into your project, detects the stack (`next` / `@nestjs/core` in package.json, `fastapi` in Python deps, `turbo.json`), installs workflows for Claude Code, Cursor, and Antigravity, and wires the rules into every tool's **always-loaded layer**:
@@ -82,7 +82,7 @@ Re-run `setup.sh` on a project any time — it's idempotent and refreshes everyt
 ### Global rules (all AI tools)
 
 ```bash
-bash /path/to/my-playbook/setup.sh --global
+bash /path/to/playbook/setup.sh --global
 ```
 
 Installs `rules/global-rules.md` into:
@@ -106,6 +106,7 @@ Once a project is set up, you drive everything with slash commands. Forget which
 
 | Step | You type / do | What happens |
 | ---- | ------------- | ------------ |
+| 0 | `/grill` + a raw idea | Relentless one-question-at-a-time interview, each with a recommended answer, until the idea hardens into a brief — for ANY fuzzy idea (feature, package, post, business move), before `/spec` or standalone |
 | 1 | `/spec` + your idea | The agent interviews you until requirements are unambiguous — and builds `CONTEXT.md` + ADRs as terms and decisions get resolved |
 | 2 | Approve the plan | The agent must present a plan and wait (global rule 2) — read it, push back, then approve |
 | 3 | Let it build | Stack templates + rules govern the code; definition-of-done gates run before it claims "done" |
