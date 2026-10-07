@@ -1,5 +1,5 @@
 ---
-description: Use when ending a session or forking to a fresh one and the next agent needs the context
+description: Use when work must travel to another session, harness, directory, or person and the next agent needs the context
 ---
 
 # Handoff
@@ -42,6 +42,6 @@ Explicit, actionable items for the next session. Be specific — file paths, fun
 6. Redact secrets and personal data — API keys, passwords, customer information
 7. Overwrite any existing HANDOFF.md
 
-## Handoff vs Compact
+## When to Hand Off
 
-Handoff **forks**: the next session starts fresh and reads HANDOFF.md. Compact (the harness built-in) **continues**: same conversation, summarized. Fork when the window is deep or the next task deserves clean context; compact only at natural phase breaks, never mid-phase.
+Only when something travels — a new harness, directory, or colleague, or a side task forked mid-phase. Otherwise continue, clear, send a subagent, or compact: the phase-boundary tree in `.playbook/workflows/flow.md` orders them.

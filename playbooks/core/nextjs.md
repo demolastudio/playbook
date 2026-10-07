@@ -15,7 +15,7 @@ Modern frameworks blur the boundary between frontend and backend. The patterns b
 | **CSRF** | Usually built-in (framework handles) | Must implement manually |
 | **HTTP method** | POST only (implicit) | Any HTTP method |
 
-**Rule:** Use server actions for user-initiated mutations. Use API routes for machine-to-machine communication.
+**Rule:** Use server actions for user-initiated mutations. Use API routes for machine-to-machine communication — and for reads a client-side component makes, since frameworks may serialize actions (Next.js dispatches them one at a time per client).
 
 ---
 
@@ -112,7 +112,7 @@ Every route group needs:
 | **Error boundary** | Catches thrown errors, prevents blank screen | Branded error message with retry button |
 | **Loading boundary** | Shows while async data is fetched | Skeleton or spinner (streaming UI) |
 
-**Never let the user see a blank white page or an unhandled error.**
+**Never let the user see a blank white page or an unhandled error.** A streamed response has already sent `200`: a not-found or redirect raised inside a loading boundary can't change the status. Check existence before the first boundary, or keep loading boundaries off routes that 404.
 
 ---
 

@@ -18,6 +18,8 @@ Before sending any email from your domain, configure these three records:
 
 **In 2026, Gmail and Yahoo require all three.** A monitoring-only DMARC policy (`p=none`) is the minimum — but move toward `p=quarantine` or `p=reject` as your setup matures.
 
+**Sending providers keep their records off the root.** Resend's SPF/MX sit on a `send.` subdomain and DKIM on `resend._domainkey`, so they coexist with Google Workspace or Zoho mail on the same domain — never replace the root MX to add a sender.
+
 ---
 
 ### Domain Separation
@@ -153,6 +155,8 @@ Email is one channel. Production booking systems need multi-channel delivery:
 - **Handle bounces automatically.** Hard bounces get suppressed immediately.
 - **Warm new domains gradually.** 10/day → 500/day over 3–4 weeks.
 - **Every email has an idempotency key.** Retries must not produce duplicate sends.
+- **Scope the API key:** sending-only, restricted to the sending domain — a leaked key can't read logs or send as other domains.
+- **Automated tests send to the provider's sink address** (Resend: `delivered@resend.dev`), never a real inbox. Background sends fail silently — verify a real send once in the provider's log and an actual inbox.
 - **Keep emails under 102KB.** Gmail clips larger emails — your CTA may be invisible.
 - **Always include a plain-text version.** HTML-only emails get flagged.
 - **Use a real reply-to address.** `hello@` not `no-reply@` — replies improve sender reputation.

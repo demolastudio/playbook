@@ -16,13 +16,15 @@ These principles govern every section. Every feature, every file, every decision
 3. **Never Trust the Client** — All inputs are re-validated server-side. All mutations are authenticated.
 4. **Audit Everything** — Every state transition, every charge, every permission change gets logged. Append-only.
 5. **Idempotency by Default** — Every side effect uses a business-derived idempotency key.
+6. **Money Is Integer Minor Units** — Never floats. The currency travels with every amount. Rounding happens once, in one named function.
 
 ## Routing Table
 
 | File | Covers | Read when you are... |
 | ---- | ------ | -------------------- |
-| [database.md](./database.md) | N+1, Prisma Extensions, Neon pooling | Writing queries, optimizing performance |
-| [security.md](./security.md) | BOLA, CSRF, rate limiting, CSP | Securing endpoints, handling auth tokens |
+| [database.md](./database.md) | Keys (UUID v7), transactions, locks, pooling, roles, soft delete | Designing schemas, transactions, connections |
+| [database-indexing.md](./database-indexing.md) | Index types, NULLS order, N+1, keyset pagination | Writing queries, adding indexes, fixing slow pages |
+| [security.md](./security.md) | BOLA, CSRF, rate limiting, auth-form defense, CSP | Securing endpoints, handling auth tokens |
 | [email.md](./email.md) | SPF/DKIM/DMARC, Resend, warming | Setting up transactional email |
 | [auth.md](./auth.md) | Better Auth, RBAC, sessions | Adding authentication, role-based access |
 | [billing.md](./billing.md) | Stripe flows, webhooks, dunning | Integrating payments (general) |
@@ -34,7 +36,7 @@ These principles govern every section. Every feature, every file, every decision
 | [testing.md](./testing.md) | Vitest, Playwright, Prisma mocking | Writing tests, setting up CI |
 | [accessibility.md](./accessibility.md) | WCAG 2.2, ARIA rules | Building forms, ensuring compliance |
 | [performance.md](./performance.md) | Core Web Vitals, budgets, enforcement | Optimizing page speed (stack mechanics: `stacks/<stack>/`) |
-| [ci-cd.md](./ci-cd.md) | Gate layers: git hooks → CI → deploy, lifecycle scripts | Setting up hooks, pipelines, or pre* scripts |
+| [ci-cd.md](./ci-cd.md) | Gate layers: git hooks → CI → deploy, lifecycle scripts, scheduled dependency updates | Setting up hooks, pipelines, or pre* scripts |
 | [deployment.md](./deployment.md) | Env validation, security headers | Deploying to production |
 | [monitoring.md](./monitoring.md) | Pino, OTel, Sentry, SLOs | Setting up error tracking, alerts |
 | [file-uploads.md](./file-uploads.md) | Presigned URLs, security | Adding file/image uploads |

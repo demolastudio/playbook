@@ -11,7 +11,7 @@ the concrete tools each check refers to (examples below use the Next.js stack).
 ## Security Checks
 
 1. **BOLA** — Every query that reads/updates/deletes a record includes an ownership filter
-2. **Rate limiting** — middleware is installed and active (Next.js 16: Arcjet in `proxy.ts` — the renamed middleware convention, see `stacks/nextjs/gotchas.md`)
+2. **Rate limiting** — the stack profile's limiter is installed and active (`.playbook/stacks/vinext-cloudflare/STACK.md`: Better Auth database limits + the Workers Rate Limiting binding; `.playbook/stacks/nextjs/`: Arcjet in `proxy.ts`)
 3. **CSRF** — All mutation endpoints have CSRF protection (Next.js: Server Actions built-in, API routes need tokens)
 4. **Cookies** — All session cookies are `httpOnly`, `secure`, `sameSite=lax`
 5. **Input validation** — Three layers: client → server schema (Zod / Pydantic / DTO) → database constraints

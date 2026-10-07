@@ -10,6 +10,7 @@ Run the commands from `.playbook/stacks/<stack>/checks.md` for the detected stac
 1. **Typecheck** passes with zero errors
 2. **Lint** passes with zero suppressions added
 3. **Tests** pass — behavior you changed has a test covering it
+4. **Design** passes (`scripts/check-design.sh`, per `.playbook/formats/design.md`) when the project has a `DESIGN.md`
 
 If no stack profile matches, find the project's equivalent commands (package.json scripts, Makefile, CI config) and run those.
 

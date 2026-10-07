@@ -24,9 +24,13 @@ export const chargeBookingOnce = async (
   );
 
   return prisma.$transaction(async (tx) => {
-    await tx.idempotencyRecord.create({
+    const claimed = await tx.idempotencyRecord.createMany({
       data: { key: idempotencyKey, result: charge },
+      skipDuplicates: true,
     });
+    if (claimed.count === 0) {
+      return charge;
+    }
     await tx.booking.update({
       where: { id: input.bookingId },
       data: { status: "PAID" },

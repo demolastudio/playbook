@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { createBooking } from "@/lib/bookings/create-booking";
 import { writeAuditLog } from "@/lib/audit/write-audit-log";
@@ -19,7 +20,7 @@ export const createBookingAction = async (
     return {
       ok: false,
       error: "Invalid input",
-      issues: parsed.error.flatten().fieldErrors,
+      issues: z.flattenError(parsed.error).fieldErrors,
     };
   }
 

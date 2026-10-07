@@ -71,9 +71,9 @@ If the record doesn't belong to the authenticated user, return "Not Found" — n
 - **Never use in-memory counters in serverless** — state doesn't persist across invocations. Use an external store (Redis, etc.)
 - **Rate limit before expensive work** — check the limit before validating inputs or querying the database
 
-#### Recommended: Arcjet (`npm i @arcjet/next`)
+#### Implementations by Stack
 
-Arcjet is a runtime security SDK that handles rate limiting, bot protection, and WAF in one package. Use it instead of building custom rate limiters.
+The stack profile names the limiter; never a hand-rolled counter. `stacks/vinext-cloudflare`: Better Auth database limits on auth routes, the Workers Rate Limiting binding elsewhere (approximate — abuse control, never business quotas), WAF rules on the zone. `stacks/nextjs`: Arcjet (`npm i @arcjet/next`), a runtime security SDK covering rate limiting, bot protection, and WAF in one package:
 
 - **Rate limiting** — token bucket, fixed window, sliding window built in
 - **Bot protection** — detects scrapers, credential stuffers, automated clients
@@ -81,6 +81,21 @@ Arcjet is a runtime security SDK that handles rate limiting, bot protection, and
 - **Prompt injection detection** — protects LLM endpoints
 - **<1ms latency** — decisions made locally via WebAssembly
 - Place in the request-level middleware for app-wide protection (Next.js 16: `proxy.ts`)
+
+---
+
+### Auth-Form Defense in Depth
+
+No single control stops current bots and AI agents. Every public auth form (sign-up, sign-in, password reset, resend verification) stacks all of these:
+
+1. **Server-verified challenge** (Turnstile, reCAPTCHA) — invisible unless the risk score asks for interaction
+2. **Per-IP rate limits** keyed on the platform's client-IP header, in a shared store
+3. **Honeypot field**, checked in the form and on the server. Label it like an ordinary field that matches its name — never "leave this empty", which AI agents read and obey. Avoid autofill-prone names; keep it `aria-hidden`, `tabIndex={-1}`, off-screen
+4. **Email verification required**, plus a mail-server (MX) check at sign-up
+5. **Breached-password rejection** (Have I Been Pwned k-anonymity range API)
+6. **Generic errors and equal timing** — the same response whether the account exists or not
+7. **Reserved usernames** (admin, support, the brand) and **limited trust for new accounts** (no payouts, invites, or votes for the first days)
+8. **WAF rules** once the app sits on a custom domain
 
 ---
 
@@ -171,7 +186,8 @@ Start with a strict policy and relax as needed — not the other way around.
 
 - **Every mutating endpoint must verify ownership**, not just authentication.
 - **Rate limit before expensive work.** Check the rate limit before validating inputs or hitting the database.
-- **Use Arcjet for rate limiting and bot protection.** Don't build custom rate limiters.
+- **Use the stack's rate limiter** (shared store, per stack above). Never an in-memory counter.
+- **Public auth forms stack every defense layer.** One control alone is bypassed.
 - **Hash passwords with Argon2id.** Encrypt PII with AES-256-GCM. Never confuse the two.
 - **All session cookies are `httpOnly`, `secure`, `sameSite=lax`.** No exceptions.
 - **Three-layer validation: client → server → database.** The server is the security boundary.

@@ -14,7 +14,7 @@ idempotency, audit everything) apply unchanged — only the tools differ.
 | ORM / data access | Prisma (`lib/`) | SQLAlchemy or SQLModel (`services/`) |
 | Auth sessions | Better Auth | fastapi-users or custom JWT/session deps |
 | Typecheck gate | `tsc --noEmit` | `mypy` or `pyright` |
-| Lint gate | `eslint` | `ruff check` |
+| Lint gate | `oxlint` | `ruff check` |
 | Test gate | `vitest` | `pytest` |
 
 ## Planned Sections

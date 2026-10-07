@@ -6,6 +6,8 @@ description: Use when a bug, error, flake, or regression needs diagnosing
 
 A discipline for real bugs. The phases run in order — do NOT skip ahead.
 
+**Redact first.** Commands, outputs, and captured artifacts get shown, so write `<REDACTED>` in place of every secret, build loops against env vars so credentials stay in the environment, and quote only the signal-carrying lines of a captured request (auth headers ride along).
+
 ## Phase 1: Build a Tight Feedback Loop
 
 **This is the skill — everything after it is mechanical.** A tight loop is one command that goes red on THIS bug and green when it's fixed. With one, the bug is 90% solved; without one, no amount of reading code will save you.
@@ -42,7 +44,7 @@ Each probe maps to one prediction from Phase 3. Change one variable at a time. P
 ## Phase 5: Fix and Regression-Test
 
 1. Turn the minimised repro into a failing test at a correct seam — one that exercises the real bug pattern. If no correct seam exists, that itself is a finding: document it instead of writing a false-confidence test.
-2. Watch it fail → apply the fix (root cause only, surgical) → watch it pass.
+2. Watch it fail → apply the fix (root cause only, surgical) → watch it pass. If you forced the red by mutating code or a fixture, `diff` against a pristine copy first — an edit that silently changed nothing passes as a failing test.
 3. Re-run the Phase 1 loop against the original, un-minimised scenario.
 
 ## Phase 6: Cleanup

@@ -16,7 +16,7 @@ Self-hosted, TypeScript-first, sessions in your own database via the Prisma adap
 ```typescript
 // lib/auth.ts
 import "server-only"
-import { betterAuth } from "better-auth"
+import { betterAuth } from "better-auth/minimal"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { prisma } from "./db"
 
@@ -32,7 +32,7 @@ export const auth = betterAuth({
     },
   },
   session: {
-    cookieCache: { enabled: true, maxAge: 60 * 5 }, // 5 min cache
+    cookieCache: { enabled: true, maxAge: 60 * 5 }, // display reads only — guards bypass it
   },
   // Production: support secret rotation without downtime
   // Set BETTER_AUTH_SECRETS="current-secret,previous-secret"
@@ -113,7 +113,10 @@ import { redirect } from "next/navigation"
 import { hasPermission, type Role } from "./permissions"
 
 export const requireSession = async () => {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const session = await auth.api.getSession({
+    headers: await headers(),
+    query: { disableCookieCache: true },
+  })
   if (!session) redirect("/login")
   return session
 }
@@ -151,11 +154,6 @@ Better Auth includes built-in CSRF protection:
 // ❌ DON'T
 export const auth = betterAuth({
   advanced: { disableCSRFCheck: true }, // NEVER in production
-})
-
-// ✅ DO — just leave the default (CSRF enabled)
-export const auth = betterAuth({
-  // CSRF is on by default — no config needed
 })
 ```
 

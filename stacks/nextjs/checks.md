@@ -6,10 +6,45 @@ Prefer the project's own `package.json` scripts if they exist; these are the fal
 | Gate | Command |
 | ---- | ------- |
 | Typecheck | `npx tsc --noEmit` |
-| Lint | `npx eslint .` |
+| Lint | `npx oxlint` |
 | Tests | `npx vitest run` |
 | E2E (when present) | `npx playwright test` |
+| Design (when `DESIGN.md` exists) | `bash scripts/check-design.sh` (`formats/design.md`) |
 | Build (before deploy) | `npx next build` |
+
+## Lint: oxlint, not ESLint
+
+TypeScript 7 (npm `latest` since 2026) ships no JS API yet, and typescript-eslint
+supports only TypeScript `<6.1` — `eslint .` fails on a fresh project. oxlint
+runs type-aware rules through `oxlint-tsgolint` and implements the React
+Compiler rules natively (all but `config`/`gating`; none are on by default).
+
+```bash
+npm i -D oxlint oxlint-tsgolint
+```
+
+```json
+// .oxlintrc.json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "import", "nextjs"],
+  "categories": { "correctness": "error" },
+  "options": { "typeAware": true },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "typescript/no-floating-promises": "error",
+    "typescript/no-deprecated": "error"
+  }
+}
+```
+
+`typescript/no-deprecated` turns every library's `@deprecated` tag into a
+failing gate whose message names the replacement — upgrades announce their own
+renames, so the playbook never keeps a rename list.
+
+Prove the gate goes red once per project: plant a `setState` call inside a
+`useEffect` and confirm `npx oxlint` exits non-zero with
+`react(set-state-in-effect)`, then delete the plant.
 
 ## Optional: Automatic Enforcement (Claude Code Hooks)
 
