@@ -14,19 +14,18 @@ set -euo pipefail
 
 # ─── Parse args ────────────────────────────────────────────────────
 INSTALL_GLOBAL=false
-FORCE=false
 PROJECT_DIR=""
 
 for arg in "$@"; do
   case "$arg" in
     --global) INSTALL_GLOBAL=true ;;
-    --force) FORCE=true ;;
+    --force) ;; # accepted for older instructions; nothing reads it
     *) PROJECT_DIR="$arg" ;;
   esac
 done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_URL="https://github.com/demolastudio/playbook.git"
+REPO_URL="${PLAYBOOK_REPO_URL:-https://github.com/demolastudio/playbook.git}"
 
 # ─── Helpers ───────────────────────────────────────────────────────
 
@@ -298,10 +297,58 @@ if [ "$INSTALL_GLOBAL" = true ]; then
   install_global_rules "$PLAYBOOK_DIR/rules/global-rules.md"
 fi
 
+# ─── Guardrail files (copied once, never overwritten) ─────────────
+# stacks/<stack>/project-files/ mirrors project paths: lint config, the CI
+# gates workflow, Dependabot, pnpm supply-chain policy, Claude Code settings
+# and SessionStart hook, check scripts. The stack's own files win over the
+# files of the stack it inherits (stacks/<stack>/inherits).
+copy_project_files() {
+  local src="$1" overridden_by="${2:-}"
+  [ -d "$src" ] || return 0
+  while IFS= read -r rel; do
+    rel="${rel#./}"
+    if [ -n "$overridden_by" ] && [ -e "$overridden_by/$rel" ]; then
+      continue
+    elif [ ! -e "$PROJECT_DIR/$rel" ]; then
+      mkdir -p "$(dirname "$PROJECT_DIR/$rel")"
+      cp "$src/$rel" "$PROJECT_DIR/$rel"
+      echo "   + $rel"
+    elif ! cmp -s "$src/$rel" "$PROJECT_DIR/$rel"; then
+      echo "   ↷ kept your $rel — differs from .playbook/${src#"$PLAYBOOK_DIR"/}/$rel"
+    fi
+  done < <(cd "$src" && find . -type f | sort)
+}
+
+GUARDRAIL_STACK=""
+if [ ${#STACKS[@]} -gt 0 ]; then
+  for stack in "${STACKS[@]}"; do
+    [ -d "$PLAYBOOK_DIR/stacks/$stack/project-files" ] || [ -f "$PLAYBOOK_DIR/stacks/$stack/inherits" ] || continue
+    if [ -z "$GUARDRAIL_STACK" ]; then
+      echo "🛡️  Guardrail files:"
+      GUARDRAIL_STACK="$stack"
+    fi
+    copy_project_files "$PLAYBOOK_DIR/stacks/$stack/project-files"
+    if [ -f "$PLAYBOOK_DIR/stacks/$stack/inherits" ]; then
+      copy_project_files "$PLAYBOOK_DIR/stacks/$(cat "$PLAYBOOK_DIR/stacks/$stack/inherits")/project-files" \
+        "$PLAYBOOK_DIR/stacks/$stack/project-files"
+    fi
+  done
+fi
+
 # ─── Done ──────────────────────────────────────────────────────────
 echo ""
 echo "✅ Done! Your playbook is set up."
 echo ""
+if [ -n "$GUARDRAIL_STACK" ]; then
+  echo "   Next: add the gate scripts to package.json (typecheck, lint, test, build —"
+  echo "   see .playbook/stacks/$GUARDRAIL_STACK/checks.md), then on GitHub require the"
+  echo "   \"gates\" check before merging to main."
+  if [ ! -f "$PROJECT_DIR/pnpm-lock.yaml" ] || ! grep -qE '"(packageManager": *"pnpm@|devEngines")' "$PKG_JSON"; then
+    echo "   ⚠️  gates.yml installs with pnpm 11+: commit a pnpm-lock.yaml and pin"
+    echo "      \"packageManager\": \"pnpm@<version>\" in package.json."
+  fi
+  echo ""
+fi
 echo "   To update: cd .playbook && git pull"
 echo "   To update global rules: bash setup.sh --global"
 echo ""

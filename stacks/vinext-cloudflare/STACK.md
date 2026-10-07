@@ -52,6 +52,15 @@ PRs in `core/ci-cd.md`, so a regression has one suspect.
 - Other endpoints: the Workers Rate Limiting binding — approximate by design (per location, eventually consistent), so it stops abuse and never enforces business quotas; those are database queries.
 - Stripe webhooks verify with `constructEventAsync` (the sync `constructEvent` throws on Workers): `templates/stripe-webhook.ts`.
 
+## CI/CD
+
+GitHub Actions runs the gates; Workers Builds deploys.
+
+- **Gates:** the shipped `.github/workflows/gates.yml` ([checks.md](./checks.md)). GitHub holds no Cloudflare credentials — no gate needs one.
+- **Deploy:** connect the repo in Workers Builds with production branch `main`, deploy command `npx @vinext/cloudflare deploy`, and no build command ([gotchas.md](./gotchas.md)). Workers Builds deploys every push to `main` without waiting for `gates`, so the branch ruleset requiring `gates` is what keeps a red commit out of production — on this stack it's mandatory.
+- **Secrets:** only through `cf workers secrets update`, never the dashboard ([gotchas.md](./gotchas.md)).
+- **After each deploy:** `bash scripts/check-cache.sh https://<production host>`.
+
 ## Templates
 
 | Creating | Copy |

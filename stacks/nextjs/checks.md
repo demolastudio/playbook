@@ -1,16 +1,41 @@
 # Checks — Next.js Stack
 
-Commands for the automated gates in `rules/definition-of-done.md`.
-Prefer the project's own `package.json` scripts if they exist; these are the fallbacks.
+Commands for the automated gates in `rules/definition-of-done.md`. Each gate is
+a `package.json` script, and CI, hooks, and agents all run the scripts — one
+definition of passing.
 
-| Gate | Command |
-| ---- | ------- |
-| Typecheck | `npx tsc --noEmit` |
-| Lint | `npx oxlint` |
-| Tests | `npx vitest run` |
-| E2E (when present) | `npx playwright test` |
-| Design (when `DESIGN.md` exists) | `bash scripts/check-design.sh` (`formats/design.md`) |
-| Build (before deploy) | `npx next build` |
+| Gate | Script | Command |
+| ---- | ------ | ------- |
+| Typecheck | `typecheck` | `tsc --noEmit` |
+| Lint | `lint` | `oxlint` |
+| Tests | `test` | `vitest run` |
+| E2E (when present) | `test:e2e` | `playwright test` |
+| Design (when `DESIGN.md` exists) | — | `bash scripts/check-design.sh` (`formats/design.md`) |
+| Build (before deploy) | `build` | `next build` |
+
+## Shipped Files
+
+`setup.sh` copies [project-files/](./project-files/) into the project once.
+It never overwrites: a re-run lists only the files that differ from the
+playbook's copy, for you to compare and merge.
+
+| File | Job |
+| ---- | --- |
+| `.github/workflows/gates.yml` | Runs the gate scripts on every PR and push to `main`; actions pinned by commit SHA |
+| `.github/dependabot.yml` | Scheduled, grouped, delayed update PRs (`core/ci-cd.md`) |
+| `pnpm-workspace.yaml` | Release-age delay and provenance check on every install |
+| `.oxlintrc.json` | The lint gate below |
+| `scripts/check-design.sh` | The design gate |
+| `.claude/settings.json` | No AI attribution on commits or PRs; registers the hook below |
+| `.claude/hooks/session-start.sh` | Cloud sessions only: fetch `.playbook/` and `pnpm install`, so slash commands and gates work |
+
+`gates.yml` installs with the pnpm version pinned in `package.json` —
+`"packageManager": "pnpm@<version>"`, 11 or newer, set with
+`pnpm pkg set packageManager=pnpm@<version>` — and a committed `pnpm-lock.yaml`.
+
+The workflow reports; only branch protection enforces. On GitHub, add a branch
+ruleset for `main` that requires a pull request and the `gates` status check
+(GitHub lists the check once `gates.yml` has run).
 
 ## Lint: oxlint, not ESLint
 
@@ -20,36 +45,27 @@ runs type-aware rules through `oxlint-tsgolint` and implements the React
 Compiler rules natively (all but `config`/`gating`; none are on by default).
 
 ```bash
-npm i -D oxlint oxlint-tsgolint
+pnpm add -D oxlint oxlint-tsgolint
 ```
 
-```json
-// .oxlintrc.json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "import", "nextjs"],
-  "categories": { "correctness": "error" },
-  "options": { "typeAware": true },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "typescript/no-floating-promises": "error",
-    "typescript/no-deprecated": "error"
-  }
-}
-```
-
-`typescript/no-deprecated` turns every library's `@deprecated` tag into a
-failing gate whose message names the replacement — upgrades announce their own
-renames, so the playbook never keeps a rename list.
+The config is the shipped `.oxlintrc.json`. Its `typescript/no-deprecated`
+turns every library's `@deprecated` tag into a failing gate whose message names
+the replacement — upgrades announce their own renames, so the playbook never
+keeps a rename list.
 
 Prove the gate goes red once per project: plant a `setState` call inside a
-`useEffect` and confirm `npx oxlint` exits non-zero with
+`useEffect` and confirm `pnpm run lint` exits non-zero with
 `react(set-state-in-effect)`, then delete the plant.
+
+`nextjs/no-html-link-for-pages` (oxlint 1.87) flags every extension-less
+internal `<a>`, route handlers included (`/api/export`, an OAuth start). Those
+aren't pages, so they stay `<a>`; disable the rule on that line with the reason:
+`{/* oxlint-disable-next-line nextjs/no-html-link-for-pages -- route handler */}`.
 
 ## Optional: Automatic Enforcement (Claude Code Hooks)
 
 Rules are probabilistic — the agent can skip them. Hooks are deterministic.
-Two layers, add to the project's `.claude/settings.json`:
+Two layers, merged into the shipped `.claude/settings.json`:
 
 **1. PostToolUse — catch type errors the moment they happen** (fast feedback):
 

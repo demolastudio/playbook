@@ -15,13 +15,13 @@
     { "name": "@prisma/client", "tag": "latest", "verified": "7.10.0", "watch": "major", "affects": "stacks/nextjs (Prisma 8 goes stable: revisit the @7 pin)" },
     { "name": "typescript", "tag": "latest", "verified": "7.0.2", "watch": "minor", "affects": "stacks/nextjs/checks.md (7.1 brings a stable API: re-check typescript-eslint)" },
     { "name": "typescript-eslint", "tag": "latest", "verified": "8.71.1", "watch": "major", "affects": "stacks/nextjs/checks.md (lint gate choice)" },
-    { "name": "oxlint", "tag": "latest", "verified": "1.87.0", "watch": "major", "affects": "stacks/nextjs/checks.md (lint config)" },
-    { "name": "pnpm", "tag": "latest", "verified": "12.9.1", "watch": "major", "affects": "stacks/nextjs/gotchas.md (pnpm), core/ci-cd.md" },
+    { "name": "oxlint", "tag": "latest", "verified": "1.87.0", "watch": "major", "affects": "stacks/nextjs/checks.md, project-files/.oxlintrc.json (lint config)" },
+    { "name": "pnpm", "tag": "latest", "verified": "12.9.1", "watch": "major", "affects": "stacks/nextjs/gotchas.md (pnpm), core/ci-cd.md, stacks/*/project-files/pnpm-workspace.yaml, gates.yml (pnpm/setup needs 11+)" },
     { "name": "pg", "tag": "latest", "verified": "8.23.1", "watch": "major", "affects": "core/database.md (pg 9 changes sslmode semantics)" },
     { "name": "stripe", "tag": "latest", "verified": "23.0.0", "watch": "major", "affects": "both webhook templates" },
     { "name": "dotenv", "tag": "latest", "verified": "18.0.6", "watch": "major", "affects": "stacks/*/gotchas.md (.env.local loading)" },
     { "name": "shadcn", "tag": "latest", "verified": "4.21.4", "watch": "major", "affects": "stacks/nextjs/gotchas.md (shadcn)" },
     { "name": "@arcjet/next", "tag": "latest", "verified": "1.14.0", "watch": "major", "affects": "core/security.md, recommended-skills.md" },
-    { "name": "@google/design.md", "tag": "latest", "verified": "0.4.0", "watch": "exact", "affects": "formats/design.md" }
+    { "name": "@google/design.md", "tag": "latest", "verified": "0.4.0", "watch": "exact", "affects": "formats/design.md, project-files/scripts/check-design.sh" }
   ]
 }

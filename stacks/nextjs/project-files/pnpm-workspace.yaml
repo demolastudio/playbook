@@ -1,0 +1,3 @@
+# Supply-chain policy (.playbook/playbooks/core/ci-cd.md, pnpm 11).
+minimumReleaseAge: 1440
+trustPolicy: no-downgrade

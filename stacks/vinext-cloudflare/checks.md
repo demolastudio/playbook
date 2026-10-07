@@ -1,41 +1,36 @@
 # Checks — vinext + Cloudflare
 
-Commands for the automated gates in `rules/definition-of-done.md`.
-Prefer the project's own `package.json` scripts if they exist; these are the fallbacks.
+Commands for the automated gates in `rules/definition-of-done.md`, as
+`package.json` scripts — CI, hooks, and agents all run the scripts.
 
-| Gate | Command |
-| ---- | ------- |
-| Typecheck | `npx cf workers types && npx tsc --noEmit` |
-| Lint | `npx oxlint` |
-| Tests | `npx vitest run` |
-| E2E (when present) | `npx playwright test` |
-| Design (when `DESIGN.md` exists) | `bash scripts/check-design.sh` (`formats/design.md`) |
-| Build (before deploy) | `npx vite build` |
-| Post-deploy | the cache check below |
+| Gate | Script | Command |
+| ---- | ------ | ------- |
+| Typecheck | `typecheck` | `cf workers types && tsc --noEmit` |
+| Lint | `lint` | `oxlint` |
+| Tests | `test` | `vitest run` |
+| E2E (when present) | `test:e2e` | `playwright test` |
+| Design (when `DESIGN.md` exists) | — | `bash scripts/check-design.sh` (`formats/design.md`) |
+| Build (before deploy) | `build` | `vite build` |
+| Post-deploy | — | `bash scripts/check-cache.sh https://<production host>` |
+
+create-vinext-app 1.0 writes `dev`, `build`, `start`, and `deploy`; add
+`typecheck`, `lint`, and `test`. No gate needs Cloudflare credentials (checked
+on the scaffold with `CI=true`). Lint fails there only on the demo page's
+`/api/hello` link — the link-rule exception in `stacks/nextjs/checks.md`.
 
 `cf workers types` regenerates the binding types in `.cloudflare/types` (include
 that directory in `tsconfig.json`); a stale copy hides a missing binding.
 
-The lint config, the deprecation gate, the prove-it-red step, and the optional
-Claude Code hooks are shared with `stacks/nextjs/checks.md` — use them as they are.
+Shared with `stacks/nextjs/checks.md` and used as they are: the shipped files
+and branch ruleset, the lint config and its link-rule exception, the
+prove-it-red step, and the optional Claude Code hooks. This stack ships its own
+`pnpm-workspace.yaml` ([gotchas.md](./gotchas.md#pnpm-11-and-the-cloudflare-prereleases))
+and `scripts/check-cache.sh`.
 
 ## Post-Deploy Cache Check
 
 Workers Cache isn't emulated locally, so the deploy isn't done until production
-headers confirm it ([caching.md](./caching.md)). Save as
-`scripts/check-cache.sh` and list the project's public and guarded routes:
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-base="$1"
-cache_status() { curl -s -o /dev/null -D - "$base$1" | tr -d '\r' | awk -F': ' 'tolower($1)=="x-vinext-cache"{print $2}'; }
-for path in / ; do
-  cache_status "$path" >/dev/null
-  case "$(cache_status "$path")" in HIT|UPDATING) ;; *) echo "public page not cached: $path"; exit 1 ;; esac
-done
-for path in /dashboard ; do
-  case "$(cache_status "$path")" in HIT|UPDATING) echo "per-user page served from cache: $path"; exit 1 ;; esac
-done
-echo "cache check passed"
-```
+headers confirm it ([caching.md](./caching.md)). The shipped
+`scripts/check-cache.sh` fails when a public route isn't served from cache
+(`HIT` or `UPDATING`) or a per-user route is. Edit its two route lists — `/`
+and `/dashboard` are placeholders — to the project's public and guarded routes.

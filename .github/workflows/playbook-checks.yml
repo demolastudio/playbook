@@ -1,0 +1,53 @@
+name: playbook-checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playbook-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: MAINTENANCE.md invariants
+        run: node scripts/check-playbook.mjs
+
+      - name: setup.sh against throwaway projects
+        run: bash scripts/test-setup.sh
+
+      - name: Install actionlint and shellcheck (pinned, checksum-verified)
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+          ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+          SHELLCHECK_VERSION: v0.11.0
+          SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
+        run: |
+          bin="$RUNNER_TEMP/bin"
+          mkdir -p "$bin"
+          curl -sSfL -o "$RUNNER_TEMP/actionlint.tar.gz" \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  $RUNNER_TEMP/actionlint.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$bin" actionlint
+          curl -sSfL -o "$RUNNER_TEMP/shellcheck.tar.xz" \
+            "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+          echo "${SHELLCHECK_SHA256}  $RUNNER_TEMP/shellcheck.tar.xz" | sha256sum -c -
+          tar -xJf "$RUNNER_TEMP/shellcheck.tar.xz" -C "$bin" --strip-components=1 "shellcheck-${SHELLCHECK_VERSION}/shellcheck"
+          echo "$bin" >> "$GITHUB_PATH"
+
+      - name: Workflows (this repo's and the shipped ones)
+        run: actionlint -shellcheck "$RUNNER_TEMP/bin/shellcheck" .github/workflows/*.yml stacks/*/project-files/.github/workflows/*.yml
+
+      - name: Shell scripts (setup and shipped)
+        run: shellcheck setup.sh scripts/*.sh stacks/*/project-files/scripts/*.sh stacks/*/project-files/.claude/hooks/*.sh

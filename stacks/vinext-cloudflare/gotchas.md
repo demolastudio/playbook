@@ -23,6 +23,11 @@
 - **`npx @vinext/cloudflare deploy` builds the app itself** — a separate Workers Builds build command builds twice.
 - **R2 is enabled once per account** (a $0 subscription); its free tier is account-wide, so projects separate by bucket name.
 
+## pnpm 11 and the Cloudflare prereleases
+
+- **An explicit `minimumReleaseAge` fails installs that need a version under a day old** — and the Cloudflare toolchain ships near-daily, pinned exactly. The shipped `pnpm-workspace.yaml` exempts `cf`, `miniflare`, `workerd`, and `@cloudflare/*`: each publishes through npm trusted publishing with provenance, and `trustPolicy` still checks them (it has its own exclude list). `workerd` is on the list because `miniflare` pins an exact `workerd` released hours before it.
+- **Anything else blocked** (Oct 2026: `@vitejs/plugin-rsc`, pinned by create-vinext-app hours after its release) waits out the day, or joins the list in a commit that names the version and why, and leaves it once that version is a day old. Never set `minimumReleaseAge: 0`.
+
 ## Drizzle 1.0 RC
 
 - **The docs install the 1.0 RC while npm `latest` is 0.45** — pin the RC exactly. 1.0 takes `drizzle({ client })`; Cloudflare's Hyperdrive example still shows the 0.x `drizzle(client)`.

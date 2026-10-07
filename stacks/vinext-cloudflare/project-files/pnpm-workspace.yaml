@@ -1,0 +1,10 @@
+# Supply-chain policy (.playbook/stacks/vinext-cloudflare/gotchas.md, pnpm 11).
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+  - cf
+  - miniflare
+  - workerd
+  - "@cloudflare/*"
+trustPolicy: no-downgrade
+allowBuilds:
+  workerd: true
