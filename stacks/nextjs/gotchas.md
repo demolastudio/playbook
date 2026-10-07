@@ -10,6 +10,7 @@
 
 - **Build scripts are blocked by default** (`ERR_PNPM_IGNORED_BUILDS`) — installs "abort" until each package's postinstall is approved. pnpm writes `allowBuilds:` placeholders into `pnpm-workspace.yaml`; set each to `true` explicitly (sharp, unrs-resolver, @prisma/engines, prisma, esbuild all need it). This is the desired security posture — approve per-package, never blanket-allow.
 - **`pnpm deploy` is a pnpm built-in** (workspace deploy), not your script — a `deploy` script runs only as `pnpm run deploy`.
+- **A Dependabot PR can fail install with `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION`** — its regenerated lockfile took a transitive version under a day old. Until Oct 2026, Dependabot also ignored the release-age gate on pnpm 12 and failed every update on 12.3+ (`ERR_PNPM_STRICT_MIN_RELEASE_AGE_REQUIRES_SAVE`); dependabot-core PR #16376 fixed both. Re-run `gates` once the version is a day old; keep the release-age keys in block-style YAML, which is all that fix reads.
 
 ## Prisma 7 (breaking vs 6 patterns)
 

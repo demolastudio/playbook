@@ -73,7 +73,7 @@ If the record doesn't belong to the authenticated user, return "Not Found" — n
 
 #### Implementations by Stack
 
-The stack profile names the limiter; never a hand-rolled counter. `stacks/vinext-cloudflare`: Better Auth database limits on auth routes, the Workers Rate Limiting binding elsewhere (approximate — abuse control, never business quotas), WAF rules on the zone. `stacks/nextjs`: Arcjet (`npm i @arcjet/next`), a runtime security SDK covering rate limiting, bot protection, and WAF in one package:
+The stack profile names the limiter; never a hand-rolled counter. `stacks/vinext-cloudflare`: Better Auth database limits on auth routes, the Workers Rate Limiting binding elsewhere (approximate — abuse control, never business quotas), WAF rules on the zone. `stacks/nextjs`: Arcjet (`pnpm add @arcjet/next`), a runtime security SDK covering rate limiting, bot protection, and WAF in one package:
 
 - **Rate limiting** — token bucket, fixed window, sliding window built in
 - **Bot protection** — detects scrapers, credential stuffers, automated clients

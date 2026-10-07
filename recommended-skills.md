@@ -41,10 +41,10 @@ All entries verified against their primary repos (July 2026):
 
 | Package | Install | When To Use |
 |---|---|---|
-| **Arcjet** | `npm i @arcjet/next` | Every `stacks/nextjs` project — the rate-limit and bot layers of `core/security.md`'s auth-form defense. Workers projects use the layers in `stacks/vinext-cloudflare/` |
-| **Prisma** | `npm i -D prisma@7 && npm i @prisma/client@7 @prisma/adapter-pg@7` | Database ORM (`stacks/nextjs`) — pin the major: npm `latest` is a Prisma 8 RC (see `stacks/nextjs/gotchas.md`) |
-| **Zod** | `npm i zod` | Schema validation — all schemas go in `schemas/` folder |
-| **Stripe** | `npm i stripe` | Payments — see `playbooks/core/billing.md` |
+| **Arcjet** | `pnpm add @arcjet/next` | Every `stacks/nextjs` project — the rate-limit and bot layers of `core/security.md`'s auth-form defense. Workers projects use the layers in `stacks/vinext-cloudflare/` |
+| **Prisma** | `pnpm add -D prisma@7 && pnpm add @prisma/client@7 @prisma/adapter-pg@7` | Database ORM (`stacks/nextjs`) — pin the major: npm `latest` is a Prisma 8 RC (see `stacks/nextjs/gotchas.md`) |
+| **Zod** | `pnpm add zod` | Schema validation — all schemas go in `schemas/` folder |
+| **Stripe** | `pnpm add stripe` | Payments — see `playbooks/core/billing.md` |
 
 ## Considered & Skipped (July 2026)
 

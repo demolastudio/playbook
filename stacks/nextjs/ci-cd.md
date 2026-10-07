@@ -63,7 +63,7 @@ console.log(`env OK (${Object.keys(env).length} vars validated)`)
 
 `setup.sh` ships `.github/workflows/gates.yml` ([checks.md](./checks.md)): it installs from the lockfile, then runs the `typecheck`, `lint`, and `test` scripts, the design gate when `DESIGN.md` exists, and `build`. Its actions are pinned by commit SHA, and Dependabot bumps them monthly. Per project, add only what the project needs:
 
-- **Build-time env:** `prebuild` asserts the env schema, so give the job what it checks — placeholders in a job-level `env:`, test-mode keys from repo Actions secrets, never live keys.
+- **Build-time env:** `prebuild` asserts the env schema, so give the job what it checks — placeholders in a job-level `env:`, test-mode keys from repo secrets, never live keys. Add each secret twice, as an Actions secret and a Dependabot secret: workflows on Dependabot PRs read only Dependabot secrets.
 - **A database for integration tests:** a Postgres service at production's major version, plus a `pnpm exec prisma migrate deploy` step before `test`:
   ```yaml
       services:
