@@ -27,6 +27,9 @@ playbook/
 │   ├── nextjs/                ← SECONDARY: Next.js 16 on Vercel + Prisma 7
 │   │   ├── STACK.md           ← Layout, conventions, template routing
 │   │   ├── checks.md          ← Definition-of-done commands, oxlint gate, hooks
+│   │   ├── project-files/     ← Guardrail files setup.sh copies into projects:
+│   │   │                         CI gates, lint config, Dependabot, pnpm policy,
+│   │   │                         Claude Code settings + cloud-session hook
 │   │   └── templates/         ← Canonical code: server action, webhook,
 │   │                             idempotent transaction, zod schema
 │   ├── fastapi/               ← Outline (concept mapping from nextjs)
@@ -48,6 +51,7 @@ playbook/
 ├── CLAUDE.md                  ← Points agents editing this repo at MAINTENANCE.md
 ├── out-of-scope.md            ← Rejected ideas, with reasons
 ├── setup.sh                   ← One-command install (detects the stack)
+├── scripts/                   ← This repo's own checks and the monthly freshness report
 └── README.md                  ← This file
 ```
 
@@ -79,8 +83,9 @@ This clones `.playbook/` into your project, detects the stack (`vinext` / `next`
 - **Claude Code** — reads `AGENTS.md` only when no `CLAUDE.md` exists, so setup adds a one-line `@AGENTS.md` import to `CLAUDE.md` (creating it if missing; your content is never touched)
 - **Antigravity** — `.agents/rules/playbook.md` (plus `.agent/` for older versions), auto-loaded workspace rules so Gemini can't skip them
 - **Cursor** — `.cursor/rules/playbook.mdc` with `alwaysApply: true`; workflows install as slash commands in `.cursor/commands/`
+- **Guardrail files** (JS stacks) — `stacks/<stack>/project-files/` copied into the project: the `gates` CI workflow with SHA-pinned actions, `.oxlintrc.json`, Dependabot, the pnpm supply-chain policy, check scripts, and `.claude/settings.json` (no AI attribution) with a SessionStart hook that installs dependencies and fetches `.playbook/` in Claude Code cloud sessions. Commit them. Then add the gate scripts and the pnpm pin to `package.json` and, on GitHub, a branch ruleset on `main` requiring the `gates` check — the stack's `checks.md` has the details.
 
-Re-run `setup.sh` on a project any time — it's idempotent and refreshes everything.
+Re-run `setup.sh` on a project any time — it's idempotent and refreshes everything except the guardrail files, which it never overwrites: it lists the ones that differ from the playbook's copy for you to merge.
 
 > **Antigravity model note:** use Gemini Pro for `/spec` and planning; use Flash only for mechanical implementation under an approved plan — Flash follows instructions less reliably, and the CI gates are the backstop it can't bypass.
 
@@ -139,7 +144,7 @@ Once a project is set up, you drive everything with slash commands. Forget which
 
 ### Optional: hard enforcement
 
-Rules are probabilistic; hooks are not. When you want the definition-of-done gate physically enforced (the agent *cannot* finish with failing checks), copy the Stop hook from `stacks/nextjs/checks.md` into the project's `.claude/settings.json`. Recommended: run your first project without it to see how the prose rules perform, then add it.
+Rules are probabilistic; hooks are not. When you want the definition-of-done gate physically enforced (the agent *cannot* finish with failing checks), merge the Stop hook from `stacks/nextjs/checks.md` into the project's `.claude/settings.json`. Recommended: run your first project without it to see how the prose rules perform, then add it.
 
 ### Keeping things current
 
@@ -147,8 +152,9 @@ Rules are probabilistic; hooks are not. When you want the definition-of-done gat
 | --------- | --- |
 | Everything in a project (playbook copy, AGENTS.md block, always-on rules, workflows) | `bash setup.sh /path/to/project` — idempotent, safe to re-run |
 | Global rules after editing `rules/global-rules.md` | `bash setup.sh --global` + re-paste into Cursor's global settings |
-| This repo itself | Read `MAINTENANCE.md` first; check `out-of-scope.md` before direction changes |
-| Knowing *when* the playbook is stale | Automatic: on the 1st of each month a GitHub Action compares package versions and upstream skills against the recorded baselines and opens a `playbook-freshness` issue when something moved (run it any time from the Actions tab) |
+| A project's guardrail files | Never overwritten — a `setup.sh` re-run lists the files that differ from `.playbook/stacks/<stack>/project-files/`; merge by hand. The project's Dependabot bumps the action pins |
+| This repo itself | Read `MAINTENANCE.md` first; check `out-of-scope.md` before direction changes. The `playbook-checks` workflow checks the invariants a script can see on every PR |
+| Knowing *when* the playbook is stale | Automatic: on the 1st of each month a GitHub Action compares package versions and upstream skills against the recorded baselines and opens a `playbook-freshness` issue assigned to you when something moved (run it any time from the Actions tab) |
 
 ---
 
