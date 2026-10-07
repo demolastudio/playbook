@@ -1,0 +1,27 @@
+{
+  "verifiedOn": "2026-10-07",
+  "packages": [
+    { "name": "vinext", "tag": "latest", "verified": "1.0.1", "watch": "minor", "affects": "stacks/vinext-cloudflare" },
+    { "name": "@vinext/cloudflare", "tag": "latest", "verified": "1.0.1", "watch": "minor", "affects": "stacks/vinext-cloudflare/caching.md" },
+    { "name": "cf", "tag": "latest", "verified": "1.0.0-beta.12", "watch": "exact", "affects": "stacks/vinext-cloudflare/gotchas.md (cf CLI beta)" },
+    { "name": "@cloudflare/vite-plugin", "tag": "latest", "verified": "1.63.0", "watch": "major", "affects": "stacks/vinext-cloudflare (v2 leaves beta)" },
+    { "name": "miniflare", "tag": "latest", "verified": "5.20261006.0-alpha", "watch": "major", "affects": "stacks/vinext-cloudflare/gotchas.md (Miniflare 5.x)" },
+    { "name": "drizzle-orm", "tag": "latest", "verified": "0.45.3", "watch": "major", "affects": "stacks/vinext-cloudflare (1.0 goes stable: drop the RC pin)" },
+    { "name": "drizzle-orm", "tag": "rc", "verified": "1.0.0-rc.4", "watch": "exact", "affects": "stacks/vinext-cloudflare/templates" },
+    { "name": "better-auth", "tag": "latest", "verified": "1.7.7", "watch": "minor", "affects": "stacks/nextjs/gotchas.md (Better Auth), both auth templates" },
+    { "name": "zod", "tag": "latest", "verified": "4.6.5", "watch": "minor", "affects": "stacks/nextjs/gotchas.md (Zod 4)" },
+    { "name": "next", "tag": "latest", "verified": "16.4.0", "watch": "minor", "affects": "stacks/nextjs" },
+    { "name": "react", "tag": "latest", "verified": "19.3.0", "watch": "minor", "affects": "stacks/nextjs/gotchas.md (React)" },
+    { "name": "@prisma/client", "tag": "latest", "verified": "7.10.0", "watch": "major", "affects": "stacks/nextjs (Prisma 8 goes stable: revisit the @7 pin)" },
+    { "name": "typescript", "tag": "latest", "verified": "7.0.2", "watch": "minor", "affects": "stacks/nextjs/checks.md (7.1 brings a stable API: re-check typescript-eslint)" },
+    { "name": "typescript-eslint", "tag": "latest", "verified": "8.71.1", "watch": "major", "affects": "stacks/nextjs/checks.md (lint gate choice)" },
+    { "name": "oxlint", "tag": "latest", "verified": "1.87.0", "watch": "major", "affects": "stacks/nextjs/checks.md (lint config)" },
+    { "name": "pnpm", "tag": "latest", "verified": "12.9.1", "watch": "major", "affects": "stacks/nextjs/gotchas.md (pnpm), core/ci-cd.md" },
+    { "name": "pg", "tag": "latest", "verified": "8.23.1", "watch": "major", "affects": "core/database.md (pg 9 changes sslmode semantics)" },
+    { "name": "stripe", "tag": "latest", "verified": "23.0.0", "watch": "major", "affects": "both webhook templates" },
+    { "name": "dotenv", "tag": "latest", "verified": "18.0.6", "watch": "major", "affects": "stacks/*/gotchas.md (.env.local loading)" },
+    { "name": "shadcn", "tag": "latest", "verified": "4.21.4", "watch": "major", "affects": "stacks/nextjs/gotchas.md (shadcn)" },
+    { "name": "@arcjet/next", "tag": "latest", "verified": "1.14.0", "watch": "major", "affects": "core/security.md, recommended-skills.md" },
+    { "name": "@google/design.md", "tag": "latest", "verified": "0.4.0", "watch": "exact", "affects": "formats/design.md" }
+  ]
+}

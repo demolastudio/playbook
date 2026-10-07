@@ -1,0 +1,33 @@
+name: Playbook freshness
+
+on:
+  schedule:
+    - cron: "17 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - id: check
+        run: node scripts/freshness-check.mjs freshness-report.md
+
+      - if: steps.check.outputs.has_findings == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create playbook-freshness --color FBCA04 --description "Monthly playbook freshness report" --force
+          existing="$(gh issue list --label playbook-freshness --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --body-file freshness-report.md
+            gh issue comment "$existing" --body "Report refreshed on $(date -u +%F) — the body now shows the current findings."
+          else
+            gh issue create --title "Playbook freshness report" --label playbook-freshness --body-file freshness-report.md
+          fi

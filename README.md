@@ -148,6 +148,7 @@ Rules are probabilistic; hooks are not. When you want the definition-of-done gat
 | Everything in a project (playbook copy, AGENTS.md block, always-on rules, workflows) | `bash setup.sh /path/to/project` — idempotent, safe to re-run |
 | Global rules after editing `rules/global-rules.md` | `bash setup.sh --global` + re-paste into Cursor's global settings |
 | This repo itself | Read `MAINTENANCE.md` first; check `out-of-scope.md` before direction changes |
+| Knowing *when* the playbook is stale | Automatic: on the 1st of each month a GitHub Action compares package versions and upstream skills against the recorded baselines and opens a `playbook-freshness` issue when something moved (run it any time from the Actions tab) |
 
 ---
 
