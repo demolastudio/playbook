@@ -10,6 +10,7 @@
 
 - **Build scripts are blocked by default** (`ERR_PNPM_IGNORED_BUILDS`) — installs "abort" until each package's postinstall is approved. pnpm writes `allowBuilds:` placeholders into `pnpm-workspace.yaml`; set each to `true` explicitly (sharp, unrs-resolver, @prisma/engines, prisma, esbuild all need it). This is the desired security posture — approve per-package, never blanket-allow.
 - **`pnpm deploy` is a pnpm built-in** (workspace deploy), not your script — a `deploy` script runs only as `pnpm run deploy`.
+- **A Dependabot PR can fail install with `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION`** — its regenerated lockfile took a transitive version under a day old. Until Oct 2026, Dependabot also ignored the release-age gate on pnpm 12 and failed every update on 12.3+ (`ERR_PNPM_STRICT_MIN_RELEASE_AGE_REQUIRES_SAVE`); dependabot-core PR #16376 fixed both. Re-run `gates` once the version is a day old; keep the release-age keys in block-style YAML, which is all that fix reads.
 
 ## Prisma 7 (breaking vs 6 patterns)
 
@@ -67,7 +68,7 @@
 ## Better Auth (1.7)
 
 - **The CLI is the `auth` package: `npx auth@latest generate`** — `@better-auth/cli` stopped at 1.4. It needs a config that exports `auth` (or a default), and it OVERWRITES the schema file — run it before adding your own models, or list the hand edits to reapply. Chicken-and-egg on fresh Prisma projects: `prisma generate` on the empty schema first so `lib/auth.ts` can import a client, then generate, then `prisma generate` again.
-- **With a database adapter, import `betterAuth` from `better-auth/minimal`** — it drops Kysely and its dialects (measured: auth chunk 885 → 788 kB). Keep the full `better-auth` import only in the CLI's schema config.
+- **With a database adapter, import `betterAuth` from `better-auth/minimal`** — it drops Kysely and its dialects (measured: auth chunk 885 → 788 kB). `auth generate` runs on it too (1.7.7, Prisma and Drizzle adapters).
 - **`session.cookieCache` makes `getSession` trust the signed cookie for `maxAge`** — a revoked session keeps passing guards until it expires. Guards pass `query: { disableCookieCache: true }`; display-only reads keep the cache (see `core/auth.md` DAL).
 - **The default rate limiter counts in memory per instance** — on serverless (Vercel functions, Workers isolates) limits barely apply. Set `rateLimit: { storage: "database", customRules: { "/get-session": false } }` (the `rateLimit` table comes from the CLI; the rule stops every page load writing a row) and `advanced.ipAddress.ipAddressHeaders` to the platform's client-IP header.
 - **`baseURL: { allowedHosts: [...], fallback }`** (1.7) resolves the URL from the request host against an allowlist (`"*.vercel.app"` covers previews) — no per-environment URL variables.

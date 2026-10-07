@@ -7,11 +7,13 @@
 
 ### Why Better Auth (2026)
 
-Self-hosted, TypeScript-first, sessions in your own database via the Prisma adapter, CSRF built-in, rich plugin ecosystem, open source. The recommended choice when the client owns their data and infrastructure — which is every custom SME platform. Managed providers (Clerk) only make sense when someone else's enterprise SSO requirements pay for the lock-in.
+Self-hosted, TypeScript-first, sessions in your own database through its Prisma or Drizzle adapter, CSRF built-in, rich plugin ecosystem, open source. The recommended choice when the client owns their data and infrastructure — which is every custom SME platform. Managed providers (Clerk) only make sense when someone else's enterprise SSO requirements pay for the lock-in.
 
 ---
 
 ### Server Setup
+
+Example: `stacks/nextjs` (Prisma, one module-level instance). On vinext, auth is built per request: `stacks/vinext-cloudflare/templates/auth.ts`.
 
 ```typescript
 // lib/auth.ts

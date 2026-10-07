@@ -9,6 +9,7 @@
     { "name": "drizzle-orm", "tag": "latest", "verified": "0.45.3", "watch": "major", "affects": "stacks/vinext-cloudflare (1.0 goes stable: drop the RC pin)" },
     { "name": "drizzle-orm", "tag": "rc", "verified": "1.0.0-rc.4", "watch": "exact", "affects": "stacks/vinext-cloudflare/templates" },
     { "name": "better-auth", "tag": "latest", "verified": "1.7.7", "watch": "minor", "affects": "stacks/nextjs/gotchas.md (Better Auth), both auth templates" },
+    { "name": "@better-auth/drizzle-adapter", "tag": "latest", "verified": "1.7.7", "watch": "minor", "affects": "stacks/vinext-cloudflare/templates/auth-config.ts (relations-v2 entry point)" },
     { "name": "zod", "tag": "latest", "verified": "4.6.5", "watch": "minor", "affects": "stacks/nextjs/gotchas.md (Zod 4)" },
     { "name": "next", "tag": "latest", "verified": "16.4.0", "watch": "minor", "affects": "stacks/nextjs" },
     { "name": "react", "tag": "latest", "verified": "19.3.0", "watch": "minor", "affects": "stacks/nextjs/gotchas.md (React)" },

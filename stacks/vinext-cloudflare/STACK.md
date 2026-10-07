@@ -28,11 +28,11 @@ Additions to the layout: `cloudflare.config.ts` (Worker, bindings, secrets),
 | Drizzle, not Prisma | Smaller Worker bundle, no codegen step, native check constraints and partial indexes | Schema is code: `templates/schema.ts` |
 | One DB client per request | Workers can't share I/O objects across requests | `getDb()` is the only way in |
 | Writes and read-after-write use the uncached Hyperdrive config | Hyperdrive's ~60 s query cache is never invalidated by writes | `getDb()` = fresh; `getCachedReadDb()` is opt-in for read-only lists that tolerate a minute of staleness |
-| Better Auth built per request: `createAuth(db)` | Its adapter needs this request's client | `templates/auth.ts` |
+| Better Auth built per request: `createAuth(db)` | Its adapter needs this request's client | `templates/auth.ts`; the options live in `templates/auth-config.ts`, which the CLI can load |
 | Bindings and secrets declared once in `cloudflare.config.ts` | One declaration feeds generated types (`.cloudflare/types`) and blocks deploy until each `bindings.secret()` is set — it replaces `lib/env.ts` | Deploy refuses; typecheck fails on a missing binding |
 | Money in integer minor units + `CHECK` constraint | Floats round; the constraint is the last guard | `templates/schema.ts` |
 | Side effects claim their idempotency key with `INSERT … ON CONFLICT DO NOTHING` | Race-free without locks — Hyperdrive has no advisory locks | `templates/idempotent-transaction.ts` |
-| Background work through `waitUntil` | Responses return before email sends finish; failures land in logs | `templates/auth.ts` (`backgroundTasks`) |
+| Background work through `waitUntil` | Responses return before email sends finish; failures land in logs | `templates/auth-config.ts` (`backgroundTasks`) |
 
 ## Prerelease Toolchain
 
@@ -48,7 +48,7 @@ PRs in `core/ci-cd.md`, so a regression has one suspect.
 
 ## Security
 
-- Auth forms: every layer of `core/security.md`'s defense in depth. Turnstile, database rate limits on `cf-connecting-ip`, and breached-password rejection are wired in `templates/auth.ts`.
+- Auth forms: every layer of `core/security.md`'s defense in depth. Turnstile, database rate limits on `cf-connecting-ip`, and breached-password rejection are wired in `templates/auth-config.ts`.
 - Other endpoints: the Workers Rate Limiting binding — approximate by design (per location, eventually consistent), so it stops abuse and never enforces business quotas; those are database queries.
 - Stripe webhooks verify with `constructEventAsync` (the sync `constructEvent` throws on Workers): `templates/stripe-webhook.ts`.
 
@@ -69,6 +69,7 @@ GitHub Actions runs the gates; Workers Builds deploys.
 | Table + money + indexes | [templates/schema.ts](./templates/schema.ts), [templates/relations.ts](./templates/relations.ts) |
 | Request DB client | [templates/db.ts](./templates/db.ts) |
 | Auth instance + session guard | [templates/auth.ts](./templates/auth.ts) |
+| Auth options, shared by the app and the schema CLI | [templates/auth-config.ts](./templates/auth-config.ts), [templates/auth-cli.ts](./templates/auth-cli.ts) |
 | Charge or other side effect, exactly once | [templates/idempotent-transaction.ts](./templates/idempotent-transaction.ts) |
 | Stripe webhook route handler | [templates/stripe-webhook.ts](./templates/stripe-webhook.ts) |
 

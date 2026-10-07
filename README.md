@@ -154,7 +154,7 @@ Rules are probabilistic; hooks are not. When you want the definition-of-done gat
 | Global rules after editing `rules/global-rules.md` | `bash setup.sh --global` + re-paste into Cursor's global settings |
 | A project's guardrail files | Never overwritten — a `setup.sh` re-run lists the files that differ from `.playbook/stacks/<stack>/project-files/`; merge by hand. The project's Dependabot bumps the action pins |
 | This repo itself | Read `MAINTENANCE.md` first; check `out-of-scope.md` before direction changes. The `playbook-checks` workflow checks the invariants a script can see on every PR |
-| Knowing *when* the playbook is stale | Automatic: on the 1st of each month a GitHub Action compares package versions and upstream skills against the recorded baselines and opens a `playbook-freshness` issue assigned to you when something moved (run it any time from the Actions tab) |
+| Knowing *when* the playbook is stale | Automatic: on the 1st of each month a GitHub Action compares package versions, upstream skills, and the shipped workflows' action pins against the recorded baselines and opens a `playbook-freshness` issue assigned to you when something moved (run it any time from the Actions tab) |
 
 ---
 

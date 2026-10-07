@@ -4,8 +4,9 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = join(dirname(new URL(import.meta.url).pathname), "..");
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tracked = execFileSync("git", ["ls-files", "-s", "--cached", "--others", "--exclude-standard"], { cwd: root, encoding: "utf8" })
   .split("\n")
   .filter(Boolean)
