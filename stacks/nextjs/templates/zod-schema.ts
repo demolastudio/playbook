@@ -3,7 +3,7 @@ import { z } from "zod";
 const supportedTimezones = new Set(Intl.supportedValuesOf("timeZone"));
 
 export const createBookingSchema = z.object({
-  serviceId: z.cuid(),
+  serviceId: z.uuid(),
   startsAt: z.coerce.date().refine((date) => date.getTime() > Date.now(), {
     error: "Booking must start in the future",
   }),

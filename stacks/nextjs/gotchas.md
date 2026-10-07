@@ -68,7 +68,7 @@
 ## Better Auth (1.7)
 
 - **The CLI is the `auth` package: `npx auth@latest generate`** — `@better-auth/cli` stopped at 1.4. It needs a config that exports `auth` (or a default), and it OVERWRITES the schema file — run it before adding your own models, or list the hand edits to reapply. Chicken-and-egg on fresh Prisma projects: `prisma generate` on the empty schema first so `lib/auth.ts` can import a client, then generate, then `prisma generate` again.
-- **With a database adapter, import `betterAuth` from `better-auth/minimal`** — it drops Kysely and its dialects (measured: auth chunk 885 → 788 kB). Keep the full `better-auth` import only in the CLI's schema config.
+- **With a database adapter, import `betterAuth` from `better-auth/minimal`** — it drops Kysely and its dialects (measured: auth chunk 885 → 788 kB). `auth generate` runs on it too (1.7.7, Prisma and Drizzle adapters).
 - **`session.cookieCache` makes `getSession` trust the signed cookie for `maxAge`** — a revoked session keeps passing guards until it expires. Guards pass `query: { disableCookieCache: true }`; display-only reads keep the cache (see `core/auth.md` DAL).
 - **The default rate limiter counts in memory per instance** — on serverless (Vercel functions, Workers isolates) limits barely apply. Set `rateLimit: { storage: "database", customRules: { "/get-session": false } }` (the `rateLimit` table comes from the CLI; the rule stops every page load writing a row) and `advanced.ipAddress.ipAddressHeaders` to the platform's client-IP header.
 - **`baseURL: { allowedHosts: [...], fallback }`** (1.7) resolves the URL from the request host against an allowlist (`"*.vercel.app"` covers previews) — no per-environment URL variables.

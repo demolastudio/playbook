@@ -3,8 +3,9 @@
 > **Source:** [web.dev — Core Web Vitals](https://web.dev/articles/vitals)
 > Google ranks on the **75th percentile** of real-user data (CrUX).
 > Always prioritise **field data** over lab/Lighthouse scores.
-> Framework-specific implementation (PPR, `use cache`, next/image, next/font):
-> see `stacks/nextjs/performance.md`.
+> Framework-specific implementation: `stacks/nextjs/performance.md` (PPR,
+> `use cache`, next/image, next/font); vinext on Workers caches whole pages
+> instead — `stacks/vinext-cloudflare/caching.md`.
 
 ---
 

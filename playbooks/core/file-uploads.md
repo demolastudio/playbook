@@ -170,7 +170,7 @@ For before/after cleaning photos or large documents:
 
 ```prisma
 model FileUpload {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid(7)) @db.Uuid
   key          String   @unique  // Storage path (S3 key or Blob URL)
   originalName String            // For display only — never used as storage path
   size         Int               // Bytes
@@ -179,7 +179,7 @@ model FileUpload {
   entity       String?           // "visit", "client", "portfolio"
   entityId     String?           // Related record ID
   status       String   @default("ACTIVE")  // ACTIVE, DELETED
-  createdAt    DateTime @default(now())
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
 
   @@index([entity, entityId])
   @@index([uploadedBy])

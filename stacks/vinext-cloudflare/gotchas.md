@@ -37,6 +37,6 @@
 
 ## Better Auth 1.7 + Drizzle 1.0
 
-- **The CLI's default Drizzle generator writes the old `relations()` API**, which 1.0 no longer exports. Point the CLI config at `@better-auth/drizzle-adapter/relations-v2` (it writes `defineRelationsPart`) and spread the result after the app's `defineRelations`.
+- **The CLI's default Drizzle generator writes the old `relations()` API**, which 1.0 no longer exports. `templates/auth-config.ts` imports `drizzleAdapter` from `@better-auth/drizzle-adapter/relations-v2`, so the CLI writes `defineRelationsPart`; spread the result after the app's `defineRelations`. Install that package at `better-auth`'s exact version (they release in lockstep; pnpm refuses an undeclared import). The same adapter serves runtime: sign-up, verification, sign-in, sessions, and database rate limits ran on it against Drizzle 1.0 RC4.
 - **Pass `import * as authSchema` to `drizzleAdapter`** — a hand-written table list missed the CLI's new `rateLimit` table and every auth request returned 500.
-- **The CLI needs an `auth` export, but auth is built per request** — give it a separate config: `export const auth = createAuth(drizzle.mock({ relations }))`.
+- **The CLI needs an `auth` export, but auth is built per request — and the CLI loads it in plain Node,** where `cloudflare:workers` and `next/*` don't resolve, so a config that imports `lib/auth.ts` fails. The options live in `lib/auth-config.ts` with runtime values as parameters; `auth-cli.ts` builds them on `drizzle.mock({ relations })` ([templates](./STACK.md#templates)). One options source, so the schema can't miss a plugin's table.
