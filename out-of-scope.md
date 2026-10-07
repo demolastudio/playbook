@@ -38,3 +38,19 @@
 ## CONTEXT-MAP (multi-context glossaries)
 
 **Deferred (July 2026).** Solo projects have one bounded context. `formats/context.md` covers the single-context case; add the map format when a real monorepo needs two glossaries.
+
+## Renaming CONTEXT.md to GLOSSARY.md
+
+**Rejected (October 2026).** mattpocock/skills 1.3.0 renamed its glossary convention with no stated reason. Following it means a `git mv` in every existing project and a dual-name period in setup.sh, for no behavior change — the file's format is otherwise identical. Revisit if a tool we use starts reading `GLOSSARY.md` by convention.
+
+## Removing /merge-conflicts
+
+**Rejected (October 2026).** Upstream removed `resolving-merge-conflicts` because agents resolve conflicts unaided. Ours stays: as a user-invoked slash command it costs no context until typed, and it carries the parts the default skips — both intents or a named trade-off, and the definition-of-done gates before the merge counts as done.
+
+## /wait-what (re-pitch the last message)
+
+**Rejected (October 2026).** Global rule 10 (ASD-STE100 output) prevents the unreadable message instead of repairing it afterwards. Revisit if output still lands unclear with the rule in place.
+
+## PR-body format skill
+
+**Deferred (October 2026).** `rules/git-workflow.md` leaves PR process to the user's stated conventions (global rule 8). Revisit when the user states a PR format.

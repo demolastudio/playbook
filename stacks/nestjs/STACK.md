@@ -13,7 +13,7 @@ The global rules and core playbook principles apply unchanged — only the tools
 | Mutations | Server Actions (`actions/`) | Controllers → Services |
 | ORM / data access | Prisma (`lib/`) | Prisma (same patterns apply directly) |
 | Auth sessions | Better Auth | Guards + Passport or Better Auth adapter |
-| Checks | `tsc` / `eslint` / `vitest` | `tsc` / `eslint` / `jest` or `vitest` |
+| Checks | `tsc` / `oxlint` / `vitest` | `tsc` / `oxlint` / `jest` or `vitest` |
 
 ## Planned Sections
 

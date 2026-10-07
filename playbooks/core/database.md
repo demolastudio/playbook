@@ -21,87 +21,9 @@ B-tree indexes are optimized for sequential inserts. Random IDs (UUID v4, CUID2)
 
 #### Recommendation
 
-- **For new projects:** UUID v7 — time-sortable, native PostgreSQL type, 16-byte storage
+- **For new projects:** UUID v7 — time-sortable, native PostgreSQL type, 16-byte storage. Postgres 18+ generates it natively: make `uuidv7()` the column default (check `select version()`; older versions generate in the app)
 - **If already using CUID2:** Fine for most booking systems at small-to-medium scale. The B-tree impact is real but manageable. Migrate to UUID v7 only if write throughput becomes a bottleneck.
 - **Never use auto-increment IDs in URLs** — they leak information (total count, creation order, enumeration attacks)
-
----
-
-### Indexing Strategy
-
-Indexes speed up reads but slow down writes. Be intentional.
-
-#### Index Types for Booking Systems
-
-| Index Type | When to Use | Example |
-| ---------- | ----------- | ------- |
-| **Single column** | Frequent filter on one field | `CREATE INDEX ON bookings(client_id)` |
-| **Composite** | Filter on multiple fields together | `CREATE INDEX ON bookings(resource_id, status, start_time)` |
-| **Partial** | Most queries only care about a subset | `CREATE INDEX ON bookings(start_time) WHERE status = 'CONFIRMED'` |
-| **Covering (INCLUDE)** | Query can be satisfied entirely from the index | `CREATE INDEX ON bookings(client_id) INCLUDE (status, start_time)` |
-
-#### Composite Index Column Order
-
-**Equality columns first, range columns last:**
-
-```
-✅  (resource_id, status, start_time)  — equality, equality, range
-❌  (start_time, resource_id, status)  — range first kills selectivity
-```
-
-#### Essential Indexes for Booking Systems
-
-| Query Pattern | Recommended Index |
-| ------------- | ----------------- |
-| "What's available for this resource?" | `(resource_id, status, start_time)` |
-| "All bookings for this client" | `(client_id, created_at DESC)` |
-| "Upcoming confirmed bookings" | Partial: `(start_time) WHERE status = 'CONFIRMED'` |
-| "Audit trail for this entity" | `(entity, entity_id, created_at)` |
-
-#### When NOT to Index
-
-- Columns with very low cardinality (e.g., boolean `is_active` on a small table)
-- Tables with < 1,000 rows — sequential scan is faster
-- Columns only used in `SELECT`, not in `WHERE` / `JOIN` / `ORDER BY`
-
----
-
-### Query Optimization
-
-#### N+1 Prevention
-
-The most common performance killer in ORM-based systems:
-
-```
-❌ N+1: 1 query for bookings + N queries for each booking's client
-   SELECT * FROM bookings
-   For each booking: SELECT * FROM clients WHERE id = booking.client_id
-
-✅ Single query with join / eager loading:
-   SELECT * FROM bookings JOIN clients ON bookings.client_id = clients.id
-```
-
-**Detection:** Monitor query counts per request. If a single page load triggers 50+ queries, you likely have an N+1. Use `pg_stat_statements` to find frequently-executed queries.
-
-#### Select Only What You Need
-
-```
-❌  SELECT * FROM bookings  (fetches all 20+ columns)
-✅  SELECT id, status, start_time, client_id FROM bookings  (fetches 4 columns)
-```
-
-Narrower selects reduce I/O, improve cache hit rates, and enable covering index scans.
-
-#### Pagination
-
-**Never use OFFSET for large datasets.** It gets slower as the offset grows because the database still scans all skipped rows.
-
-```
-❌  SELECT * FROM bookings ORDER BY created_at OFFSET 10000 LIMIT 20
-✅  SELECT * FROM bookings WHERE created_at < :lastSeenDate ORDER BY created_at DESC LIMIT 20
-```
-
-Cursor-based pagination (keyset) is constant-time regardless of page depth.
 
 ---
 
@@ -138,6 +60,8 @@ Unlock
 
 Useful for coordinating across distributed workers (e.g., "only one process should generate slots for resource 123 at a time") without table-level contention.
 
+**Unavailable behind transaction-mode poolers.** Cloudflare Hyperdrive doesn't support them, and a session lock under PgBouncer transaction mode outlives the borrowed connection. There, serialize with `SELECT … FOR UPDATE` in a short transaction, a conditional `UPDATE … WHERE status = 'PENDING'` (check the affected-row count), or a unique constraint.
+
 ---
 
 ### Connection Management
@@ -150,6 +74,12 @@ Useful for coordinating across distributed workers (e.g., "only one process shou
 | **Read replicas** | High read volume | Offload dashboard/reporting queries from the primary writer |
 
 **Pool sizing rule of thumb:** 2–4× the number of CPU cores. Too many connections cause context switching; too few cause request queuing.
+
+**One pooler, not two.** An edge pooler (Hyperdrive) connects to the database's direct endpoint — on Neon, the host without `-pooler` — because two poolers in series fight over the same connections.
+
+### Roles & Least Privilege
+
+The app connects with a role holding only the grants it uses — e.g. `INSERT, SELECT` on the audit log and no `UPDATE`/`DELETE`, so append-only is enforced by the database. Migrations run as a separate owner role. On Neon, roles created in the console join `neon_superuser` and inherit broad access: create least-privilege roles in SQL with explicit grants.
 
 ---
 
@@ -191,10 +121,9 @@ As tables grow past millions of rows, performance degrades:
 
 ### Rules
 
-- **Index foreign keys.** They're not auto-indexed in PostgreSQL. Missing FK indexes cause slow joins.
+- **Timestamps are `timestamp with time zone`.** A plain `timestamp` stores the client's local wall time — local time from a laptop, UTC from a server.
+- **Verify the server certificate:** `sslmode=verify-full` in every connection string.
 - **Use the smallest data type that fits.** `INT` vs `BIGINT`, specific `DATE` vs `TIMESTAMP` — smaller types improve cache efficiency.
-- **`EXPLAIN ANALYZE` before optimizing.** Never guess. Run the actual query plan to see if it's using your indexes.
-- **Prefer cursor-based pagination.** OFFSET pagination degrades linearly with depth.
+- **`EXPLAIN ANALYZE` before optimizing.** Never guess — indexing and query patterns live in `database-indexing.md`.
 - **Keep transactions under 100ms.** If a transaction takes longer, you're probably holding a lock during an external call.
-- **Monitor `pg_stat_statements`.** It reveals your slowest and most-frequent queries — optimize those first.
 - **Separate migration and application connection strings.** Migrations need direct access; app queries go through the pooler.

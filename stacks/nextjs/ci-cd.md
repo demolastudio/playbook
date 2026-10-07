@@ -26,7 +26,7 @@ npx vitest run --changed
 ```json
 // package.json
 "lint-staged": {
-  "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+  "*.{ts,tsx}": ["oxlint --fix", "prettier --write"],
   "*.{json,md,css}": ["prettier --write"]
 }
 ```
@@ -45,7 +45,7 @@ lint-staged auto-stages its fixes — never add `git add` to the tasks.
   "build": "next build",
   "postinstall": "prisma generate",
   "typecheck": "tsc --noEmit",
-  "lint": "eslint .",
+  "lint": "oxlint",
   "test": "vitest run"
 }
 ```

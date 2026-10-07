@@ -28,39 +28,7 @@ A model predicts the most probable output. For visual design, "most probable" is
 
 ### The Fix: DESIGN.md Token Lock
 
-At the start of every project, create a `DESIGN.md` in the project root. It is the single source of truth for visual decisions — the agent reads it before styling anything, and never deviates from it.
-
-```markdown
-# Design — [Project Name]
-
-## Direction
-[ONE committed direction: editorial / brutalist / industrial-mono /
- soft-organic / dense-terminal. Name it. Everything follows from it.]
-
-## Motif
-[2–3 sentences: the feeling the product should evoke, one real-world
- inspiration. e.g. "Calm confidence of a well-run clinic — precise,
- warm, never clinical. Inspired by Swiss transit signage."]
-
-## Tokens (locked)
-- Palette: [dominant 60% / neutral 30% / accent 10% — exact HSL values]
-- Semantic colors: success / warning / error / info — separate from brand hues
-- Type: Inter or Outfit (per Design Taste); heading weights + scale, [mono] for data
-- Type scale: [e.g. 1.25 ratio from 14px base]
-- Radius scale: [e.g. 2px data / 8px interactive / full pills]
-- Spacing unit: [e.g. 4px base grid]
-- Motion: [e.g. 200ms ease-out, no bounce]
-
-## Never
-[Project-specific bans, e.g. "no gradients", "no cards inside cards"]
-```
-
-**Rules for the lock:**
-
-- Extend the palette only via tints/shades of the locked hues — never new hues
-- New components use existing tokens; a new token requires updating DESIGN.md first
-- If DESIGN.md doesn't exist yet, ask the user for direction + motif before styling — never invent taste (see `rules/global-rules.md` rule 8)
-- Design-skill output (e.g. ui-ux-pro-max's MASTER.md) is *input* to DESIGN.md — merge what survives the taste filter; one lock per project (see `recommended-skills.md` precedence)
+At the start of every project, create a `DESIGN.md` in the project root in the format of `.playbook/formats/design.md`. It is the single source of truth for visual decisions: the agent reads it before styling anything, the Tailwind theme is generated from it, and its gate fails on broken token references, contrast below WCAG AA, and a theme that drifted from it. The format file also holds the lock's rules (tokens only, tints and shades only, ask before inventing taste).
 
 ---
 

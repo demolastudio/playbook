@@ -29,14 +29,6 @@
 
 ---
 
-## Loop Engineering (2026)
+## Closed Loops
 
-The unit of engineering in 2026 is the **loop**, not the prompt.
-
-- **Design closed-loop systems.** Every task follows: action → evaluate → repair. The agent acts, checks the result against objective truth, and iterates until verified.
-- **Every loop needs 3 things:**
-  1. **Trigger** — what starts the loop
-  2. **Evaluation cycle** — agent checks if the goal is met after each action
-  3. **Stop condition** — guardrails that prevent infinite loops, goal drift, and runaway costs
-- **Verification is the critical step.** Never assume something works — check it. The concrete verification gate for this playbook is [definition-of-done.md](./definition-of-done.md).
-- **The quality of the system is limited by the design of the loop, not the model.**
+Every task runs act → check against objective truth → repair, with an explicit stop condition. Never assume something works — check it. The concrete check is [definition-of-done.md](./definition-of-done.md).

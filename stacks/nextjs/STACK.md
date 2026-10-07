@@ -10,7 +10,7 @@
 app/
 ├── (public)/             ← Public-facing pages
 ├── (admin)/              ← Admin/dashboard pages
-└── api/                  ← Route handlers (webhooks and public APIs only)
+└── api/                  ← Route handlers (webhooks, external callers, client reads)
 
 types/                    ← All TypeScript types/interfaces
 schemas/                  ← All Zod validation schemas
@@ -23,7 +23,7 @@ components/               ← UI components
 ## Conventions
 
 - **Arrow functions everywhere** (`const fn = async () => {}`) — never `function` declarations. Components export via `const Page = () => ...; export default Page`. (Global rule 9; the templates model it.)
-- **Mutations are Server Actions.** Route handlers exist only for webhooks and endpoints external systems call.
+- **Mutations are Server Actions.** Server Components read through the DAL directly. Next.js dispatches Server Actions one at a time per client, so they never serve reads: data a Client Component fetches (per-user data on cached pages, optimistic updates) comes from a GET route handler (`Cache-Control: private, no-store`) through TanStack Query or SWR. Route handlers otherwise exist only for webhooks and endpoints external systems call.
 - **Every mutation follows the same pipeline:** Better Auth session check → Zod parse → single-source-of-truth business function in `lib/` → audit log → typed result. The canonical shape is [templates/server-action.ts](./templates/server-action.ts).
 - **Prisma stays in `lib/`.** No queries in components or actions — actions call business functions, business functions query.
 - **Multi-step writes use transactions** with a business-derived idempotency key — see [templates/prisma-idempotent-transaction.ts](./templates/prisma-idempotent-transaction.ts) and `playbooks/core/idempotency.md`.
@@ -51,8 +51,8 @@ Husky v9 hooks, `predev`/`prebuild` env assertion, and the GitHub Actions pipeli
 
 ## Gotchas
 
-Operational traps (non-interactive Prisma migrations, stale `.next`, React Compiler rules, Decimal serialization): [gotchas.md](./gotchas.md).
+Operational traps (version pins, non-interactive Prisma migrations, streaming status codes, the effects table, Zod 4 and Better Auth changes): [gotchas.md](./gotchas.md).
 
 ## Definition-of-Done Commands
 
-See [checks.md](./checks.md).
+See [checks.md](./checks.md) — lint is oxlint (TypeScript 7 breaks typescript-eslint).

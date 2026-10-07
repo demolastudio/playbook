@@ -13,14 +13,14 @@ searchParams (URL)  →  parse + validate (schema)  →  DAL query  →  page of
 
 - **URL is the single source of table state** — page, sort, filters, search all live in searchParams; the table renders what the server returned, nothing more
 - Validate searchParams with a schema like any other untrusted input: whitelist sortable columns, clamp page size (max 100), reject unknown filters
-- **Sorting by unindexed columns is a denial-of-service on your own DB** — the sortable-column whitelist and the index list are the same list (`core/database.md`)
+- **Sorting by unindexed columns is a denial-of-service on your own DB** — the sortable-column whitelist and the index list are the same list (`core/database-indexing.md`)
 
 ### Pagination
 
 | Context | Pattern |
 | ------- | ------- |
 | Admin tables (jump to page, show totals) | OFFSET is acceptable up to ~10K rows — admins need page numbers |
-| Feeds and exports | Cursor/keyset — constant-time at any depth (`core/database.md`) |
+| Feeds and exports | Cursor/keyset — constant-time at any depth (`core/database-indexing.md`) |
 | Counts | `count()` on the filtered query, cached briefly — exact totals on every keystroke are wasted queries |
 
 ### Search

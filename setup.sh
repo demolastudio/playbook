@@ -110,7 +110,9 @@ PKG_JSON="$PROJECT_DIR/package.json"
 if [ -f "$PROJECT_DIR/turbo.json" ]; then
   STACKS+=("turborepo")
 fi
-if [ -f "$PKG_JSON" ] && grep -q '"next"' "$PKG_JSON"; then
+if [ -f "$PKG_JSON" ] && grep -q '"vinext"' "$PKG_JSON"; then
+  STACKS+=("vinext-cloudflare")
+elif [ -f "$PKG_JSON" ] && grep -q '"next"' "$PKG_JSON"; then
   STACKS+=("nextjs")
 fi
 if [ -f "$PKG_JSON" ] && grep -q '"@nestjs/core"' "$PKG_JSON"; then
@@ -128,17 +130,23 @@ fi
 
 # ─── Gitignore playbook artifacts ──────────────────────────────────
 GITIGNORE="$PROJECT_DIR/.gitignore"
-for entry in ".playbook/" ".agents/workflows/" ".agent/workflows/" ".agents/rules/playbook.md" ".agent/rules/playbook.md" ".claude/commands/" ".cursor/rules/"; do
+for entry in ".playbook/" ".agents/workflows/" ".agent/workflows/" ".agents/rules/playbook.md" ".agent/rules/playbook.md" ".claude/commands/" ".cursor/commands/" ".cursor/rules/playbook.mdc"; do
   add_gitignore_entry "$GITIGNORE" "$entry"
 done
 echo "📋 Ensured playbook artifacts are gitignored"
 
 # ─── Copy workflows to all AI tool paths ──────────────────────────
+# Workflows are user-invoked slash commands in every tool. Cursor reads
+# commands from .cursor/commands/ (plain Markdown); earlier installs wrote
+# them as .cursor/rules/<workflow>.mdc, which Cursor could auto-attach —
+# a file is removed only if it has that generated shape (agent-requested
+# rule carrying the workflow's own title), never a user's own rule.
 WORKFLOWS_SRC="$PLAYBOOK_DIR/workflows"
 
 if [ -d "$WORKFLOWS_SRC" ]; then
   mkdir -p "$PROJECT_DIR/.agents/workflows" "$PROJECT_DIR/.agent/workflows" \
-           "$PROJECT_DIR/.claude/commands" "$PROJECT_DIR/.cursor/rules"
+           "$PROJECT_DIR/.claude/commands" "$PROJECT_DIR/.cursor/commands" \
+           "$PROJECT_DIR/.cursor/rules"
 
   for f in "$WORKFLOWS_SRC"/*.md; do
     [ -f "$f" ] || continue
@@ -147,33 +155,30 @@ if [ -d "$WORKFLOWS_SRC" ]; then
     copy_if_newer "$f" "$PROJECT_DIR/.agent/workflows/$name"
     copy_if_newer "$f" "$PROJECT_DIR/.claude/commands/$name"
 
-    target="$PROJECT_DIR/.cursor/rules/${name%.md}.mdc"
+    target="$PROJECT_DIR/.cursor/commands/$name"
     if [ ! -f "$target" ] || [ "$f" -nt "$target" ]; then
-      desc="$(grep "^description:" "$f" | head -1 | sed 's/description: *//')"
-      {
-        echo "---"
-        echo "description: \"$desc\""
-        echo "alwaysApply: false"
-        echo "---"
-        echo ""
-        strip_frontmatter "$f"
-      } > "$target"
+      strip_frontmatter "$f" > "$target"
+    fi
+    legacy="$PROJECT_DIR/.cursor/rules/${name%.md}.mdc"
+    title="$(grep -m1 '^# ' "$f" || true)"
+    if [ -f "$legacy" ] && [ -n "$title" ] && grep -qxF "alwaysApply: false" "$legacy" && grep -qxF "$title" "$legacy"; then
+      rm "$legacy"
     fi
   done
 
-  echo "📂 Antigravity  → .agent/workflows/ + .agents/workflows/"
+  echo "📂 Antigravity  → .agents/workflows/ (+ .agent/ for older versions)"
   echo "📂 Claude Code  → .claude/commands/"
-  echo "📂 Cursor       → .cursor/rules/ (.mdc)"
+  echo "📂 Cursor       → .cursor/commands/"
 fi
 
 # ─── Always-loaded rules per tool ──────────────────────────────────
-# Antigravity workspace rules (plain Markdown, auto-loaded; .agent/ is
-# current per v1.20.5 docs, .agents/ kept for older installs) and a Cursor
-# always-apply rule. Both are rendered from rules/global-rules.md — one
-# source of truth, refreshed on every setup run.
+# Antigravity workspace rules (plain Markdown, auto-loaded; .agents/ is
+# current, .agent/ kept for older versions) and a Cursor always-apply rule.
+# Both are rendered from rules/global-rules.md — one source of truth,
+# refreshed on every setup run.
 GLOBAL_RULES_SRC="$PLAYBOOK_DIR/rules/global-rules.md"
 
-for rules_dir in "$PROJECT_DIR/.agent/rules" "$PROJECT_DIR/.agents/rules"; do
+for rules_dir in "$PROJECT_DIR/.agents/rules" "$PROJECT_DIR/.agent/rules"; do
   mkdir -p "$rules_dir"
   {
     cat "$GLOBAL_RULES_SRC"
@@ -181,7 +186,7 @@ for rules_dir in "$PROJECT_DIR/.agent/rules" "$PROJECT_DIR/.agents/rules"; do
     echo "Project routing and completion gate: see AGENTS.md at the project root."
   } > "$rules_dir/playbook.md"
 done
-echo "📌 Antigravity  → .agent/rules/playbook.md (always-loaded, + .agents/ fallback)"
+echo "📌 Antigravity  → .agents/rules/playbook.md (always-loaded, + .agent/ fallback)"
 
 {
   echo "---"
@@ -213,21 +218,23 @@ BLOCK_FILE="$(mktemp)"
 3. **Never Trust the Client** — re-validate all inputs server-side; authenticate and authorize all mutations.
 4. **Audit Everything** — every state transition, charge, and permission change gets logged. Append-only.
 5. **Idempotency by Default** — every external side effect uses a business-derived idempotency key.
+6. **Money Is Integer Minor Units** — never floats; the currency travels with every amount; rounding happens once, in one named function.
 
 ## Required Reading, in Order
 
 1. `.playbook/rules/` — global-rules, code-style, project-structure, mistakes, definition-of-done
 2. `CONTEXT.md` at the project root, if it exists — the domain glossary; use its exact terms in all naming
+3. `DESIGN.md` at the project root, if it exists — the design lock; read it before any UI work
 EOF
 
-    step=3
+    step=4
     if [ ${#STACKS[@]} -gt 0 ]; then
       for stack in "${STACKS[@]}"; do
         echo "$step. \`.playbook/stacks/$stack/STACK.md\` — stack conventions, templates, and check commands"
         step=$((step + 1))
       done
     else
-      echo "$step. \`.playbook/stacks/\` — identify the closest profile (nextjs, nestjs, fastapi, turborepo) and read its STACK.md; if none fits, proceed with the agnostic rules only"
+      echo "$step. \`.playbook/stacks/\` — identify the closest profile (vinext-cloudflare, nextjs, nestjs, fastapi, turborepo) and read its STACK.md; if none fits, proceed with the agnostic rules only"
       step=$((step + 1))
     fi
 
@@ -272,6 +279,18 @@ else
 fi
 
 rm -f "$BLOCK_FILE"
+
+# ─── Claude Code: make sure it reads AGENTS.md ────────────────────
+# Claude Code reads AGENTS.md only when no CLAUDE.md exists (and only on
+# recent versions). A one-line @-import in CLAUDE.md covers both cases.
+CLAUDE_FILE="$PROJECT_DIR/CLAUDE.md"
+if [ ! -f "$CLAUDE_FILE" ]; then
+  echo "@AGENTS.md" > "$CLAUDE_FILE"
+  echo "📝 Created CLAUDE.md importing AGENTS.md"
+elif ! grep -qxF "@AGENTS.md" "$CLAUDE_FILE"; then
+  { echo ""; echo "@AGENTS.md"; } >> "$CLAUDE_FILE"
+  echo "📝 Added @AGENTS.md import to your existing CLAUDE.md (content preserved)"
+fi
 
 # ─── Global rules (if --global passed with a project dir) ─────────
 if [ "$INSTALL_GLOBAL" = true ]; then

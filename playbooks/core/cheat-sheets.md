@@ -127,10 +127,10 @@ export const ContactFormSchema = z.object({
 | --- | --- | --- |
 | `page.tsx` | Route component | Every route |
 | `layout.tsx` | Shared wrapper | Route groups |
-| `loading.tsx` | Suspense fallback (skeleton) | Every route |
+| `loading.tsx` | Suspense fallback (skeleton) | List/feed routes — never above a route that calls `notFound()` (streaming fixes the status at 200) |
 | `error.tsx` | Error boundary | Every route group |
 | `not-found.tsx` | 404 page | Top-level + important routes |
-| `route.ts` | API endpoint | External callers only (webhooks) |
+| `route.ts` | API endpoint | Webhooks, external callers, GET reads for Client Components |
 | `proxy.ts` | Auth middleware | Project root |
 | `instrumentation.ts` | OTel/Sentry init | Project root |
 | `global-error.tsx` | Root error boundary | `app/` root |

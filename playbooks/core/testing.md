@@ -123,6 +123,13 @@ Test the complete user journey through a real browser:
 - Use unique, descriptive IDs on interactive elements for reliable selectors
 - Seed test data at the start of each test — never depend on data from a previous test
 
+**E2E baseline (Playwright):**
+- Specs live in `e2e/`. A **setup project** signs in once and saves `storageState`; specs start authenticated
+- A **phone-device project** runs the same specs — the 375px responsive gate, automated
+- `workers: 1` when specs share an account or a rate limit
+- **Global teardown** deletes test data, and refuses to run unless the database URL is the development database
+- Assert on **server-confirmed state** (the persisted value after reload, the server's response) — never on optimistic UI
+
 ---
 
 ### Edge Cases Every Booking System Must Test
@@ -149,7 +156,7 @@ Booking creation budget: max 3 queries
 API listing endpoint budget: max 2 queries
 ```
 
-This catches N+1 regressions before they reach production (see `core/database.md`).
+This catches N+1 regressions before they reach production (see `core/database-indexing.md`).
 
 ---
 
