@@ -1,9 +1,9 @@
 {
-  "verifiedOn": "2026-10-07",
+  "verifiedOn": "2026-10-08",
   "packages": [
     { "name": "vinext", "tag": "latest", "verified": "1.0.1", "watch": "minor", "affects": "stacks/vinext-cloudflare" },
     { "name": "@vinext/cloudflare", "tag": "latest", "verified": "1.0.1", "watch": "minor", "affects": "stacks/vinext-cloudflare/caching.md" },
-    { "name": "cf", "tag": "latest", "verified": "1.0.0-beta.12", "watch": "exact", "affects": "stacks/vinext-cloudflare/gotchas.md (cf CLI beta)" },
+    { "name": "cf", "tag": "latest", "verified": "1.0.0-beta.13", "watch": "exact", "affects": "stacks/vinext-cloudflare/gotchas.md (cf CLI beta)" },
     { "name": "@cloudflare/vite-plugin", "tag": "latest", "verified": "1.63.0", "watch": "major", "affects": "stacks/vinext-cloudflare (v2 leaves beta)" },
     { "name": "miniflare", "tag": "latest", "verified": "5.20261006.0-alpha", "watch": "major", "affects": "stacks/vinext-cloudflare/gotchas.md (Miniflare 5.x)" },
     { "name": "drizzle-orm", "tag": "latest", "verified": "0.45.3", "watch": "major", "affects": "stacks/vinext-cloudflare (1.0 goes stable: drop the RC pin)" },
