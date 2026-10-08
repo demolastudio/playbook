@@ -62,6 +62,33 @@ expect_file "$p" .claude/hooks/session-start.sh
 expect_file "$p" vitest.config.mts
 expect_no_file "$p" scripts/check-cache.sh
 
+# Turborepo: app stacks under apps/ are routed, guardrails stay root-only
+p="$work/turbo"
+mkdir -p "$p/apps/web" "$p/apps/api" && echo '{}' > "$p/turbo.json" && echo '{ "devDependencies": { "turbo": "2.0.0" } }' > "$p/package.json"
+echo '{ "dependencies": { "next": "16.4.0" } }' > "$p/apps/web/package.json"
+echo 'dependencies = ["fastapi"]' > "$p/apps/api/pyproject.toml"
+run_setup "$p"
+grep -qF "stacks/turborepo/STACK.md" "$p/AGENTS.md" || fail "turbo: AGENTS.md lacks turborepo"
+grep -q "stacks/nextjs/STACK.md.* for .apps/web/" "$p/AGENTS.md" || fail "turbo: AGENTS.md lacks nextjs for apps/web"
+grep -q "stacks/fastapi/STACK.md.* for .apps/api/" "$p/AGENTS.md" || fail "turbo: AGENTS.md lacks fastapi for apps/api"
+expect_no_file "$p" .github/workflows/gates.yml
+
+# Claude Code and Cursor only; an earlier install's Antigravity copies go,
+# a user's own file there stays
+p="$work/legacy"
+mkdir -p "$p/.agents/workflows" "$p/.agent/rules" "$p/.agents/rules"
+cp "$root/workflows/flow.md" "$p/.agents/workflows/flow.md"
+printf 'rules\n\nProject routing and completion gate: see AGENTS.md at the project root.\n' > "$p/.agent/rules/playbook.md"
+echo "mine" > "$p/.agents/rules/team.md"
+run_setup "$p"
+expect_file "$p" .claude/commands/flow.md
+expect_file "$p" .cursor/commands/flow.md
+expect_file "$p" .cursor/rules/playbook.mdc
+expect_no_file "$p" .agent
+expect_no_file "$p" .agents/workflows
+expect_file "$p" .agents/rules/team.md
+grep -q "agent" "$p/.gitignore" && fail "legacy: .gitignore gained Antigravity entries"
+
 # a stack without shipped files gets none, and no next-step note
 p="$work/fastapi"
 mkdir "$p" && echo 'dependencies = ["fastapi"]' > "$p/pyproject.toml"

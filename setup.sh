@@ -36,21 +36,11 @@ install_global_rules() {
     exit 1
   fi
 
-  echo "🌍 Updating global rules for all AI tools..."
+  echo "🌍 Updating global rules..."
 
   mkdir -p "$HOME/.claude"
   cp "$rules_file" "$HOME/.claude/CLAUDE.md"
   echo "   ✅ Claude Code  → ~/.claude/CLAUDE.md"
-
-  mkdir -p "$HOME/.gemini"
-  cp "$rules_file" "$HOME/.gemini/GEMINI.md"
-  echo "   ✅ Gemini CLI   → ~/.gemini/GEMINI.md"
-  echo "      💡 Tip: add \"AGENTS.md\" to context.fileName in ~/.gemini/settings.json"
-  echo "         so Gemini CLI also reads project AGENTS.md files."
-
-  mkdir -p "$HOME/.codex"
-  cp "$rules_file" "$HOME/.codex/AGENTS.md"
-  echo "   ✅ OpenAI Codex → ~/.codex/AGENTS.md"
 
   echo ""
   echo "   ⚠️  Cursor: paste rules/global-rules.md into Settings → Rules for AI"
@@ -103,39 +93,70 @@ else
 fi
 
 # ─── Detect project stacks ─────────────────────────────────────────
+# STACKS drives AGENTS.md routing; STACK_WHERE names the app folder for
+# stacks found under apps/ in a Turborepo (empty for the project root).
+# Guardrail files come from root stacks only: one app's CI and test config
+# don't fit a monorepo root.
 STACKS=()
+STACK_WHERE=()
+ROOT_STACKS=()
 PKG_JSON="$PROJECT_DIR/package.json"
+
+detect_stacks() {
+  local dir="$1" where="$2" pkg="$1/package.json" found=()
+  if [ -f "$pkg" ] && grep -q '"vinext"' "$pkg"; then
+    found+=("vinext-cloudflare")
+  elif [ -f "$pkg" ] && grep -q '"next"' "$pkg"; then
+    found+=("nextjs")
+  fi
+  if [ -f "$pkg" ] && grep -q '"@nestjs/core"' "$pkg"; then
+    found+=("nestjs")
+  fi
+  if grep -qs "fastapi" "$dir/pyproject.toml" "$dir"/requirements*.txt 2>/dev/null; then
+    found+=("fastapi")
+  fi
+  for stack in ${found[@]+"${found[@]}"}; do
+    STACKS+=("$stack")
+    STACK_WHERE+=("$where")
+    [ -n "$where" ] || ROOT_STACKS+=("$stack")
+  done
+}
 
 if [ -f "$PROJECT_DIR/turbo.json" ]; then
   STACKS+=("turborepo")
+  STACK_WHERE+=("")
+  ROOT_STACKS+=("turborepo")
 fi
-if [ -f "$PKG_JSON" ] && grep -q '"vinext"' "$PKG_JSON"; then
-  STACKS+=("vinext-cloudflare")
-elif [ -f "$PKG_JSON" ] && grep -q '"next"' "$PKG_JSON"; then
-  STACKS+=("nextjs")
-fi
-if [ -f "$PKG_JSON" ] && grep -q '"@nestjs/core"' "$PKG_JSON"; then
-  STACKS+=("nestjs")
-fi
-if grep -qs "fastapi" "$PROJECT_DIR/pyproject.toml" "$PROJECT_DIR"/requirements*.txt 2>/dev/null; then
-  STACKS+=("fastapi")
+detect_stacks "$PROJECT_DIR" ""
+if [ -f "$PROJECT_DIR/turbo.json" ]; then
+  for app in "$PROJECT_DIR"/apps/*/; do
+    [ -d "$app" ] || continue
+    app="${app%/}"
+    detect_stacks "$app" "apps/${app##*/}"
+  done
 fi
 
 if [ ${#STACKS[@]} -gt 0 ]; then
-  echo "🔍 Detected stack(s): ${STACKS[*]}"
+  detected=""
+  for i in "${!STACKS[@]}"; do
+    detected+="${detected:+, }${STACKS[$i]}${STACK_WHERE[$i]:+ (${STACK_WHERE[$i]})}"
+  done
+  echo "🔍 Detected stack(s): $detected"
 else
   echo "🔍 No known stack detected — AGENTS.md will list available profiles."
 fi
 
 # ─── Gitignore playbook artifacts ──────────────────────────────────
 GITIGNORE="$PROJECT_DIR/.gitignore"
-for entry in ".playbook/" ".agents/workflows/" ".agent/workflows/" ".agents/rules/playbook.md" ".agent/rules/playbook.md" ".claude/commands/" ".cursor/commands/" ".cursor/rules/playbook.mdc"; do
+for entry in ".playbook/" ".claude/commands/" ".cursor/commands/" ".cursor/rules/playbook.mdc"; do
   add_gitignore_entry "$GITIGNORE" "$entry"
 done
 echo "📋 Ensured playbook artifacts are gitignored"
 
 # ─── Copy workflows to all AI tool paths ──────────────────────────
-# Workflows are user-invoked slash commands in every tool. Cursor reads
+# Workflows are user-invoked slash commands in Claude Code and Cursor. Earlier
+# installs also wrote Antigravity copies (.agents/, .agent/); a re-run removes
+# only those generated files, then any folder they leave empty. Cursor reads
 # commands from .cursor/commands/ (plain Markdown); earlier installs wrote
 # them as .cursor/rules/<workflow>.mdc, which Cursor could auto-attach —
 # a file is removed only if it has that generated shape (agent-requested
@@ -143,16 +164,16 @@ echo "📋 Ensured playbook artifacts are gitignored"
 WORKFLOWS_SRC="$PLAYBOOK_DIR/workflows"
 
 if [ -d "$WORKFLOWS_SRC" ]; then
-  mkdir -p "$PROJECT_DIR/.agents/workflows" "$PROJECT_DIR/.agent/workflows" \
-           "$PROJECT_DIR/.claude/commands" "$PROJECT_DIR/.cursor/commands" \
+  mkdir -p "$PROJECT_DIR/.claude/commands" "$PROJECT_DIR/.cursor/commands" \
            "$PROJECT_DIR/.cursor/rules"
 
   for f in "$WORKFLOWS_SRC"/*.md; do
     [ -f "$f" ] || continue
     name="$(basename "$f")"
-    copy_if_newer "$f" "$PROJECT_DIR/.agents/workflows/$name"
-    copy_if_newer "$f" "$PROJECT_DIR/.agent/workflows/$name"
     copy_if_newer "$f" "$PROJECT_DIR/.claude/commands/$name"
+    for old in "$PROJECT_DIR/.agents/workflows/$name" "$PROJECT_DIR/.agent/workflows/$name"; do
+      if [ -f "$old" ] && cmp -s "$f" "$old"; then rm "$old"; fi
+    done
 
     target="$PROJECT_DIR/.cursor/commands/$name"
     if [ ! -f "$target" ] || [ "$f" -nt "$target" ]; then
@@ -165,27 +186,23 @@ if [ -d "$WORKFLOWS_SRC" ]; then
     fi
   done
 
-  echo "📂 Antigravity  → .agents/workflows/ (+ .agent/ for older versions)"
   echo "📂 Claude Code  → .claude/commands/"
   echo "📂 Cursor       → .cursor/commands/"
 fi
 
 # ─── Always-loaded rules per tool ──────────────────────────────────
-# Antigravity workspace rules (plain Markdown, auto-loaded; .agents/ is
-# current, .agent/ kept for older versions) and a Cursor always-apply rule.
-# Both are rendered from rules/global-rules.md — one source of truth,
-# refreshed on every setup run.
+# A Cursor always-apply rule rendered from rules/global-rules.md — one source
+# of truth, refreshed on every setup run. Earlier installs' Antigravity rule
+# copies are removed, then any folder left empty.
 GLOBAL_RULES_SRC="$PLAYBOOK_DIR/rules/global-rules.md"
 
-for rules_dir in "$PROJECT_DIR/.agents/rules" "$PROJECT_DIR/.agent/rules"; do
-  mkdir -p "$rules_dir"
-  {
-    cat "$GLOBAL_RULES_SRC"
-    echo ""
-    echo "Project routing and completion gate: see AGENTS.md at the project root."
-  } > "$rules_dir/playbook.md"
+for old_dir in "$PROJECT_DIR/.agents" "$PROJECT_DIR/.agent"; do
+  if [ -f "$old_dir/rules/playbook.md" ] && grep -qxF "Project routing and completion gate: see AGENTS.md at the project root." "$old_dir/rules/playbook.md"; then
+    rm "$old_dir/rules/playbook.md"
+  fi
+  for sub in rules workflows; do rmdir "$old_dir/$sub" 2>/dev/null || true; done
+  rmdir "$old_dir" 2>/dev/null || true
 done
-echo "📌 Antigravity  → .agents/rules/playbook.md (always-loaded, + .agent/ fallback)"
 
 {
   echo "---"
@@ -228,8 +245,9 @@ EOF
 
     step=4
     if [ ${#STACKS[@]} -gt 0 ]; then
-      for stack in "${STACKS[@]}"; do
-        echo "$step. \`.playbook/stacks/$stack/STACK.md\` — stack conventions, templates, and check commands"
+      for i in "${!STACKS[@]}"; do
+        stack="${STACKS[$i]}" where="${STACK_WHERE[$i]}"
+        echo "$step. \`.playbook/stacks/$stack/STACK.md\` — stack conventions, templates, and check commands${where:+ for \`$where/\`}"
         step=$((step + 1))
       done
     else
@@ -315,8 +333,8 @@ copy_project_files() {
 }
 
 GUARDRAIL_STACK=""
-if [ ${#STACKS[@]} -gt 0 ]; then
-  for stack in "${STACKS[@]}"; do
+if [ ${#ROOT_STACKS[@]} -gt 0 ]; then
+  for stack in "${ROOT_STACKS[@]}"; do
     [ -d "$PLAYBOOK_DIR/stacks/$stack/project-files" ] || [ -f "$PLAYBOOK_DIR/stacks/$stack/inherits" ] || continue
     if [ -z "$GUARDRAIL_STACK" ]; then
       echo "🛡️  Guardrail files:"

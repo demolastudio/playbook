@@ -54,3 +54,7 @@
 ## PR-body format skill
 
 **Deferred (October 2026).** `rules/git-workflow.md` leaves PR process to the user's stated conventions (global rule 8). Revisit when the user states a PR format.
+
+## Installs for Antigravity, Gemini CLI, and Codex
+
+**Removed (October 2026).** The user works in Claude Code and Cursor only; the other tools' copies were clutter that every re-run recreated. `AGENTS.md` still serves any tool that reads it. Revisit if another tool joins the daily workflow.
