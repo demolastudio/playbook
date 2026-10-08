@@ -248,9 +248,6 @@ EOF
 ## Completion Gate
 
 A task is complete ONLY when `.playbook/rules/definition-of-done.md` passes.
-Run the stack's check commands and report actual output.
-
-NEVER guess on architecture or naming. Consult the playbook first.
 <!-- playbook:end -->
 EOF
 } > "$BLOCK_FILE"

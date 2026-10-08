@@ -1,11 +1,31 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "import", "nextjs"],
-  "categories": { "correctness": "error" },
-  "options": { "typeAware": true },
+  "plugins": [
+    "react",
+    "typescript",
+    "import",
+    "nextjs",
+    "unicorn"
+  ],
+  "categories": {
+    "correctness": "error"
+  },
+  "options": {
+    "typeAware": true
+  },
   "rules": {
     "react/rules-of-hooks": "error",
     "typescript/no-floating-promises": "error",
-    "typescript/no-deprecated": "error"
+    "typescript/no-deprecated": "error",
+    "unicorn/filename-case": [
+      "error",
+      {
+        "case": "kebabCase"
+      }
+    ],
+    "eslint/func-style": [
+      "error",
+      "expression"
+    ]
   }
 }

@@ -25,9 +25,3 @@ Split by concern, not by convenience. Every type of code gets a dedicated home:
 | Mutations / handlers | `actions/` | `routers/` | `controllers/` |
 | Business logic | `lib/` | `services/` | `services/` |
 | Reusable client logic | `hooks/` | — | — |
-
-## Principles
-
-- **Readability first.** If someone opens a folder, they must immediately know what's inside.
-- **Scalability.** The structure must work for 10 files and 1000 files.
-- **One source of truth.** A function lives in one place. Everything else imports it.
