@@ -1,7 +1,6 @@
 # Definition of Done
 
 > A task is NOT complete until every gate below passes.
-> Run the checks and read the output — never report "should work".
 
 ## Automated Gates
 

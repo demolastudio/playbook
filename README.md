@@ -15,7 +15,7 @@ playbook/
 ├── rules/                     ← Stack-agnostic rules (apply to EVERY project)
 │   ├── global-rules.md        ← The canonical rule list (single source of truth)
 │   ├── definition-of-done.md  ← Completion gates: typecheck, lint, tests, review checklist
-│   ├── code-style.md          ← Principles: SSOT, Karpathy, loop engineering
+│   ├── code-style.md          ← Deep modules: seams, deletion test, injected deps
 │   ├── project-structure.md   ← Kebab-case, split-by-concern (per-stack mapping)
 │   ├── mistakes.md            ← Known AI mistakes, each with the fix (living file)
 │   ├── cursor-rules.md        ← Pointer for Cursor's Settings → Rules for AI
