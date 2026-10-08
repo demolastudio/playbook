@@ -9,7 +9,7 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import type { ChargeResult } from "@/types/billing";
+import type { ChargeResult } from "@/lib/stripe";
 
 export const services = pgTable("services", {
   id: uuid("id").primaryKey().default(sql`uuidv7()`),

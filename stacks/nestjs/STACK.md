@@ -9,8 +9,8 @@ The global rules and core playbook principles apply unchanged — only the tools
 
 | Concern | Next.js stack | NestJS equivalent |
 | ------- | ------------- | ----------------- |
-| Validation schemas | Zod (`schemas/`) | class-validator DTOs or nestjs-zod (`dto/`) |
-| Mutations | Server Actions (`actions/`) | Controllers → Services |
+| Validation schemas | Zod (`features/<name>/<name>-schema.ts`) | class-validator DTOs or nestjs-zod (`dto/`) |
+| Mutations | Server Actions (`features/<name>/<name>-actions.ts`) | Controllers → Services |
 | ORM / data access | Prisma (`lib/`) | Prisma (same patterns apply directly) |
 | Auth sessions | Better Auth | Guards + Passport or Better Auth adapter |
 | Checks | `tsc` / `oxlint` / `vitest` | `tsc` / `oxlint` / `jest` or `vitest` |

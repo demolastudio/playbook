@@ -107,9 +107,7 @@ export const hasPermission = (role: Role, permission: string): boolean =>
 The DAL is where auth meets data. Every Server Action calls through it.
 
 ```typescript
-// lib/dal.ts
-import "server-only"
-import { auth } from "./auth"
+// lib/auth.ts (continued): the guards live beside the instance
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { hasPermission, type Role } from "./permissions"
@@ -173,7 +171,7 @@ In 2025, a **middleware bypass vulnerability** was discovered in Next.js. An att
 
 ✅ DO: Defense in depth
    1. proxy.ts → redirects (UX convenience, not security)
-   2. DAL (lib/dal.ts) → requireSession() in every Server Action
+   2. DAL (lib/auth.ts guards) → requireSession() in every Server Action (defineAction does it)
    3. Database constraints → final safety net
 ```
 

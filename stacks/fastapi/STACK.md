@@ -10,8 +10,8 @@ idempotency, audit everything) apply unchanged — only the tools differ.
 
 | Concern | Next.js stack | FastAPI equivalent |
 | ------- | ------------- | ------------------ |
-| Validation schemas | Zod (`schemas/`) | Pydantic models (`schemas/`) |
-| ORM / data access | Prisma (`lib/`) | SQLAlchemy or SQLModel (`services/`) |
+| Validation schemas | Zod (`features/<name>/<name>-schema.ts`) | Pydantic models (`schemas/`) |
+| ORM / data access | Prisma, in feature use cases | SQLAlchemy or SQLModel (`services/`) |
 | Auth sessions | Better Auth | fastapi-users or custom JWT/session deps |
 | Typecheck gate | `tsc --noEmit` | `mypy` or `pyright` |
 | Lint gate | `oxlint` | `ruff check` |
@@ -19,7 +19,7 @@ idempotency, audit everything) apply unchanged — only the tools differ.
 
 ## Planned Sections
 
-- [ ] Folder layout (`routers/`, `schemas/`, `services/`, `models/`, `core/`)
+- [ ] Folder layout grouped by feature per global rule 7 (router, schemas, service per domain; shared `core/`)
 - [ ] Dependency-injection conventions (auth, DB session per request)
 - [x] [checks.md](./checks.md) — gate commands
 - [ ] `templates/` — router endpoint, Pydantic schema, idempotent service function

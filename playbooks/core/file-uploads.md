@@ -42,7 +42,7 @@ Always upload directly from the client to storage using presigned/signed URLs.
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { nanoid } from "nanoid"
-import { requireSession } from "@/lib/dal"
+import { requireSession } from "@/lib/auth"
 
 const s3 = new S3Client({ region: process.env.AWS_REGION })
 

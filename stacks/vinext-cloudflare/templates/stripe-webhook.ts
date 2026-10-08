@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import Stripe from "stripe";
-import { handleStripeEvent } from "@/lib/billing/handle-stripe-event";
+import { handleStripeEvent } from "@/features/payment/handle-stripe-event";
 import { getDb } from "@/lib/db";
 import { logger } from "@/lib/logger";
 
