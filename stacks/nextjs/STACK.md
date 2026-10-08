@@ -6,40 +6,49 @@
 
 ## Folder Layout
 
-```
-app/
-├── (public)/             ← Public-facing pages
-├── (admin)/              ← Admin/dashboard pages
-└── api/                  ← Route handlers (webhooks, external callers, client reads)
+No `src/`. Rules and growth: `.playbook/rules/project-structure.md`.
 
-types/                    ← All TypeScript types/interfaces
-schemas/                  ← All Zod validation schemas
-actions/                  ← All Server Actions
-hooks/                    ← All custom React hooks
-lib/                      ← Business logic, data access, utilities
-components/               ← UI components
+```
+app/                         ← routes only: (public)/, (admin)/, api/ (GET reads, webhooks)
+features/
+└── booking/
+    ├── booking-schema.ts    ← Zod schemas; types via z.infer
+    ├── booking-actions.ts   ← "use server" — each action is one defineAction(...)
+    ├── booking-queries.ts   ← server-only reads for pages and GET routes
+    ├── create-booking.ts    ← one use case per file: rule + audit row in one transaction
+    ├── create-booking.test.ts  ← integration test against real Postgres
+    └── components/          ← booking-form.tsx, slot-picker.tsx
+components/ui/               ← shadcn primitives; components/ for app-wide composites
+lib/                         ← define-action, logger, errors, auth, prisma (db), stripe — no business rules
+prisma/                      ← schema.prisma + migrations
+e2e/                         ← Playwright specs, one per money journey
+proxy.ts                     ← request ID + security headers
+instrumentation.ts           ← unhandled errors → logger
 ```
 
 ## Conventions
 
-- **Arrow functions everywhere** (`const fn = async () => {}`) — never `function` declarations. Components export via `const Page = () => ...; export default Page`. (Global rule 9; the templates model it.)
-- **Mutations are Server Actions.** Server Components read through the DAL directly. Next.js dispatches Server Actions one at a time per client, so they never serve reads: data a Client Component fetches (per-user data on cached pages, optimistic updates) comes from a GET route handler (`Cache-Control: private, no-store`) through TanStack Query or SWR. Route handlers otherwise exist only for webhooks and endpoints external systems call.
-- **Every mutation follows the same pipeline:** Better Auth session check → Zod parse → single-source-of-truth business function in `lib/` → audit log → typed result. The canonical shape is [templates/server-action.ts](./templates/server-action.ts).
-- **Prisma stays in `lib/`.** No queries in components or actions — actions call business functions, business functions query.
-- **Multi-step writes use transactions** with a business-derived idempotency key — see [templates/prisma-idempotent-transaction.ts](./templates/prisma-idempotent-transaction.ts) and `playbooks/core/idempotency.md`.
-- **Zod schemas live in `schemas/`,** types are inferred with `z.infer` — see [templates/zod-schema.ts](./templates/zod-schema.ts). Never hand-write a type that a schema can infer.
+- **Arrow functions everywhere** (`const fn = async () => {}`) — never `function` declarations. Components export via `const Page = () => ...; export default Page`. (Global rule 9; lint enforces named functions.)
+- **Mutations are Server Actions built with `defineAction`** — session guard, optional rate limit, Zod parse, request-scoped logging, and safe errors in one place. Server Components read through the feature's `-queries.ts`. Next.js dispatches Server Actions one at a time per client, so they never serve reads: data a Client Component fetches comes from a GET route handler (`Cache-Control: private, no-store`) through TanStack Query or SWR.
+- **The use case owns the rule.** An action calls one use-case file; the use case runs the business rule and writes the audit row in the same transaction (`playbooks/core/audit-trails.md`). Components and actions never query the database directly.
+- **Expected business failures throw `appError("message")`** — the user sees that message; anything else becomes a generic message and an error log.
+- **Multi-step writes use transactions** with a business-derived idempotency key — see `playbooks/core/idempotency.md`.
 - **Environment variables are validated at startup** through a single `lib/env.ts`; nothing reads `process.env` directly.
 
 ## Templates
 
 New code copies the matching template — same structure, same error handling, same result shape:
 
-| Creating | Copy |
-| -------- | ---- |
-| Server Action (mutation) | [templates/server-action.ts](./templates/server-action.ts) |
-| Webhook route handler | [templates/route-handler.ts](./templates/route-handler.ts) |
-| Transaction with idempotency | [templates/prisma-idempotent-transaction.ts](./templates/prisma-idempotent-transaction.ts) |
-| Validation schema | [templates/zod-schema.ts](./templates/zod-schema.ts) |
+| Creating | Copy | To |
+| -------- | ---- | -- |
+| Action pipeline (once per project) | [define-action.ts](./templates/define-action.ts), [errors.ts](./templates/errors.ts), [logger.ts](./templates/logger.ts) | `lib/` |
+| Request ID + security headers (once) | [proxy.ts](./templates/proxy.ts), [instrumentation.ts](./templates/instrumentation.ts) | project root |
+| Server Action | [server-action.ts](./templates/server-action.ts) | `features/<name>/<name>-actions.ts` |
+| Validation schema | [zod-schema.ts](./templates/zod-schema.ts) | `features/<name>/<name>-schema.ts` |
+| Transaction with idempotency | [prisma-idempotent-transaction.ts](./templates/prisma-idempotent-transaction.ts) | `features/<name>/<verb>-<name>.ts` |
+| Webhook route handler | [route-handler.ts](./templates/route-handler.ts) | `app/api/webhooks/<provider>/route.ts` |
+
+Rate limiting on Vercel: Arcjet (`playbooks/core/security.md`).
 
 ## Performance
 

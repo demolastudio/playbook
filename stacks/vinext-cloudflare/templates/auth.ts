@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { buildAuth } from "@/lib/auth-config";
 import { getDb, type Db } from "@/lib/db";
-import { sendVerificationEmail } from "@/lib/email/send-verification-email";
+import { sendVerificationEmail } from "@/lib/email";
 
 export const createAuth = (db: Db) =>
   buildAuth(db, {

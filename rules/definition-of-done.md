@@ -8,7 +8,13 @@ Run the commands from `.playbook/stacks/<stack>/checks.md` for the detected stac
 
 1. **Typecheck** passes with zero errors
 2. **Lint** passes with zero suppressions added
-3. **Tests** pass — behavior you changed has a test covering it
+3. **Tests** pass, and the diff carries the test its change requires (`.playbook/playbooks/core/testing.md`):
+   - Money, booking state, capacity, idempotency, permission, or webhook logic → integration test against real Postgres; writes that can race → a parallel-request test
+   - Pure money calculation → table-driven test at the pricing function, expected values worked by hand
+   - Bug fix → a test that fails before the fix
+   - A money journey no integration test can see → a Playwright spec
+   - An integration a fake cannot prove → a run against the provider's sandbox (test-mode keys only)
+   - Copy, styling, layout, config, dependency bumps, plain CRUD, or refactors under existing tests → no new test; report "no test: <reason>"
 4. **Design** passes (`scripts/check-design.sh`, per `.playbook/formats/design.md`) when the project has a `DESIGN.md`
 
 If no stack profile matches, find the project's equivalent commands (package.json scripts, Makefile, CI config) and run those.

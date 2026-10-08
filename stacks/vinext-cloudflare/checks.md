@@ -16,7 +16,12 @@ Commands for the automated gates in `rules/definition-of-done.md`, as
 create-vinext-app 1.0 writes `dev`, `build`, `start`, and `deploy`; add
 `typecheck`, `lint`, and `test`. No gate needs Cloudflare credentials (checked
 on the scaffold with `CI=true`). Lint fails there only on the demo page's
-`/api/hello` link — the link-rule exception in `stacks/nextjs/checks.md`.
+`/api/hello` link (the link-rule exception in `stacks/nextjs/checks.md`) and on
+its `export function GET`, which becomes `export const GET = () => …`.
+
+Integration tests need Postgres in `gates.yml`: add the `services` block from
+`stacks/nextjs/ci-cd.md` and a `pnpm exec drizzle-kit migrate` step before
+`test` (`playbooks/core/testing.md`).
 
 `cf workers types` regenerates the binding types in `.cloudflare/types` (include
 that directory in `tsconfig.json`); a stale copy hides a missing binding.

@@ -26,6 +26,32 @@
     "eslint/func-style": [
       "error",
       "expression"
-    ]
-  }
+    ],
+    "import/no-cycle": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "lib/**",
+        "components/**",
+        "db/**"
+      ],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@/features/**",
+                  "@/app/**"
+                ],
+                "message": "Shared code (lib/, components/, db/) never imports a feature or a route; move the shared piece down instead."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

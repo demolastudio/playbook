@@ -1,98 +1,65 @@
 ## Testing
 
-### Testing Priority for Booking Systems
+> Integration first. Tests enter at a feature's public seam and run against a
+> real Postgres; Playwright covers only the money journeys. There is no unit
+> layer and no mocks of your own modules. Which changes need which test:
+> `rules/definition-of-done.md` gate 3.
 
-Not all code deserves the same test coverage. Prioritize by business impact:
+### The Three Layers
 
-| Priority | What to Test | Why | Test Type |
-| -------- | ------------ | --- | --------- |
-| **1 (Critical)** | State transitions | Prevents impossible states | Unit |
-| **2 (Critical)** | Pricing & billing calculations | One bug = wrong charges on every booking | Unit |
-| **3 (High)** | Scheduling / slot generation | Wrong dates = missed appointments | Unit + Integration |
+| Layer | What | Runs |
+| ----- | ---- | ---- |
+| **Static** | `tsc` + oxlint (types, deprecations, import direction) | Every save and every PR |
+| **Integration** (most tests) | A feature's use case (`create-booking.ts`) against real Postgres; Stripe, email, and the clock faked at the boundary | Every PR |
+| **E2E** | 3–8 Playwright specs, one per money journey | Preview deploy or local build |
+
+A test of an internal helper breaks on every refactor and proves nothing a seam test misses. The one exception is pure money math (rounding, tax, fees, refunds): table-driven tests at the pricing function's own seam, expected values worked out by hand.
+
+| Priority | What to Test | Why | Test |
+| -------- | ------------ | --- | ---- |
+| **1 (Critical)** | State transitions | Prevents impossible states | Integration |
+| **2 (Critical)** | Pricing & billing calculations | One bug = wrong charges on every booking | Pricing-seam table |
+| **3 (High)** | Scheduling / slot generation | Wrong dates = missed appointments | Integration |
 | **4 (High)** | Idempotency (charges, emails) | Prevents duplicate charges and notifications | Integration |
-| **5 (High)** | Concurrency (double-booking) | Race conditions only surface under load | Load + Integration |
-| **6 (Medium)** | Cancellation policy logic | Fee miscalculations cause disputes | Unit |
+| **5 (High)** | Concurrency (double-booking) | Race conditions only surface under load | Integration, parallel requests |
+| **6 (Medium)** | Cancellation policy logic | Fee miscalculations cause disputes | Integration |
 | **7 (Medium)** | Capacity checks | Prevents overbooking | Integration |
-| **8 (Medium)** | Full booking flow (E2E) | Validates the user journey end-to-end | E2E |
+| **8 (Medium)** | Book → pay → confirm | The journey only a browser sees | E2E |
 
 ---
 
-### The Testing Pyramid
-
-| Layer | Purpose | Speed | Isolation | When to Use |
-| ----- | ------- | ----- | --------- | ----------- |
-| **Unit** | Test pure business logic (pricing, state transitions, validations) | Fast (ms) | Full — no DB, no network | Every function with business rules |
-| **Integration** | Test database interactions, service boundaries, real transactions | Medium (s) | Partial — real DB, mocked externals | DAL functions, concurrency, data constraints |
-| **E2E** | Test complete user flows through the real UI | Slow (s–min) | None — full system | Critical booking flow, payment flow |
-| **Load** | Test behavior under concurrent traffic | Variable | None | Double-booking prevention, slot generation under spike |
-
----
-
-### Unit Testing Patterns
-
-#### Test Business Logic, Not Implementation
-
-```
-✅  Test: "Cancellation 12 hours before appointment incurs 100% fee"
-❌  Test: "prisma.booking.update is called with status CANCELLED"
-```
-
-Test **what** the function does, not **how** it does it. Implementation changes shouldn't break tests.
+### Writing Tests
 
 #### Test at Seams
 
-A **seam** is the public boundary you test at — the interface, never the internals. Decide the seams under test before writing tests — ideally during `/spec`, where they're agreed with the user — so effort lands on critical paths instead of every private helper. And never write **tautological tests**: an assertion that recomputes the expected value the same way the code does passes by construction and can never disagree with the code — expected values come from a known-good literal or a worked example.
+A **seam** is the public boundary you test at — a feature's use case, never its internals. Test **what** it does ("cancellation 12 hours before incurs a 100% fee"), not **how** (which query it ran). Decide the seams under test before writing tests — ideally during `/spec`. Never write **tautological tests**: expected values come from a known-good literal or a worked example, never from recomputing them the way the code does. Schema rules are tested through the use case that parses the input, not separately.
 
 #### The Red → Green Loop
 
-When building test-first, work in **vertical slices**: one failing test → the minimum implementation that passes it → the next test, each slice responding to what the last one taught you. Never slice horizontally (all tests written up front, then all implementation) — bulk-written tests verify imagined behavior and commit to structure before the implementation teaches you anything. Watch the test fail before making it pass; a test that never went red proves nothing. Refactoring is a separate step after green — never mid-loop.
+When building test-first, work in **vertical slices**: one failing test → the minimum implementation that passes it → the next test. Never write all tests up front. Watch the test fail before making it pass; a test that never went red proves nothing. Refactoring is a separate step after green.
 
 #### Use Factories, Not Fixtures
-
-Generate test data dynamically instead of using static JSON or SQL fixtures:
 
 ```
 ✅  Factory: createBooking({ status: "CONFIRMED", startTime: tomorrow() })
 ❌  Fixture: static booking_123.json that depends on a specific database state
 ```
 
-**Why:** Factories produce fresh, isolated data per test. Fixtures create hidden dependencies between tests.
-
-#### Validation Schema Tests
-
-Test your validation schemas with both valid and invalid inputs:
-
-| Input Type | Test |
-| ---------- | ---- |
-| Valid input | Schema accepts and returns parsed data |
-| Missing required fields | Schema rejects with specific field errors |
-| Invalid types | Schema rejects (string where number expected) |
-| Boundary values | Empty strings, zero, negative numbers, max-length strings |
-| Injection attempts | SQL injection strings, XSS payloads — should be rejected or sanitized |
+Factories produce fresh, isolated data per test; fixtures create hidden dependencies between tests.
 
 ---
 
-### Integration Testing Patterns
+### Integration Test Setup
 
-#### Use a Real Database
+- **Runner:** Vitest in plain Node. The Workers test pool adds little: it was renamed to `@cloudflare/vitest-plugin` (Oct 2026: needs Vitest 4), and no local runtime reproduces Hyperdrive's pooling.
+- **Seam:** use cases take the database client as their first argument (`createBooking(db, input)` on vinext); a test builds its own client from `DATABASE_URL`. With Prisma, point `DATABASE_URL` at the test database.
+- **Database:** a Postgres service container in CI (`stacks/nextjs/ci-cd.md`), Docker Postgres locally, migrations applied first. `TRUNCATE … RESTART IDENTITY CASCADE` in `beforeEach`, with `fileParallelism: false`. PGlite suits quick local runs but holds one connection, so it cannot run concurrency tests.
+- **Signed-in users:** Better Auth's `testUtils()` plugin, in a test-only auth instance.
+- **Location:** `create-booking.test.ts` sits next to `create-booking.ts`.
 
-For critical paths (concurrency, pricing, constraints), mocks are insufficient:
+#### Sandbox Checks
 
-```
-1. Before each test suite: reset the test database (run migrations, clear data)
-2. Before each test: seed only the data that test needs (via factories)
-3. Run the test against the real database
-4. After the test: clean up (transaction rollback or truncate)
-```
-
-**When to use mocks vs real DB:**
-
-| Situation | Use |
-| --------- | --- |
-| Testing pure business logic (fee calculation) | Mocks — fast, isolated |
-| Testing DB constraints (unique indexes, exclusion constraints) | Real DB — mocks can't simulate constraints |
-| Testing transaction behavior (atomicity, locking) | Real DB — mocks can't simulate transaction rollback |
-| Mocks are becoming complex (simulating relations, joins) | Switch to real DB |
+When a fake cannot prove an integration — Stripe webhook signatures and payloads, email delivery, database behavior on Neon — run it against the provider's sandbox before calling the work done: Stripe test mode (`stripe listen --forward-to` + `stripe trigger`), Resend's test addresses, a Neon branch. Test-mode keys only; report the sandbox run as evidence.
 
 #### Concurrency Tests
 
@@ -165,7 +132,7 @@ This catches N+1 regressions before they reach production (see `core/database-in
 | Concern | Pattern |
 | ------- | ------- |
 | **Database** | Separate test database. Reset between suites. Use same migrations as production. |
-| **External services** | Mock payment providers, email APIs, calendar sync. Never hit real external services in tests. |
+| **External services** | Fake payment providers, email APIs, calendar sync at the boundary in CI; their sandboxes when you need proof (above). Never live services. |
 | **Time** | Freeze or mock the current time for deterministic date-based tests. |
 | **Secrets** | Use test-specific env vars. Never share production credentials with tests. |
 | **Isolation** | Each test gets fresh data. No test depends on another test's side effects. |
@@ -176,7 +143,7 @@ This catches N+1 regressions before they reach production (see `core/database-in
 
 - **Prioritize by business impact.** Pricing bugs and double-bookings cost real money. Test those first.
 - **Factories over fixtures.** Generate test data dynamically for isolation and readability.
-- **Use a real database for integration tests.** Mocks can't simulate constraints, transactions, or race conditions.
+- **Integration first, no unit layer.** Real database, real modules; fakes only at system boundaries.
 - **Test concurrency with parallel requests.** Single-threaded tests can't find race conditions.
 - **Freeze time in date-sensitive tests.** Non-deterministic tests are worse than no tests.
 - **Set query budgets.** Catch N+1 regressions before they reach production.

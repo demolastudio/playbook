@@ -136,7 +136,7 @@ Critical modules (DAL, auth, db client) must be marked as server-only:
 
 - This causes a **build-time error** if a client component accidentally imports them
 - Prevents database credentials, API keys, and business logic from leaking to the browser
-- Every file in `lib/dal/`, `lib/auth/`, and `lib/db/` should have this protection
+- `lib/auth.ts`, the db client, and every feature's `-queries.ts` and use-case files need this protection
 
 ---
 

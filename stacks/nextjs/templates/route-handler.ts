@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { stripe } from "@/lib/stripe";
-import { handleStripeEvent } from "@/lib/billing/handle-stripe-event";
+import { handleStripeEvent } from "@/features/payment/handle-stripe-event";
 import { logger } from "@/lib/logger";
 
 export const POST = async (request: Request) => {

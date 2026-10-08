@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { bookings, idempotencyRecords } from "@/db/schema";
 import type { Db } from "@/lib/db";
-import { createStripeCharge } from "@/lib/stripe";
-import type { ChargeBookingInput, ChargeResult } from "@/types/billing";
+import type { ChargeBookingInput } from "@/features/payment/payment-schema";
+import { createStripeCharge, type ChargeResult } from "@/lib/stripe";
 
 export const chargeBookingOnce = async (
   db: Db,

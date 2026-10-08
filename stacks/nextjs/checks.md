@@ -48,7 +48,10 @@ Compiler rules natively (all but `config`/`gating`; none are on by default).
 pnpm add -D oxlint oxlint-tsgolint
 ```
 
-The config is the shipped `.oxlintrc.json`. Its `typescript/no-deprecated`
+The config is the shipped `.oxlintrc.json`. Beyond correctness it enforces
+kebab-case file names, arrow functions, and one-way imports: `lib/`,
+`components/`, and `db/` never import a feature or a route, and no import cycle
+passes. Its `typescript/no-deprecated`
 turns every library's `@deprecated` tag into a failing gate whose message names
 the replacement — upgrades announce their own renames, so the playbook never
 keeps a rename list.

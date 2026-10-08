@@ -52,68 +52,17 @@ export const env = envSchema.parse(process.env)
 
 ---
 
-### Security Headers
+### Security Headers and CSP
 
-```typescript
-// next.config.ts
-const securityHeaders = [
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
-  },
-  { key: "X-Content-Type-Options", value: "nosniff" },
-  { key: "X-Frame-Options", value: "DENY" },
-  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  {
-    key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
-  },
-]
+The stack's `proxy.ts` template (`stacks/nextjs/templates/proxy.ts`) sets the baseline on every response: HSTS, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, and a structural CSP (`frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'`). That CSP restricts no scripts, so it is safe on pages served from cache.
 
-const nextConfig = {
-  async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }]
-  },
-}
-```
-
-> **Test after deploy:** [securityheaders.com](https://securityheaders.com) — aim for A+ score.
-
----
-
-### Content Security Policy (CSP)
-
-For production apps that handle payment data, add a CSP:
-
-```typescript
-// proxy.ts (Next.js 16 — pre-16 projects: middleware.ts exporting `middleware`)
-import { NextRequest, NextResponse } from "next/server"
-import { nanoid } from "nanoid"
-
-export const proxy = (request: NextRequest) => {
-  const nonce = nanoid()
-  const csp = [
-    `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' https://js.stripe.com`,
-    `style-src 'self' 'unsafe-inline'`,  // Required for many UI libraries
-    `frame-src https://js.stripe.com`,   // Stripe Elements iframes
-    `img-src 'self' data: https:`,
-    `connect-src 'self' https://api.stripe.com https://*.upstash.io`,
-    `font-src 'self'`,
-  ].join("; ")
-
-  const response = NextResponse.next()
-  response.headers.set("Content-Security-Policy", csp)
-  response.headers.set("x-nonce", nonce)
-  return response
-}
-```
+A script-restricting CSP needs a per-request nonce, and a nonce disables static rendering, ISR, Partial Prerendering, and Workers Cache page caching. Add one only to apps whose pages are all dynamic, following the Next.js CSP guide: generate the nonce with `crypto.randomUUID()`, and set the CSP header on the **request** (`NextResponse.next({ request: { headers } })`) as well as the response — the framework reads the nonce from the request.
 
 **Rules:**
-- Avoid `unsafe-inline` for scripts — use nonces instead
-- Avoid `unsafe-eval` entirely — no legitimate use case in production
-- Stripe Elements require `frame-src https://js.stripe.com` and `script-src https://js.stripe.com`
-- Test CSP with `Content-Security-Policy-Report-Only` first, then switch to enforcing mode
+- Never `unsafe-eval`; never `unsafe-inline` for scripts — nonces instead
+- Stripe Elements need `script-src https://js.stripe.com` and `frame-src https://js.stripe.com`
+- Roll out a new CSP as `Content-Security-Policy-Report-Only` first, then enforce
+- After deploy, check [securityheaders.com](https://securityheaders.com)
 
 ---
 

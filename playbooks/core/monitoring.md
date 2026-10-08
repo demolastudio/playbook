@@ -12,7 +12,7 @@ Production observability requires correlating **Logs, Metrics, and Traces** usin
 
 | Pillar | What It Answers | Tool |
 | ------ | --------------- | ---- |
-| **Logs** | "What happened?" | Structured JSON logs (Pino) |
+| **Logs** | "What happened?" | Structured JSON logs (`lib/logger.ts`) |
 | **Metrics** | "How much / how often?" | Counters, gauges, histograms |
 | **Traces** | "Where did the time go?" | Distributed traces (OpenTelemetry → Sentry) |
 
@@ -20,42 +20,18 @@ Production observability requires correlating **Logs, Metrics, and Traces** usin
 
 ### Structured Logging
 
-Every log entry must be a queryable JSON object — never free-text strings.
+Every log entry is one queryable JSON object, never free text. The logger is the stack's `lib/logger.ts` template (`stacks/nextjs/templates/logger.ts`): JSON through `console`, which both Workers Logs and Vercel index by field. `defineAction` and `withContext` attach `requestId`, `action`, and `userId` to every line written during a request, so call sites add only the event's own fields:
 
 ```typescript
-// lib/logger.ts
-import pino from "pino"
-
-export const logger = pino({
-  level: process.env.LOG_LEVEL ?? "info",
-  formatters: {
-    level: (label) => ({ level: label }),
-  },
-  // In production, Vercel captures stdout as structured logs
-})
-
-// Usage in a Server Action:
-logger.info({
-  event: "booking.created",
-  clientId: "clx_abc123",
-  planFrequency: "BI_WEEKLY",
-  quoteAmount: 18500,  // cents
-}, "New booking created")
-
-// Usage in an error handler:
-logger.error({
-  event: "payment.failed",
-  visitId: "visit_xyz",
-  stripeDeclineCode: "insufficient_funds",
-  clientId: "clx_abc123",
-}, "Post-clean charge failed")
+logger.info({ event: "booking.created", bookingId, amountInCents: 18500 }, "booking created")
+logger.error({ event: "payment.failed", bookingId, declineCode }, "charge failed")
 ```
 
 **Rules:**
-- Use **Pino** — it's the fastest Node.js logger and outputs structured JSON by default
-- Always include `event` (machine-readable action name) and relevant entity IDs
-- Never log PII in plain text (email, phone, card numbers). Use IDs that can be looked up.
-- Include `traceId` when available to correlate logs with traces
+- Always include `event` (machine-readable action name) and the entity IDs involved
+- Never log PII in plain text (email, phone, card numbers) — log IDs that can be looked up
+- Expected business failures (`appError`) log as `warn`; `error` is reserved for what someone must fix
+- No Pino on Workers: it needs `worker_threads`, and Workers prefixes stdout lines, so its output isn't indexed as JSON
 
 ---
 
@@ -185,7 +161,7 @@ export const GET = async () => {
 
 | Phase | What to Set Up | Tool |
 | ----- | ------------- | ---- |
-| **Dev** | Structured logging (Pino) | Console output |
+| **Dev** | Structured logging (`lib/logger.ts`) | Console output |
 | **Preview** | Error tracking | Sentry (dev DSN) |
 | **Production** | Error tracking + tracing | Sentry + OTel |
 | **Production** | Uptime monitoring | Better Stack / UptimeRobot |

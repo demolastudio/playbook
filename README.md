@@ -30,7 +30,8 @@ playbook/
 │   │   ├── project-files/     ← Guardrail files setup.sh copies into projects:
 │   │   │                         CI gates, lint config, Dependabot, pnpm policy,
 │   │   │                         Claude Code settings + cloud-session hook
-│   │   └── templates/         ← Canonical code: server action, webhook,
+│   │   └── templates/         ← Canonical code: action pipeline (define-action,
+│   │                             errors, logger), proxy, server action, webhook,
 │   │                             idempotent transaction, zod schema
 │   ├── fastapi/               ← Outline (concept mapping from nextjs)
 │   ├── nestjs/                ← Outline

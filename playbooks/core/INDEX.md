@@ -33,12 +33,12 @@ These principles govern every section. Every feature, every file, every decision
 | [audit-trails.md](./audit-trails.md) | AuditLog schema, compliance, retention | Logging state changes, activity feeds |
 | [events.md](./events.md) | Fan-out, saga, outbox, DLQ, queues | Adding background jobs, event-driven flows |
 | [nextjs.md](./nextjs.md) | Server Actions, caching, DAL | Building Next.js 16 features |
-| [testing.md](./testing.md) | Vitest, Playwright, Prisma mocking | Writing tests, setting up CI |
+| [testing.md](./testing.md) | Integration-first: real Postgres, Playwright money journeys, sandboxes | Writing tests, setting up CI |
 | [accessibility.md](./accessibility.md) | WCAG 2.2, ARIA rules | Building forms, ensuring compliance |
 | [performance.md](./performance.md) | Core Web Vitals, budgets, enforcement | Optimizing page speed (stack mechanics: `stacks/<stack>/`) |
 | [ci-cd.md](./ci-cd.md) | Gate layers: git hooks → CI → deploy, lifecycle scripts, scheduled dependency updates | Setting up hooks, pipelines, or pre* scripts |
 | [deployment.md](./deployment.md) | Env validation, security headers | Deploying to production |
-| [monitoring.md](./monitoring.md) | Pino, OTel, Sentry, SLOs | Setting up error tracking, alerts |
+| [monitoring.md](./monitoring.md) | JSON logger, OTel, Sentry, SLOs | Setting up error tracking, alerts |
 | [file-uploads.md](./file-uploads.md) | Presigned URLs, security | Adding file/image uploads |
 | [anti-patterns.md](./anti-patterns.md) | Race conditions, N+1, God service | Reviewing code for common mistakes |
 | [cheat-sheets.md](./cheat-sheets.md) | Stripe, Prisma, HTTP codes, Zod | Quick lookup during implementation |

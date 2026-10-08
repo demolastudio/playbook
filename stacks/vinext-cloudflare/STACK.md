@@ -8,17 +8,18 @@
 
 ## Inherits `stacks/nextjs`
 
-Folder layout, arrow functions, the Server Action pipeline and
-[server-action template](../nextjs/templates/server-action.ts), Zod schemas, the
-oxlint gate, and the pnpm, App Router, React, Zod 4, Better Auth, and shadcn
+Folder layout, conventions, the action pipeline (`define-action.ts`,
+`errors.ts`, `logger.ts`, `proxy.ts`, `instrumentation.ts` templates), Zod
+schemas, the oxlint gate, and the pnpm, App Router, React, Zod 4, Better Auth, and shadcn
 sections of `stacks/nextjs/gotchas.md`. Where the two disagree, this profile
 wins. The Prisma and `next` CLI sections and the Prisma templates never apply
 here. vinext ships no `next` package, so `node_modules/next/dist/docs/` doesn't
 exist — Next.js API semantics come from the Next.js docs site.
 
-Additions to the layout: `cloudflare.config.ts` (Worker, bindings, secrets),
-`vite.config.ts`, `db/` (schema, relations, generated auth schema), `drizzle/`
-(migrations).
+Layout differences: `db/` (schema, relations, generated auth schema) and
+`drizzle/` (migrations) replace `prisma/`; `cloudflare.config.ts` (Worker,
+bindings, secrets) and `vite.config.ts` replace `next.config.ts`. Use cases take
+the request's client as their first argument: `createBooking(db, input)`.
 
 ## Decisions
 
@@ -49,7 +50,7 @@ PRs in `core/ci-cd.md`, so a regression has one suspect.
 ## Security
 
 - Auth forms: every layer of `core/security.md`'s defense in depth. Turnstile, database rate limits on `cf-connecting-ip`, and breached-password rejection are wired in `templates/auth-config.ts`.
-- Other endpoints: the Workers Rate Limiting binding — approximate by design (per location, eventually consistent), so it stops abuse and never enforces business quotas; those are database queries.
+- Server Actions: `defineAction({ limit: perUserLimit })` keys the Workers Rate Limiting binding on action + user (`templates/rate-limit.ts`; declare `ACTION_LIMITER: bindings.rateLimit({ namespace: "1001", simple: { limit: 10, period: 60 } })` in `cloudflare.config.ts`). Approximate by design (per location, eventually consistent), so it stops abuse and never enforces business quotas; those are database queries.
 - Stripe webhooks verify with `constructEventAsync` (the sync `constructEvent` throws on Workers): `templates/stripe-webhook.ts`.
 
 ## CI/CD
@@ -63,15 +64,16 @@ GitHub Actions runs the gates; Workers Builds deploys.
 
 ## Templates
 
-| Creating | Copy |
-| -------- | ---- |
-| Server Action (mutation) | [../nextjs/templates/server-action.ts](../nextjs/templates/server-action.ts) |
-| Table + money + indexes | [templates/schema.ts](./templates/schema.ts), [templates/relations.ts](./templates/relations.ts) |
-| Request DB client | [templates/db.ts](./templates/db.ts) |
-| Auth instance + session guard | [templates/auth.ts](./templates/auth.ts) |
-| Auth options, shared by the app and the schema CLI | [templates/auth-config.ts](./templates/auth-config.ts), [templates/auth-cli.ts](./templates/auth-cli.ts) |
-| Charge or other side effect, exactly once | [templates/idempotent-transaction.ts](./templates/idempotent-transaction.ts) |
-| Stripe webhook route handler | [templates/stripe-webhook.ts](./templates/stripe-webhook.ts) |
+| Creating | Copy | To |
+| -------- | ---- | -- |
+| Action pipeline, headers (once) | the shared templates in [../nextjs/STACK.md](../nextjs/STACK.md#templates), plus [templates/rate-limit.ts](./templates/rate-limit.ts) | `lib/`, project root |
+| Server Action | [templates/server-action.ts](./templates/server-action.ts) | `features/<name>/<name>-actions.ts` |
+| Table + money + indexes | [templates/schema.ts](./templates/schema.ts), [templates/relations.ts](./templates/relations.ts) | `db/` |
+| Request DB client | [templates/db.ts](./templates/db.ts) | `lib/db.ts` |
+| Auth instance + session guard | [templates/auth.ts](./templates/auth.ts) | `lib/auth.ts` |
+| Auth options, shared by the app and the schema CLI | [templates/auth-config.ts](./templates/auth-config.ts), [templates/auth-cli.ts](./templates/auth-cli.ts) | `lib/`, project root |
+| Charge or other side effect, exactly once | [templates/idempotent-transaction.ts](./templates/idempotent-transaction.ts) | `features/payment/charge-booking-once.ts` |
+| Stripe webhook route handler | [templates/stripe-webhook.ts](./templates/stripe-webhook.ts) | `app/api/webhooks/stripe/route.ts` |
 
 Templates typecheck against the pinned versions; when an upgrade breaks one, fix the template in the same PR.
 
