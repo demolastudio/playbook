@@ -89,6 +89,12 @@ expect_no_file "$p" .agents/workflows
 expect_file "$p" .agents/rules/team.md
 grep -q "agent" "$p/.gitignore" && fail "legacy: .gitignore gained Antigravity entries"
 
+# the home folder is refused and left untouched
+h="$work/home"
+mkdir "$h"
+(cd "$h" && HOME="$h" bash "$root/setup.sh" . > "$h.log" 2>&1) && fail "home: setup.sh ran in the home folder"
+[ -z "$(ls -A "$h")" ] || fail "home: setup.sh wrote into the home folder"
+
 # a stack without shipped files gets none, and no next-step note
 p="$work/fastapi"
 mkdir "$p" && echo 'dependencies = ["fastapi"]' > "$p/pyproject.toml"

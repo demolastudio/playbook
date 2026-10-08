@@ -79,6 +79,12 @@ fi
 
 # ─── Project setup mode ───────────────────────────────────────────
 PROJECT_DIR="${PROJECT_DIR:-$(pwd)}"
+# A failed `cd` before `setup.sh .` lands here with the home folder, and a
+# CLAUDE.md there loads into every Claude Code session on the machine.
+if [ "$(cd "$PROJECT_DIR" 2>/dev/null && pwd -P)" = "$(cd "$HOME" && pwd -P)" ]; then
+  echo "❌ $PROJECT_DIR is your home folder, not a project — cd into the project first."
+  exit 1
+fi
 PLAYBOOK_DIR="$PROJECT_DIR/.playbook"
 
 echo "🔧 Setting up playbook in $PROJECT_DIR"
