@@ -46,7 +46,8 @@ lint-staged auto-stages its fixes — never add `git add` to the tasks.
   "postinstall": "prisma generate",
   "typecheck": "tsc --noEmit",
   "lint": "oxlint",
-  "test": "vitest run"
+  "db:migrate": "prisma migrate deploy",
+  "test": "vitest run --passWithNoTests"
 }
 ```
 
@@ -61,22 +62,10 @@ console.log(`env OK (${Object.keys(env).length} vars validated)`)
 
 ## GitHub Actions — `gates.yml`
 
-`setup.sh` ships `.github/workflows/gates.yml` ([checks.md](./checks.md)): it installs from the lockfile, then runs the `typecheck`, `lint`, and `test` scripts, the design gate when `DESIGN.md` exists, and `build`. Its actions are pinned by commit SHA, and Dependabot bumps them monthly. Per project, add only what the project needs:
+`setup.sh` ships `.github/workflows/gates.yml` ([checks.md](./checks.md)): it installs from the lockfile, starts Postgres with `DATABASE_URL` set, then runs the `typecheck`, `lint`, `db:migrate` (when present), and `test` scripts, the design gate when `DESIGN.md` exists, and `build`. Its actions are pinned by commit SHA, and Dependabot bumps them monthly. Per project, add only what the project needs:
 
 - **Build-time env:** `prebuild` asserts the env schema, so give the job what it checks — placeholders in a job-level `env:`, test-mode keys from repo secrets, never live keys. Add each secret twice, as an Actions secret and a Dependabot secret: workflows on Dependabot PRs read only Dependabot secrets.
-- **A database for integration tests:** a Postgres service at production's major version, plus a `pnpm exec prisma migrate deploy` step before `test`:
-  ```yaml
-      services:
-        postgres:
-          image: postgres:18 # production's major
-          env: { POSTGRES_PASSWORD: test, POSTGRES_DB: test }
-          ports: ["5432:5432"]
-          options: >-
-            --health-cmd pg_isready --health-interval 5s
-            --health-timeout 5s --health-retries 5
-      env:
-        DATABASE_URL: postgresql://postgres:test@localhost:5432/test
-  ```
+- **Postgres image:** production's major version (`postgres:18` as shipped).
 - **Branch ruleset on `main`:** require a pull request and the `gates` check ([checks.md](./checks.md)).
 - **E2E:** Vercel builds a preview deployment per PR; run the Playwright critical paths against the preview URL as a separate job.
 

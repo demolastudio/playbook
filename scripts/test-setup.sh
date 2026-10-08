@@ -30,7 +30,7 @@ vinext_files="$root/stacks/vinext-cloudflare/project-files"
 p="$work/vinext"
 mkdir "$p" && echo '{ "dependencies": { "vinext": "1.0.1" } }' > "$p/package.json"
 run_setup "$p"
-for f in .oxlintrc.json .github/workflows/gates.yml .github/dependabot.yml .claude/settings.json scripts/check-design.sh; do
+for f in .oxlintrc.json vitest.config.mts .github/workflows/gates.yml .github/dependabot.yml .claude/settings.json scripts/check-design.sh; do
   expect_same "$p" "$f" "$next_files/$f"
 done
 expect_same "$p" pnpm-workspace.yaml "$vinext_files/pnpm-workspace.yaml"
@@ -59,6 +59,7 @@ expect_same "$p" .claude/settings.json "$work/settings.before"
 grep -qF "kept your .claude/settings.json" "$p.log" || fail "next: kept settings not reported"
 expect_same "$p" pnpm-workspace.yaml "$next_files/pnpm-workspace.yaml"
 expect_file "$p" .claude/hooks/session-start.sh
+expect_file "$p" vitest.config.mts
 expect_no_file "$p" scripts/check-cache.sh
 
 # a stack without shipped files gets none, and no next-step note

@@ -16,6 +16,16 @@ jobs:
   gates:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18 # production's major version
+        env: { POSTGRES_PASSWORD: test, POSTGRES_DB: test }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s
+          --health-timeout 5s --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:test@localhost:5432/test
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -29,6 +39,7 @@ jobs:
 
       - run: pnpm run typecheck
       - run: pnpm run lint
+      - run: pnpm run --if-present db:migrate
       - run: pnpm run test
 
       - if: hashFiles('DESIGN.md') != ''
