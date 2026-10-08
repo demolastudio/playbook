@@ -1,5 +1,6 @@
 ---
 description: Use when a raw idea needs stress-testing before it becomes a plan or spec - a relentless round-by-round interview
+effort: xhigh
 ---
 
 # Grill

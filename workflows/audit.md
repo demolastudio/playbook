@@ -1,5 +1,6 @@
 ---
 description: Use for a periodic security and performance audit of the whole codebase
+effort: xhigh
 ---
 
 # Audit

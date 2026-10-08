@@ -39,6 +39,8 @@ for (const p of workflows) {
   const description = frontmatter?.match(/^description: (.+)$/m)?.[1];
   if (!description) fail(p, "frontmatter needs a single-line `description:`");
   else if (description.includes('"')) fail(p, "description contains a double quote");
+  const effort = frontmatter?.match(/^effort: (.+)$/m)?.[1];
+  if (effort && !["low", "medium", "high", "xhigh", "max"].includes(effort)) fail(p, `effort must be low, medium, high, xhigh, or max (got ${effort})`);
 }
 
 // Routing: every workflow in flow.md, every chapter in its domain's INDEX.md
