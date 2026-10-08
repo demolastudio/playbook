@@ -335,9 +335,9 @@ echo ""
 echo "✅ Done! Your playbook is set up."
 echo ""
 if [ -n "$GUARDRAIL_STACK" ]; then
-  echo "   Next: add the gate scripts to package.json (typecheck, lint, test, build —"
-  echo "   see .playbook/stacks/$GUARDRAIL_STACK/checks.md), then on GitHub require the"
-  echo "   \"gates\" check before merging to main."
+  echo "   Next: add the gate scripts to package.json (typecheck, lint, test, build,"
+  echo "   db:migrate — see .playbook/stacks/$GUARDRAIL_STACK/checks.md), then on GitHub"
+  echo "   require the \"gates\" check before merging to main."
   if [ ! -f "$PROJECT_DIR/pnpm-lock.yaml" ] || ! grep -qE '"(packageManager": *"pnpm@|devEngines")' "$PKG_JSON"; then
     echo "   ⚠️  gates.yml installs with pnpm 11+: commit a pnpm-lock.yaml and pin"
     echo "      \"packageManager\": \"pnpm@<version>\" in package.json."

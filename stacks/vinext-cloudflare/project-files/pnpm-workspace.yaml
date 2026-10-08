@@ -7,4 +7,5 @@ minimumReleaseAgeExclude:
   - "@cloudflare/*"
 trustPolicy: no-downgrade
 allowBuilds:
+  esbuild: true
   workerd: true

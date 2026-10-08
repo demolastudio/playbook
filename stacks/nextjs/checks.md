@@ -8,7 +8,8 @@ definition of passing.
 | ---- | ------ | ------- |
 | Typecheck | `typecheck` | `tsc --noEmit` |
 | Lint | `lint` | `oxlint` |
-| Tests | `test` | `vitest run` |
+| Migrations (with a database) | `db:migrate` | `prisma migrate deploy` |
+| Tests | `test` | `vitest run --passWithNoTests` |
 | E2E (when present) | `test:e2e` | `playwright test` |
 | Design (when `DESIGN.md` exists) | — | `bash scripts/check-design.sh` (`formats/design.md`) |
 | Build (before deploy) | `build` | `next build` |
@@ -21,10 +22,11 @@ playbook's copy, for you to compare and merge.
 
 | File | Job |
 | ---- | --- |
-| `.github/workflows/gates.yml` | Runs the gate scripts on every PR and push to `main`; actions pinned by commit SHA |
+| `.github/workflows/gates.yml` | Runs the gate scripts on every PR and push to `main`, with a Postgres service for integration tests; actions pinned by commit SHA |
 | `.github/dependabot.yml` | Scheduled, grouped, delayed update PRs (`core/ci-cd.md`) |
 | `pnpm-workspace.yaml` | Release-age delay and provenance check on every install |
 | `.oxlintrc.json` | The lint gate below |
+| `vitest.config.mts` | Tests in plain Node, `@/` imports, one test file at a time (they share the database), `e2e/` left to Playwright |
 | `scripts/check-design.sh` | The design gate |
 | `.claude/settings.json` | No AI attribution on commits or PRs; registers the hook below |
 | `.claude/hooks/session-start.sh` | Cloud sessions only: fetch `.playbook/` and `pnpm install`, so slash commands and gates work |

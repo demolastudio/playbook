@@ -53,7 +53,7 @@ Factories produce fresh, isolated data per test; fixtures create hidden dependen
 
 - **Runner:** Vitest in plain Node. The Workers test pool adds little: it was renamed to `@cloudflare/vitest-plugin` (Oct 2026: needs Vitest 4), and no local runtime reproduces Hyperdrive's pooling.
 - **Seam:** use cases take the database client as their first argument (`createBooking(db, input)` on vinext); a test builds its own client from `DATABASE_URL`. With Prisma, point `DATABASE_URL` at the test database.
-- **Database:** a Postgres service container in CI (`stacks/nextjs/ci-cd.md`), Docker Postgres locally, migrations applied first. `TRUNCATE … RESTART IDENTITY CASCADE` in `beforeEach`, with `fileParallelism: false`. PGlite suits quick local runs but holds one connection, so it cannot run concurrency tests.
+- **Database:** the shipped `gates.yml` runs Postgres in CI and applies migrations first (`db:migrate`); Docker Postgres locally. `TRUNCATE … RESTART IDENTITY CASCADE` in `beforeEach`; the shipped `vitest.config.mts` runs test files one at a time. PGlite suits quick local runs but holds one connection, so it cannot run concurrency tests.
 - **Signed-in users:** Better Auth's `testUtils()` plugin, in a test-only auth instance.
 - **Location:** `create-booking.test.ts` sits next to `create-booking.ts`.
 

@@ -7,21 +7,19 @@ Commands for the automated gates in `rules/definition-of-done.md`, as
 | ---- | ------ | ------- |
 | Typecheck | `typecheck` | `cf workers types && tsc --noEmit` |
 | Lint | `lint` | `oxlint` |
-| Tests | `test` | `vitest run` |
+| Migrations (with a database) | `db:migrate` | `drizzle-kit migrate` |
+| Tests | `test` | `vitest run --passWithNoTests` |
 | E2E (when present) | `test:e2e` | `playwright test` |
 | Design (when `DESIGN.md` exists) | — | `bash scripts/check-design.sh` (`formats/design.md`) |
 | Build (before deploy) | `build` | `vite build` |
 | Post-deploy | — | `bash scripts/check-cache.sh https://<production host>` |
 
 create-vinext-app 1.0 writes `dev`, `build`, `start`, and `deploy`; add
-`typecheck`, `lint`, and `test`. No gate needs Cloudflare credentials (checked
-on the scaffold with `CI=true`). Lint fails there only on the demo page's
-`/api/hello` link (the link-rule exception in `stacks/nextjs/checks.md`) and on
-its `export function GET`, which becomes `export const GET = () => …`.
-
-Integration tests need Postgres in `gates.yml`: add the `services` block from
-`stacks/nextjs/ci-cd.md` and a `pnpm exec drizzle-kit migrate` step before
-`test` (`playbooks/core/testing.md`).
+`typecheck`, `lint`, `test`, and `db:migrate`. No gate needs Cloudflare
+credentials (checked on the scaffold with `CI=true`). Lint fails there only on
+the demo page's `/api/hello` link (the link-rule exception in
+`stacks/nextjs/checks.md`) and on its `export function GET`, which becomes
+`export const GET = () => …`.
 
 `cf workers types` regenerates the binding types in `.cloudflare/types` (include
 that directory in `tsconfig.json`); a stale copy hides a missing binding.
