@@ -238,8 +238,6 @@ EOF
     fi
 
     echo "$step. \`.playbook/playbooks/<domain>/INDEX.md\` — for the relevant domain (e.g. \`booking\`, \`core\`)"
-    step=$((step + 1))
-    echo "$step. \`.playbook/recommended-skills.md\` — install any relevant package skills"
 
     cat << 'EOF'
 

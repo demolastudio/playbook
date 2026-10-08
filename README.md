@@ -85,6 +85,8 @@ This clones `.playbook/` into your project, detects the stack (`vinext` / `next`
 - **Cursor** — `.cursor/rules/playbook.mdc` with `alwaysApply: true`; workflows install as slash commands in `.cursor/commands/`
 - **Guardrail files** (JS stacks) — `stacks/<stack>/project-files/` copied into the project: the `gates` CI workflow with SHA-pinned actions, `.oxlintrc.json`, Dependabot, the pnpm supply-chain policy, check scripts, and `.claude/settings.json` (no AI attribution) with a SessionStart hook that installs dependencies and fetches `.playbook/` in Claude Code cloud sessions. Commit them. Then add the gate scripts and the pnpm pin to `package.json` and, on GitHub, a branch ruleset on `main` requiring the `gates` check — the stack's `checks.md` has the details.
 
+Once per new project, skim `.playbook/recommended-skills.md` and install the package skills that fit; agents don't re-read it each session.
+
 Re-run `setup.sh` on a project any time — it's idempotent and refreshes everything except the guardrail files, which it never overwrites: it lists the ones that differ from the playbook's copy for you to merge.
 
 > **Antigravity model note:** use Gemini Pro for `/spec` and planning; use Flash only for mechanical implementation under an approved plan — Flash follows instructions less reliably, and the CI gates are the backstop it can't bypass.
