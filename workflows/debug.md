@@ -1,5 +1,6 @@
 ---
 description: Use when a bug, error, flake, or regression needs diagnosing
+effort: xhigh
 ---
 
 # Debug

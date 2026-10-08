@@ -1,5 +1,6 @@
 ---
 description: Use before planning any feature to gather requirements and resolve ambiguities by interview
+effort: xhigh
 ---
 
 # Spec

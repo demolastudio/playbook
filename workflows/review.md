@@ -1,5 +1,6 @@
 ---
 description: Use to review recent changes on two axes - playbook standards and the originating spec
+effort: xhigh
 ---
 
 # Review
