@@ -34,7 +34,17 @@ gates already pass and adds production-only concerns. Read
 - [ ] CSRF protection is active on all mutations
 - [ ] Session cookies have correct flags
 - [ ] CSP headers are configured
-- [ ] Rate limiting is active on auth endpoints
+
+### Launch Day
+- [ ] Debug mode is off; test accounts and test data are deleted from production
+- [ ] Payments are live: live keys and the live webhook signing secret are set in production
+- [ ] `pnpm audit --prod` reports no known vulnerabilities, or each one is upgraded
+- [ ] User-only, in dashboards (give the user the steps): two-factor auth on the payment provider, hosting, and database; domain auto-renew on; spending caps or alerts on paid AI, SMS, and email
+
+### Pages
+- [ ] Every page has a title, a description, and a favicon
+- [ ] Every page has one main action, and no placeholder text remains
+- [ ] Sign-up and checkout (or booking) work end to end with only a keyboard; no button does nothing and no link is broken
 
 ### Testing
 - [ ] All tests pass
