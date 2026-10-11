@@ -144,6 +144,7 @@ This catches N+1 regressions before they reach production (see `core/database-in
 - **Prioritize by business impact.** Pricing bugs and double-bookings cost real money. Test those first.
 - **Factories over fixtures.** Generate test data dynamically for isolation and readability.
 - **Integration first, no unit layer.** Real database, real modules; fakes only at system boundaries.
+- **A test asserts the exact result a user sees.** Delete or rewrite any test that would still pass if the code under test returned `undefined`: no `toBeDefined`/`toBeTruthy`/bare `toHaveBeenCalled`, no expected value computed by the code itself. For a mock, assert the payload it received.
 - **Test concurrency with parallel requests.** Single-threaded tests can't find race conditions.
 - **Freeze time in date-sensitive tests.** Non-deterministic tests are worse than no tests.
 - **Set query budgets.** Catch N+1 regressions before they reach production.
