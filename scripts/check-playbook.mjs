@@ -38,7 +38,7 @@ for (const p of chapters) {
 for (const p of workflows) {
   const frontmatter = read(p).match(/^---\n([\s\S]*?)\n---\n/)?.[1];
   const description = frontmatter?.match(/^description: (.+)$/m)?.[1];
-  if (!description) fail(p, "frontmatter needs a single-line `description:`");
+  if (!description || /^[>|]/.test(description)) fail(p, "frontmatter needs a single-line `description:`");
   else if (description.includes('"')) fail(p, "description contains a double quote");
   const effort = frontmatter?.match(/^effort: (.+)$/m)?.[1];
   if (effort && !["low", "medium", "high", "xhigh", "max"].includes(effort)) fail(p, `effort must be low, medium, high, xhigh, or max (got ${effort})`);
@@ -52,7 +52,7 @@ for (const name of skillDirs) {
   const frontmatter = read(p).match(/^---\n([\s\S]*?)\n---\n/)?.[1];
   if (!/^[a-z0-9-]+$/.test(name)) fail(p, "skill folder names are lowercase letters, digits, and hyphens");
   if (frontmatter?.match(/^name: (.+)$/m)?.[1] !== name) fail(p, `frontmatter needs \`name: ${name}\` (the folder name)`);
-  if (!frontmatter?.match(/^description: .+$/m)) fail(p, "frontmatter needs a single-line `description:`");
+  if (!/^description: [^>|].*$/m.test(frontmatter ?? "")) fail(p, "frontmatter needs a single-line `description:`");
 }
 if (paths.includes("skills/sources.json")) {
   for (const source of JSON.parse(read("skills/sources.json")).sources ?? []) {

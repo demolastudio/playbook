@@ -1,6 +1,6 @@
 # Caching — vinext + Workers Cache
 
-> Verified on vinext 1.0 / `@vinext/cloudflare` 1.0; 1.1 changes no cache status. Adapter setup lives in
+> Traps verified on vinext 1.0 / `@vinext/cloudflare` 1.0; on 1.1 only the changelog and the cache status values were checked. Adapter setup lives in
 > `node_modules/@vinext/cloudflare/README.md`; this file keeps the decisions
 > and the traps.
 

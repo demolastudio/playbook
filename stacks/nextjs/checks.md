@@ -29,7 +29,7 @@ playbook's copy, for you to compare and merge.
 | `vitest.config.mts` | Tests in plain Node, `@/` imports, one test file at a time (they share the database), `e2e/` left to Playwright |
 | `scripts/check-design.sh` | The design gate |
 | `.claude/settings.json` | No AI attribution on commits or PRs; registers the hook below |
-| `.claude/hooks/session-start.sh` | Cloud sessions only: fetch `.playbook/` and `pnpm install`, so slash commands and gates work |
+| `.claude/hooks/session-start.sh` | Cloud sessions only: fetch `.playbook/`, copy the slash commands and skills, and `pnpm install`, so they and the gates work |
 
 `gates.yml` installs with the pnpm version pinned in `package.json` —
 `"packageManager": "pnpm@<version>"`, 11 or newer, set with
@@ -49,6 +49,8 @@ Compiler rules natively (all but `config`/`gating`; none are on by default).
 ```bash
 pnpm add -D oxlint oxlint-tsgolint
 ```
+
+Scaffold with `pnpm create next-app --no-linter`. On a project created with ESLint, remove it (`pnpm remove eslint eslint-config-next && rm eslint.config.mjs`): its `unrs-resolver` dependency runs a build script the shipped pnpm policy blocks, so the install fails.
 
 The config is the shipped `.oxlintrc.json`. Beyond correctness it enforces
 kebab-case file names, arrow functions, and one-way imports: `lib/`,

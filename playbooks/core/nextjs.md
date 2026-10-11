@@ -37,20 +37,21 @@ Server Component (page)
 
 ### Data Access Layer (DAL)
 
-**All database access must go through a centralized Data Access Layer** — never call the database directly from components, actions, or route handlers. Folders split by concern, per `rules/project-structure.md`:
+**All database access must go through a centralized Data Access Layer** — never call the database directly from components, actions, or route handlers. One folder per feature, per `rules/project-structure.md`:
 
 ```
-lib/bookings/       → DB queries + business logic (the DAL)
-schemas/            → Validation schemas
-actions/            → Server actions (thin: auth → validate → call DAL)
-components/         → UI components
+features/booking/
+  booking-queries.ts   → reads: check the session, then query (the DAL)
+  create-booking.ts    → one use case: the business rule and its writes
+  booking-actions.ts   → Server Actions (thin: defineAction → use case)
+  booking-schema.ts    → Zod schema; types via z.infer
 ```
 
 #### Why
 
 - **Security boundary:** The DAL verifies authentication and authorization before every query
 - **Single source of truth:** All booking logic lives in one place, not scattered across components
-- **Testability:** You can unit test the DAL independently of the framework
+- **Testability:** integration tests call the use case directly against real Postgres (`core/testing.md`)
 
 #### Pattern
 

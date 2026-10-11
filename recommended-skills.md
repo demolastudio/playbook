@@ -14,7 +14,7 @@ Snyk's ToxicSkills research found **prompt injection in 36% of tested skills** a
 
 ## Design Skills
 
-All entries verified against their primary repos (July 2026):
+All entries verified against their primary repos (July 2026; Emil Kowalski's row October 2026):
 
 | Skill | Backed by | What It Provides | Install |
 |---|---|---|---|
@@ -43,7 +43,7 @@ All entries verified against their primary repos (July 2026):
 | Package | Install | When To Use |
 |---|---|---|
 | **Arcjet** | `pnpm add @arcjet/next` | Every `stacks/nextjs` project — the rate-limit and bot layers of `core/security.md`'s auth-form defense. Workers projects use the layers in `stacks/vinext-cloudflare/` |
-| **Prisma** | `pnpm add -D prisma@7 && pnpm add @prisma/client@7 @prisma/adapter-pg@7` | Database ORM (`stacks/nextjs`) — pin the major: npm `latest` is a Prisma 8 RC (see `stacks/nextjs/gotchas.md`) |
+| **Prisma** | `pnpm add -D -E prisma@7.9.1 && pnpm add -E @prisma/client@7.9.1 @prisma/adapter-pg@7.9.1` | Database ORM (`stacks/nextjs`) — one exact 7.x version for all three (see `stacks/nextjs/gotchas.md`) |
 | **Zod** | `pnpm add zod` | Schema validation — each schema lives in its feature (`features/<name>/<name>-schema.ts`) |
 | **Stripe** | `pnpm add stripe` | Payments — see `playbooks/core/billing.md` |
 

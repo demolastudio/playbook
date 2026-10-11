@@ -10,7 +10,7 @@ idempotency, audit everything) apply unchanged — only the tools differ.
 
 | Concern | Next.js stack | FastAPI equivalent |
 | ------- | ------------- | ------------------ |
-| Validation schemas | Zod (`features/<name>/<name>-schema.ts`) | Pydantic models (`schemas/`) |
+| Validation schemas | Zod (`features/<name>/<name>-schema.ts`) | Pydantic models, in each `features/<name>/` |
 | ORM / data access | Prisma, in feature use cases | SQLAlchemy or SQLModel (`services/`) |
 | Auth sessions | Better Auth | fastapi-users or custom JWT/session deps |
 | Typecheck gate | `tsc --noEmit` | `mypy` or `pyright` |

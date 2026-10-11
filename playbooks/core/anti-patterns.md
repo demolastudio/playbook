@@ -44,7 +44,7 @@ if (result === 0) throw new Error("Item no longer available")
   lib/workers/charge.ts         →  calculates price (yet another copy)
 
 ✅ DO:
-  lib/pricing.ts                →  calculatePrice() — THE ONLY PLACE
+  features/booking/calculate-price.ts →  calculatePrice() — THE ONLY PLACE
   Everything else imports and calls calculatePrice()
 ```
 
@@ -111,12 +111,12 @@ Centralising ALL logic into one service or one file makes every change high-risk
 ❌ DON'T: lib/order-service.ts (2000 lines) — pricing, inventory,
           payments, notifications, returns all in one file
 
-✅ DO: Separate by domain
-  lib/pricing.ts / lib/inventory.ts / lib/notifications.ts
-  actions/create-order.ts → orchestrates the above
+✅ DO: Separate by feature
+  features/pricing/ / features/inventory/ / features/notifications/
+  features/order/create-order.ts → orchestrates the above
 ```
 
-**Rule:** Each `lib/` module should do one thing. If the file is > 300 lines, it's doing too much.
+**Rule:** Each file does one thing. If the file is > 300 lines, it's doing too much.
 
 ---
 

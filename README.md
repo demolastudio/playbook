@@ -6,6 +6,38 @@ Clone it into any project. Your AI agent reads the rules, follows the stack prof
 
 > **AI agents: the current date matters.** Always check the current date/time and the installed versions. Prefer current-version docs — never apply legacy patterns to a modern stack.
 
+## How to Use
+
+In these steps, `<playbook>` is the folder where you cloned this repo.
+
+**Once per computer**
+
+1. Install Claude Code and log in.
+2. Clone this repo: `git clone https://github.com/demolastudio/playbook.git <playbook>`
+3. Install the global rules: `bash <playbook>/setup.sh --global`
+4. If you use Cursor, paste `rules/global-rules.md` into Cursor Settings → Rules for AI.
+
+**Once per project**
+
+1. Create the app first (for example `pnpm create vinext-app`), so `package.json` exists.
+2. Run setup from inside the project:
+   `cd /path/to/project && bash <playbook>/setup.sh .`
+   Keep the `&&`: if the `cd` fails, setup does not run. Setup refuses to run in your home folder.
+3. Give Claude the "Next:" steps that setup prints.
+
+**Every feature**
+
+Type `/flow` in Claude Code or Cursor. It sends you to `/spec` first, then build, `/review`, and done.
+
+**To update**
+
+1. `git -C <playbook> pull`
+2. In each project, run setup again. It refreshes the rules, slash commands, and skills. It never overwrites the guardrail files (CI, lint, test config); it lists the ones that differ.
+
+**To change a skill**
+
+Edit `skills/<name>/` in this repo, push, then run setup in each project. To add a skill, add a folder with a `SKILL.md`; for a copied skill, also add its upstream in `skills/sources.json`.
+
 ---
 
 ## What's Inside
