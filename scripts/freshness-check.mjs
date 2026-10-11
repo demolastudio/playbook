@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const tracked = JSON.parse(readFileSync(new URL("scripts/tracked-packages.json", root), "utf8"));
+const skillSources = JSON.parse(readFileSync(new URL("skills/sources.json", root), "utf8")).sources;
 const maintenance = readFileSync(new URL("MAINTENANCE.md", root), "utf8");
 const reportPath = process.argv[2] ?? "freshness-report.md";
 const upstreamUrl = "https://github.com/mattpocock/skills.git";
@@ -102,7 +103,33 @@ const checkUpstream = () => {
   }
 };
 
-const renderReport = ({ moved, errors }, actions, upstream) => {
+// Copied skills (skills/sources.json) record the upstream commit they were
+// taken from; any later upstream commit touching a skill's folder is reported.
+const checkSkills = () => {
+  const changed = [];
+  const errors = [];
+  for (const source of skillSources) {
+    const dir = mkdtempSync(join(tmpdir(), "skills-"));
+    try {
+      execFileSync("git", ["clone", "-q", "--filter=blob:none", "--no-checkout", `https://github.com/${source.repo}.git`, dir], {
+        stdio: "ignore",
+        env: { ...process.env, GIT_TERMINAL_PROMPT: "0" },
+      });
+      for (const [name, path] of Object.entries(source.skills)) {
+        const log = execFileSync("git", ["-C", dir, "log", `${source.commit}..HEAD`, "--format=%h %ad %s", "--date=short", "--", path], { encoding: "utf8" });
+        const commits = log.split("\n").filter(Boolean);
+        if (commits.length) changed.push({ name, repo: source.repo, path, commit: source.commit, commits });
+      }
+    } catch (error) {
+      errors.push(`skills from \`${source.repo}\`: ${error.message}`);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+  return { changed, errors };
+};
+
+const renderReport = ({ moved, errors }, actions, upstream, skills) => {
   const today = new Date().toISOString().slice(0, 10);
   const lines = [
     `## Playbook freshness — ${today}`,
@@ -128,7 +155,12 @@ const renderReport = ({ moved, errors }, actions, upstream) => {
     if (upstream.commits.length > shown.length) lines.push(`- … and ${upstream.commits.length - shown.length} more`);
     lines.push("", "Read its `CHANGELOG.md` and `.changeset/` since that date, and verify against the SKILL.md files (MAINTENANCE.md).", "");
   }
-  const allErrors = [...errors, ...actions.errors, ...(upstream.error ? [upstream.error] : [])];
+  if (skills.changed.length) {
+    lines.push("### Your skills: upstream changes", "", "| Skill | Upstream | Commits since your copy |", "| --- | --- | --- |");
+    for (const k of skills.changed) lines.push(`| \`skills/${k.name}\` | \`${k.repo}\` \`${k.path}\` | ${k.commits.join("<br>")} |`);
+    lines.push("", "Compare with `git diff <commit> HEAD -- <path>` in a clone of the upstream repo, merge what you want into your copy, then set that source's `commit` in `skills/sources.json` to the upstream commit you compared against.", "");
+  }
+  const allErrors = [...errors, ...actions.errors, ...skills.errors, ...(upstream.error ? [upstream.error] : [])];
   if (allErrors.length) {
     lines.push("### Could not check", "");
     for (const error of allErrors) lines.push(`- ${error}`);
@@ -141,8 +173,9 @@ const renderReport = ({ moved, errors }, actions, upstream) => {
 const packages = await checkPackages();
 const actions = checkActionPins();
 const upstream = checkUpstream();
-const hasFindings = [packages.moved, packages.errors, actions.moved, actions.errors, upstream.commits].some((list) => list.length > 0) || upstream.error !== null;
+const skills = checkSkills();
+const hasFindings = [packages.moved, packages.errors, actions.moved, actions.errors, upstream.commits, skills.changed, skills.errors].some((list) => list.length > 0) || upstream.error !== null;
 
-writeFileSync(reportPath, `${renderReport(packages, actions, upstream)}\n`);
+writeFileSync(reportPath, `${renderReport(packages, actions, upstream, skills)}\n`);
 if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `has_findings=${hasFindings}\n`);
 console.log(hasFindings ? `Findings written to ${reportPath}` : "Playbook is current — no findings");

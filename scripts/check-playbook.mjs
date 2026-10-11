@@ -1,6 +1,7 @@
 // Checks the MAINTENANCE.md invariants a script can see: budgets, workflow
-// frontmatter, routing (flow.md, INDEX rows), links and cited paths, JSON,
-// the freshness baselines, SHA-pinned actions, and executable shell scripts.
+// and skill frontmatter, copied-skill sources, routing (flow.md, INDEX rows),
+// links and cited paths, JSON, the freshness baselines, SHA-pinned actions,
+// and executable shell scripts.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
@@ -41,6 +42,26 @@ for (const p of workflows) {
   else if (description.includes('"')) fail(p, "description contains a double quote");
   const effort = frontmatter?.match(/^effort: (.+)$/m)?.[1];
   if (effort && !["low", "medium", "high", "xhigh", "max"].includes(effort)) fail(p, `effort must be low, medium, high, xhigh, or max (got ${effort})`);
+}
+
+// Skills: the folder name is the skill's name; a copied skill names its
+// upstream commit and keeps the upstream license beside it
+const skillDirs = [...new Set(paths.filter((p) => /^skills\/[^/]+\/SKILL\.md$/.test(p)).map((p) => p.split("/")[1]))];
+for (const name of skillDirs) {
+  const p = `skills/${name}/SKILL.md`;
+  const frontmatter = read(p).match(/^---\n([\s\S]*?)\n---\n/)?.[1];
+  if (!/^[a-z0-9-]+$/.test(name)) fail(p, "skill folder names are lowercase letters, digits, and hyphens");
+  if (frontmatter?.match(/^name: (.+)$/m)?.[1] !== name) fail(p, `frontmatter needs \`name: ${name}\` (the folder name)`);
+  if (!frontmatter?.match(/^description: .+$/m)) fail(p, "frontmatter needs a single-line `description:`");
+}
+if (paths.includes("skills/sources.json")) {
+  for (const source of JSON.parse(read("skills/sources.json")).sources ?? []) {
+    if (!/^[\w.-]+\/[\w.-]+$/.test(source.repo ?? "") || !/^[0-9a-f]{40}$/.test(source.commit ?? "")) fail("skills/sources.json", `each source needs \`repo: owner/name\` and a full 40-character \`commit\`: ${JSON.stringify(source.repo)}`);
+    for (const name of Object.keys(source.skills ?? {})) {
+      if (!skillDirs.includes(name)) fail("skills/sources.json", `lists ${name}, but skills/${name}/SKILL.md doesn't exist`);
+      else if (!paths.includes(`skills/${name}/LICENSE`)) fail(`skills/${name}`, "a copied skill keeps its upstream LICENSE file");
+    }
+  }
 }
 
 // Routing: every workflow in flow.md, every chapter in its domain's INDEX.md
