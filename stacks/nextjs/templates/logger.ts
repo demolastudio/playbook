@@ -8,10 +8,14 @@ const context = new AsyncLocalStorage<Fields>();
 export const withContext = <T>(fields: Fields, run: () => T): T =>
   context.run({ ...context.getStore(), ...fields }, run);
 
-const serialize = (_key: string, value: unknown) =>
-  value instanceof Error
+const sensitive = /password|secret|token|authorization|cookie|api[-_]?key|signature/i;
+
+const serialize = (key: string, value: unknown) => {
+  if (sensitive.test(key)) return "[redacted]";
+  return value instanceof Error
     ? { name: value.name, message: value.message, stack: value.stack }
     : value;
+};
 
 const write = (level: Level) => (fields: Fields, message: string) =>
   console[level](

@@ -23,7 +23,7 @@ Steps 1–2 belong in one unbroken context window; start implementation fresh fr
 Situations that generate work, merging back into the main flow:
 
 - **Something is broken** → **/debug** — refuses to hypothesize until a tight feedback loop reproduces the bug.
-- **Periodic health check** → **/audit** — full security and performance sweep against playbook standards. Run every few days on active projects.
+- **Periodic health check** → **/audit** — read-only subagents sweep security, cost abuse, payments, failures, and performance; you confirm the list before anything changes. Run every few days on active projects and before launch.
 - **Code needs restructuring without behavior change** → **/refactor**.
 - **A merge or rebase is stuck on conflicts** → **/merge-conflicts** — resolves by intent, never aborts.
 

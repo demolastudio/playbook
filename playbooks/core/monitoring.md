@@ -30,6 +30,7 @@ logger.error({ event: "payment.failed", bookingId, declineCode }, "charge failed
 **Rules:**
 - Always include `event` (machine-readable action name) and the entity IDs involved
 - Never log PII in plain text (email, phone, card numbers) — log IDs that can be looked up
+- The logger replaces any field whose name contains password, secret, token, authorization, cookie, api key, or signature with `[redacted]`. A secret inside a message or a differently named field still leaks, so never log whole request bodies, headers, or third-party responses
 - Expected business failures (`appError`) log as `warn`; `error` is reserved for what someone must fix
 - No Pino on Workers: it needs `worker_threads`, and Workers prefixes stdout lines, so its output isn't indexed as JSON
 
