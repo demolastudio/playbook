@@ -127,6 +127,20 @@ run_setup "$p"
 diff -r "$root/skills/emil-design-eng" "$p/.claude/skills/emil-design-eng" > /dev/null || fail "skills re-run: installed skill not refreshed"
 grep -qF "kept your .claude/skills/emil-design-eng" "$p.log" && fail "skills re-run: treated its own install as the project's"
 
+# --all re-runs setup only where setup ran before
+root_all="$work/all"
+mkdir -p "$root_all/one" "$root_all/group/two" "$root_all/fresh" "$root_all/one/node_modules/pkg/.playbook"
+run_setup "$root_all/one"
+run_setup "$root_all/group/two"
+rm "$root_all/one/AGENTS.md" "$root_all/group/two/AGENTS.md"
+bash "$root/setup.sh" --all "$root_all" > "$root_all.log" 2>&1 || { cat "$root_all.log"; fail "all: exited non-zero"; }
+expect_file "$root_all" one/AGENTS.md
+expect_file "$root_all" group/two/AGENTS.md
+expect_no_file "$root_all" fresh/AGENTS.md
+expect_no_file "$root_all" fresh/.playbook
+expect_no_file "$root_all" one/node_modules/pkg/AGENTS.md
+grep -qF "Updated 2 project(s)" "$root_all.log" || fail "all: summary missing or wrong count"
+
 # the home folder is refused and left untouched
 h="$work/home"
 mkdir "$h"

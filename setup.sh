@@ -9,6 +9,8 @@
 #                                                 always-on rule files, and workflows)
 #   bash setup.sh /path/to/project --global    ← project setup + global rules
 #   bash setup.sh --global                     ← update global rules only (no project setup)
+#   bash setup.sh --all ~/projects             ← re-run setup in every project under a
+#                                                 folder that already has .playbook/
 
 set -euo pipefail
 
@@ -16,15 +18,43 @@ set -euo pipefail
 INSTALL_GLOBAL=false
 PROJECT_DIR=""
 
-for arg in "$@"; do
-  case "$arg" in
+ALL_ROOT=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
     --global) INSTALL_GLOBAL=true ;;
+    --all) ALL_ROOT="${2:?usage: bash setup.sh --all <folder>}"; shift ;;
     --force) ;; # accepted for older instructions; nothing reads it
-    *) PROJECT_DIR="$arg" ;;
+    *) PROJECT_DIR="$1" ;;
   esac
+  shift
 done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# ─── All-projects mode ─────────────────────────────────────────────
+# Re-runs this script in every project under the folder that setup has
+# run in before (it has .playbook/), up to three levels down.
+if [ -n "$ALL_ROOT" ]; then
+  [ "$INSTALL_GLOBAL" = true ] && bash "$SCRIPT_DIR/setup.sh" --global
+  updated=0
+  failed=0
+  while IFS= read -r marker; do
+    project="$(dirname "$marker")"
+    echo ""
+    echo "━━ $project"
+    if bash "$SCRIPT_DIR/setup.sh" "$project"; then
+      updated=$((updated + 1))
+    else
+      echo "❌ setup failed in $project"
+      failed=$((failed + 1))
+    fi
+  done < <(find "$ALL_ROOT" -maxdepth 4 -type d -name node_modules -prune -o -type d -name .playbook -print -prune)
+  echo ""
+  echo "Updated $updated project(s) under $ALL_ROOT; $failed failed."
+  [ "$failed" -eq 0 ]
+  exit
+fi
 REPO_URL="${PLAYBOOK_REPO_URL:-https://github.com/demolastudio/playbook.git}"
 
 # ─── Helpers ───────────────────────────────────────────────────────
@@ -436,6 +466,7 @@ if [ -n "$GUARDRAIL_STACK" ]; then
   fi
   echo ""
 fi
-echo "   To update: cd .playbook && git pull"
+echo "   To update: pull the playbook repo, then run setup here again"
+echo "   (every project at once: bash setup.sh --all <folder>)."
 echo "   To update global rules: bash setup.sh --global"
 echo ""
