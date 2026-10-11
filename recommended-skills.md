@@ -21,6 +21,7 @@ All entries verified against their primary repos (July 2026):
 | **frontend-design** | Anthropic — `anthropics/skills` (160k★), verified at `skills/frontend-design` | Aesthetic direction: styles, palettes, font pairings; forces a committed visual direction | Official: `/plugin marketplace add anthropics/skills` (or `npx skills add anthropics/skills --skill frontend-design`) |
 | **web-design-guidelines** | Vercel — `vercel-labs/agent-skills` (28.9k★), verified | UI **review gate**: audits finished UI against 100+ accessibility/UX rules — run before shipping any page | `npx skills add vercel-labs/agent-skills` (official README command) |
 | **ui-ux-pro-max** | Community — `nextlevelbuilder/ui-ux-pro-max-skill`, repo verified | Design database with industry reasoning: 161 product-type rule sets (incl. beauty/health services — booking-SME territory), matched palettes, local BM25 search | `npm i -g ui-ux-pro-max-cli && uipro init --ai claude` (from its README) — review `scripts/search.py` first |
+| **emil-design-eng, review-animations, break-ui, mobile-native** | Emil Kowalski (author of Sonner; worked at Vercel and Linear) — `emilkowalski/skills`, verified Oct 2026: Markdown only, no scripts, no tool permissions | Animation and polish rules; a strict motion reviewer; worst-case data stress test for any screen; web-app-on-a-phone fixes. Skip its pick-ui-library (recommends base-ui over shadcn) | Global, so Cursor's copy stays out of the project's `.agents/`: `npx skills add emilkowalski/skills --skill emil-design-eng --skill review-animations --skill break-ui --skill mobile-native -g -a claude-code cursor` |
 | **shadcn/ui** | Official project | Project-aware component intelligence; discover existing components before building custom | [ui.shadcn.com/docs/skills](https://ui.shadcn.com/docs/skills) |
 
 ### Precedence (Read This Before Using Design Skills)
@@ -43,7 +44,7 @@ All entries verified against their primary repos (July 2026):
 |---|---|---|
 | **Arcjet** | `pnpm add @arcjet/next` | Every `stacks/nextjs` project — the rate-limit and bot layers of `core/security.md`'s auth-form defense. Workers projects use the layers in `stacks/vinext-cloudflare/` |
 | **Prisma** | `pnpm add -D prisma@7 && pnpm add @prisma/client@7 @prisma/adapter-pg@7` | Database ORM (`stacks/nextjs`) — pin the major: npm `latest` is a Prisma 8 RC (see `stacks/nextjs/gotchas.md`) |
-| **Zod** | `pnpm add zod` | Schema validation — all schemas go in `schemas/` folder |
+| **Zod** | `pnpm add zod` | Schema validation — each schema lives in its feature (`features/<name>/<name>-schema.ts`) |
 | **Stripe** | `pnpm add stripe` | Payments — see `playbooks/core/billing.md` |
 
 ## Considered & Skipped (July 2026)

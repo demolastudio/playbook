@@ -25,10 +25,11 @@
 | [responsive.md](./responsive.md) | Mobile-first breakpoints, touch targets, adaptive layouts | Building any user-facing page |
 | [dashboards.md](./dashboards.md) | Layout anatomy, data tables, filters, density, states | Building admin/dashboard UIs |
 
+Motion craft and worst-case UI testing come from Emil Kowalski's skills (`recommended-skills.md`), not a chapter.
+
 ## Planned Chapters
 
 - [ ] **components.md** — Component architecture, composition, prop design
-- [ ] **animations.md** — Framer Motion patterns, page transitions
 - [ ] **forms.md** — Form UX, validation feedback, multi-step flows
 - [ ] **navigation.md** — Sidebar, breadcrumbs, tabs, mobile nav
 - [ ] **anti-patterns.md** — Layout shift, poor contrast, missing feedback
