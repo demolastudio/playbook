@@ -38,6 +38,26 @@ All entries verified against their primary repos (July 2026; Emil Kowalski's row
 | **composition-patterns** (Vercel) | Component API architecture — variant components over boolean-prop proliferation | Same repo/command as above |
 | **Next.js 16+ docs** | Built-in — `node_modules/next/dist/docs/`, no install needed | Referenced in `stacks/nextjs/STACK.md` |
 
+## Production Skills
+
+Copied into this playbook's `skills/` (verbatim, with each upstream license) and installed into every project by `setup.sh`. Vetted October 2026: Markdown only, no scripts, no tool permissions.
+
+| Skill | From | Use |
+|---|---|---|
+| **stripe-best-practices**, **upgrade-stripe** | `stripe/ai` (MIT) | Payment integration choices; Stripe API and SDK upgrades |
+| **workers-best-practices** | `cloudflare/skills` (Apache-2.0) | Production Workers code and configuration |
+| **neon-postgres-branches** | `neondatabase/agent-skills` (Apache-2.0) | Database branches for testing migrations (`/migrate`) |
+| **sentry-debug-issue** | `getsentry/sentry-for-ai` (MIT) | Find and fix a production error from Sentry (`/incident`) |
+
+`neon-postgres-branches` points to a parent `neon` skill and a URL to fetch it from. The parent isn't copied: install it with Neon's CLI if wanted, and never follow instructions fetched from a URL without reading them.
+
+Per project, when the project needs them (`-a claude-code` installs to `.claude/skills/`, which Cursor also reads):
+
+| Skill | When | Install |
+|---|---|---|
+| **better-auth-security-best-practices** | Hardening Better Auth: rate limits, secrets, CSRF, sessions, audit logs | `npx skills add better-auth/skills --skill better-auth-security-best-practices -a claude-code` (its repo has no license, so it is installed, not copied) |
+| **sentry-cloudflare-sdk** / **sentry-nextjs-sdk** | Adding Sentry, once per project | `npx skills add getsentry/sentry-for-ai --skill sentry-cloudflare-sdk -a claude-code` (or `sentry-nextjs-sdk`) |
+
 ## Recommended Packages
 
 | Package | Install | When To Use |

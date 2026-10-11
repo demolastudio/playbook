@@ -21,6 +21,10 @@ Layout differences: `db/` (schema, relations, generated auth schema) and
 bindings, secrets) and `vite.config.ts` replace `next.config.ts`. Use cases take
 the request's client as their first argument: `createBooking(db, input)`.
 
+The `workers-best-practices` skill assumes `wrangler.jsonc` and `wrangler types`; this stack declares
+bindings in `cloudflare.config.ts` and generates types with `cf workers types` ([checks.md](./checks.md)).
+Where the two differ, this profile wins.
+
 ## Decisions
 
 | Decision | Why | Guardrail |

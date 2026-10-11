@@ -52,7 +52,7 @@ for (const name of skillDirs) {
   const frontmatter = read(p).match(/^---\n([\s\S]*?)\n---\n/)?.[1];
   if (!/^[a-z0-9-]+$/.test(name)) fail(p, "skill folder names are lowercase letters, digits, and hyphens");
   if (frontmatter?.match(/^name: (.+)$/m)?.[1] !== name) fail(p, `frontmatter needs \`name: ${name}\` (the folder name)`);
-  if (!/^description: [^>|].*$/m.test(frontmatter ?? "")) fail(p, "frontmatter needs a single-line `description:`");
+  if (!/^description: ([^>|\s].*|[>|][-+]?\n[ \t]+\S.*)$/m.test(frontmatter ?? "")) fail(p, "frontmatter needs a `description:`");
 }
 if (paths.includes("skills/sources.json")) {
   for (const source of JSON.parse(read("skills/sources.json")).sources ?? []) {
@@ -75,7 +75,7 @@ for (const p of markdown.filter((p) => /^playbooks\/[^/]+\/[^/]+\.md$/.test(p) &
 }
 
 // Links and cited paths
-const slug = (heading) => heading.toLowerCase().replace(/[`*_]/g, "").replace(/[^\p{L}\p{N}\s-]/gu, "").trim().replace(/\s/g, "-");
+const slug = (heading) => heading.toLowerCase().replace(/[`*]|(?<!\w)_+|_+(?!\w)/g, "").replace(/[^\p{L}\p{N}\s_-]/gu, "").trim().replace(/\s/g, "-");
 const anchors = (path) => [...read(path).matchAll(/^#{1,6} (.+)$/gm)].map((m) => slug(m[1]));
 const playbookPath = (cited) => {
   if (cited.startsWith(".playbook/")) return cited.slice(".playbook/".length);
