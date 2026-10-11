@@ -9,6 +9,39 @@
         "mobile-native": "skills/mobile-native",
         "review-animations": "skills/review-animations"
       }
+    },
+    {
+      "repo": "stripe/ai",
+      "commit": "735b42d3952b59fa3d9c42b11e884d988c102c7c",
+      "skills": {
+        "stripe-best-practices": "skills/stripe-best-practices",
+        "upgrade-stripe": "skills/upgrade-stripe"
+      }
+    },
+    {
+      "repo": "cloudflare/skills",
+      "commit": "c430dd965cea3a8faf0ef035e3b3d73b38518081",
+      "skills": {
+        "workers-best-practices": "skills/workers-best-practices"
+      }
+    },
+    {
+      "repo": "neondatabase/agent-skills",
+      "commit": "bfd013c352ed31b57a573e4f60263afc5fdd7f7a",
+      "skills": {
+        "neon-postgres-branches": "skills/neon-postgres-branches"
+      }
+    },
+    {
+      "repo": "getsentry/sentry-for-ai",
+      "commit": "c2313d3a826d56249e70623313bdc27ce5fca8b6",
+      "skills": {
+        "sentry-debug-issue": [
+          "src/skills/sentry-debug-issue",
+          "src/references/search-query-language.md",
+          "src/references/concepts"
+        ]
+      }
     }
   ]
 }
