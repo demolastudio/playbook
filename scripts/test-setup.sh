@@ -15,9 +15,16 @@ expect_no_file() { [ ! -e "$1/$2" ] || fail "$(basename "$1"): unexpected $2"; }
 expect_same() { cmp -s "$1/$2" "$3" || fail "$(basename "$1"): $2 differs from ${3#"$root"/}"; }
 expect_exec() { [ -x "$1/$2" ] || fail "$(basename "$1"): $2 not executable"; }
 
-mkdir "$work/repo"
-(cd "$root" && git ls-files -z --cached --others --exclude-standard | xargs -0 tar -cf - 2>/dev/null) | tar -xf - -C "$work/repo"
+# History first: an older grill.md and a since-deleted workflow, so the
+# legacy cleanup below meets copies that only match an earlier version.
+mkdir -p "$work/repo/workflows"
 git -C "$work/repo" init -q
+{ cat "$root/workflows/grill.md"; echo "an older version"; } > "$work/repo/workflows/grill.md"
+echo "a retired workflow" > "$work/repo/workflows/retired.md"
+git -C "$work/repo" add -A
+git -C "$work/repo" -c user.name=test -c user.email=test@example.invalid commit -q -m older
+git -C "$work/repo" rm -q -r workflows
+(cd "$root" && git ls-files -z --cached --others --exclude-standard | xargs -0 tar -cf - 2>/dev/null) | tar -xf - -C "$work/repo"
 git -C "$work/repo" add -A
 git -C "$work/repo" -c user.name=test -c user.email=test@example.invalid commit -q -m snapshot
 export PLAYBOOK_REPO_URL="$work/repo"
@@ -72,12 +79,16 @@ grep -qF "stacks/turborepo/STACK.md" "$p/AGENTS.md" || fail "turbo: AGENTS.md la
 grep -q "stacks/nextjs/STACK.md.* for .apps/web/" "$p/AGENTS.md" || fail "turbo: AGENTS.md lacks nextjs for apps/web"
 grep -q "stacks/fastapi/STACK.md.* for .apps/api/" "$p/AGENTS.md" || fail "turbo: AGENTS.md lacks fastapi for apps/api"
 expect_no_file "$p" .github/workflows/gates.yml
+grep -qF "Monorepo: no guardrail files copied" "$p.log" || fail "turbo: missing-guardrails warning not printed"
 
 # Claude Code and Cursor only; an earlier install's Antigravity copies go,
 # a user's own file there stays
 p="$work/legacy"
 mkdir -p "$p/.agents/workflows" "$p/.agent/rules" "$p/.agents/rules"
 cp "$root/workflows/flow.md" "$p/.agents/workflows/flow.md"
+{ cat "$root/workflows/grill.md"; echo "an older version"; } > "$p/.agents/workflows/grill.md"
+mkdir -p "$p/.agent/workflows" && echo "a retired workflow" > "$p/.agent/workflows/retired.md"
+echo "mine" > "$p/.agents/workflows/team-flow.md"
 printf 'rules\n\nProject routing and completion gate: see AGENTS.md at the project root.\n' > "$p/.agent/rules/playbook.md"
 echo "mine" > "$p/.agents/rules/team.md"
 run_setup "$p"
@@ -85,7 +96,9 @@ expect_file "$p" .claude/commands/flow.md
 expect_file "$p" .cursor/commands/flow.md
 expect_file "$p" .cursor/rules/playbook.mdc
 expect_no_file "$p" .agent
-expect_no_file "$p" .agents/workflows
+expect_no_file "$p" .agents/workflows/flow.md
+expect_no_file "$p" .agents/workflows/grill.md
+expect_file "$p" .agents/workflows/team-flow.md
 expect_file "$p" .agents/rules/team.md
 grep -q "agent" "$p/.gitignore" && fail "legacy: .gitignore gained Antigravity entries"
 

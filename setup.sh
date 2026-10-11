@@ -81,7 +81,7 @@ fi
 PROJECT_DIR="${PROJECT_DIR:-$(pwd)}"
 # A failed `cd` before `setup.sh .` lands here with the home folder, and a
 # CLAUDE.md there loads into every Claude Code session on the machine.
-if [ "$(cd "$PROJECT_DIR" 2>/dev/null && pwd -P)" = "$(cd "$HOME" && pwd -P)" ]; then
+if [ -n "${HOME:-}" ] && [ "$(cd "$PROJECT_DIR" 2>/dev/null && pwd -P)" = "$(cd "$HOME" && pwd -P)" ]; then
   echo "❌ $PROJECT_DIR is your home folder, not a project — cd into the project first."
   exit 1
 fi
@@ -159,7 +159,7 @@ for entry in ".playbook/" ".claude/commands/" ".cursor/commands/" ".cursor/rules
 done
 echo "📋 Ensured playbook artifacts are gitignored"
 
-# ─── Copy workflows to all AI tool paths ──────────────────────────
+# ─── Copy workflows to Claude Code and Cursor ─────────────────────
 # Workflows are user-invoked slash commands in Claude Code and Cursor. Earlier
 # installs also wrote Antigravity copies (.agents/, .agent/); a re-run removes
 # only those generated files, then any folder they leave empty. Cursor reads
@@ -177,9 +177,6 @@ if [ -d "$WORKFLOWS_SRC" ]; then
     [ -f "$f" ] || continue
     name="$(basename "$f")"
     copy_if_newer "$f" "$PROJECT_DIR/.claude/commands/$name"
-    for old in "$PROJECT_DIR/.agents/workflows/$name" "$PROJECT_DIR/.agent/workflows/$name"; do
-      if [ -f "$old" ] && cmp -s "$f" "$old"; then rm "$old"; fi
-    done
 
     target="$PROJECT_DIR/.cursor/commands/$name"
     if [ ! -f "$target" ] || [ "$f" -nt "$target" ]; then
@@ -195,6 +192,17 @@ if [ -d "$WORKFLOWS_SRC" ]; then
   echo "📂 Claude Code  → .claude/commands/"
   echo "📂 Cursor       → .cursor/commands/"
 fi
+
+# An Antigravity copy is generated when it matches any version of that
+# workflow in the playbook's history: older copies and copies of workflows
+# the playbook since deleted go too; anything else stays.
+for old in "$PROJECT_DIR"/.agents/workflows/*.md "$PROJECT_DIR"/.agent/workflows/*.md; do
+  [ -f "$old" ] || continue
+  blob="$(git hash-object "$old")"
+  if git -C "$PLAYBOOK_DIR" log --all --format= --raw --no-abbrev -- "workflows/$(basename "$old")" 2>/dev/null | grep -qF " $blob "; then
+    rm "$old"
+  fi
+done
 
 # ─── Skills ────────────────────────────────────────────────────────
 # skills/<name>/ (SKILL.md plus its files) installs to .claude/skills/<name>/,
@@ -408,6 +416,10 @@ if [ ${#ROOT_STACKS[@]} -gt 0 ]; then
         "$PLAYBOOK_DIR/stacks/$stack/project-files"
     fi
   done
+fi
+if [ -z "$GUARDRAIL_STACK" ] && [ -f "$PROJECT_DIR/turbo.json" ]; then
+  echo "⚠️  Monorepo: no guardrail files copied (CI, lint, test config, pnpm policy, Claude settings)."
+  echo "   Add them by hand: .playbook/stacks/turborepo/STACK.md, Guardrail Files."
 fi
 
 # ─── Done ──────────────────────────────────────────────────────────

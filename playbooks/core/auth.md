@@ -84,9 +84,11 @@ const PERMISSIONS = {
 } as const
 
 type Role = keyof typeof PERMISSIONS
-
-export const hasPermission = (role: Role, permission: string): boolean =>
-  (PERMISSIONS[role] as readonly string[]).includes(permission)
+const isRole = (value: unknown): value is Role => typeof value === "string" && Object.hasOwn(PERMISSIONS, value)
+export const hasPermission = (role: unknown, permission: string): boolean => {
+  const granted: readonly string[] = isRole(role) ? PERMISSIONS[role] : []
+  return granted.includes(permission)
+}
 ```
 
 #### Where to Check Permissions
@@ -110,7 +112,7 @@ The DAL is where auth meets data. Every Server Action calls through it.
 // lib/auth.ts (continued): the guards live beside the instance
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { hasPermission, type Role } from "./permissions"
+import { hasPermission } from "./permissions"
 
 export const requireSession = async () => {
   const session = await auth.api.getSession({
@@ -131,7 +133,7 @@ export const requireRole = async (role: string) => {
 
 export const requirePermission = async (permission: string) => {
   const session = await requireSession()
-  if (!hasPermission(session.user.role as Role, permission)) {
+  if (!hasPermission(session.user.role, permission)) {
     throw new Error("Forbidden")
   }
   return session

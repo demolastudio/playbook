@@ -157,7 +157,7 @@ const renderReport = ({ moved, errors }, actions, upstream, skills) => {
   }
   if (skills.changed.length) {
     lines.push("### Your skills: upstream changes", "", "| Skill | Upstream | Commits since your copy |", "| --- | --- | --- |");
-    for (const k of skills.changed) lines.push(`| \`skills/${k.name}\` | \`${k.repo}\` \`${k.path}\` | ${k.commits.join("<br>")} |`);
+    for (const k of skills.changed) lines.push(`| \`skills/${k.name}\` | \`${k.repo}\` \`${k.path}\` | ${k.commits.map((c) => c.replaceAll("|", "\\|")).join("<br>")} |`);
     lines.push("", "Compare with `git diff <commit> HEAD -- <path>` in a clone of the upstream repo, merge what you want into your copy, then set that source's `commit` in `skills/sources.json` to the upstream commit you compared against.", "");
   }
   const allErrors = [...errors, ...actions.errors, ...skills.errors, ...(upstream.error ? [upstream.error] : [])];
