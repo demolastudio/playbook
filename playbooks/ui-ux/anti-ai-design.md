@@ -23,6 +23,9 @@ A model predicts the most probable output. For visual design, "most probable" is
 | Identical padding on every section | A deliberate spacing rhythm: hero breathes, dense sections compress |
 | Generic microcopy ("Empower your workflow") | Concrete language about what the product actually does |
 | Every surface glassmorphic | Glass as accent on 1–2 surface types max |
+| Motion on everything: `transition: all`, pop-ins from `scale(0)`, `ease-in` | Transition named properties, `transform` and `opacity` only; enter from `scale(0.95)` with `opacity: 0`; `ease-out` with a strong curve (`@theme { --ease-out: cubic-bezier(0.23, 1, 0.32, 1); }` restyles Tailwind's `ease-out`); durations per the Design Taste. Never animate keyboard-triggered actions or anything used 100 times a day. Reduced motion: `core/accessibility.md` |
+| Actions that appear only on hover | Touch screens cannot hover: anything a user needs to act stays visible without it. Tailwind 4's `hover:` already applies only where `(hover: hover)` matches; hand-written CSS needs the same media query |
+| Designed against kind demo data ("Jane Doe, 12 members") | Render the realistic worst case before a screen is done: long hyphenated names, unbroken emails, 0 / 1 / 1,284 items, missing optional fields. Usual fixes: `min-w-0` on the text column, `shrink-0` on avatars and trailing actions, `wrap-anywhere` on emails and URLs, `Intl.PluralRules` and `Intl.NumberFormat` for counts, `tabular-nums` on money and changing numbers |
 
 ---
 
