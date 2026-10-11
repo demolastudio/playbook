@@ -7,7 +7,7 @@ Priority order: correctness and safety first (rules 1–4), then conventions (ru
 3. A task is complete ONLY when `.playbook/rules/definition-of-done.md` passes. Run the checks — never assume.
 4. NEVER guess or assume. Research the official docs for the installed version when stuck. Prefer current-version documentation — check the current date and never apply legacy patterns to a modern stack.
 5. NEVER add comments to code. Names and structure must carry the meaning.
-6. ALWAYS use kebab-case for file and folder names.
+6. ALWAYS use kebab-case for file and folder names, except Python files and folders: snake_case, because Python cannot import a hyphenated name.
 7. ALWAYS group code by feature (`features/<name>/`: schema, actions, queries, one file per use case); shared infrastructure goes in `lib/`. Imports flow one way: app → features → lib, components, db.
 8. NEVER make up preferences the user did not state. Ask if unclear.
 9. In TypeScript/JavaScript, ALWAYS use arrow functions (`const fn = async () => {}`) — never `function` declarations.
