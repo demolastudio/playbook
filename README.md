@@ -32,7 +32,7 @@ Type `/flow` in Claude Code or Cursor. It sends you to `/spec` first, then build
 **To update**
 
 1. `git -C <playbook> pull`
-2. In each project, run setup again. It refreshes the rules, slash commands, and skills. It never overwrites the guardrail files (CI, lint, test config); it lists the ones that differ.
+2. Run setup again in each project, or in all of them at once: `bash <playbook>/setup.sh --all ~/Documents/personal` (every folder up to three levels down that already has `.playbook/`). It refreshes the rules, slash commands, and skills. It never overwrites the guardrail files (CI, lint, test config); it lists the ones that differ.
 
 **To change a skill**
 
