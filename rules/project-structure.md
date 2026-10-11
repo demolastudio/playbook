@@ -6,7 +6,7 @@
 ## Naming
 
 - **Kebab-case everything** — files, folders, routes (lint-enforced on JS/TS):
-  `booking-form.tsx`, `use-booking.ts`, `booking-schema.py`; never `BookingForm.tsx` or `useBooking.ts`.
+  `booking-form.tsx`, `use-booking.ts`; never `BookingForm.tsx` or `useBooking.ts`. Python files and folders are snake_case (`booking_schema.py`): Python cannot import a hyphenated name.
 - **Prefix feature files with the feature**: `booking-schema.ts`, `booking-actions.ts`, `booking-queries.ts`, so search and agents never meet 30 files named `schema.ts`. Use-case files are verb-noun: `create-booking.ts`, `refund-payment.ts`.
 - **No `index.ts` barrels.**
 
