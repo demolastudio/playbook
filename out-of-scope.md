@@ -9,7 +9,7 @@
 
 ## Model-invoked domain knowledge
 
-**Rejected (July 2026).** Same reason as above: playbook chapters are reached by forced INDEX routing, not by hoping the agent invokes a skill. The zero-context-load side of the trade-off is already captured by workflows being user-invoked slash commands.
+**Rejected (July 2026).** Same reason as above: playbook chapters are reached by forced INDEX routing, not by hoping the agent invokes a skill. The zero-context-load side of the trade-off is already captured by workflows being user-invoked slash commands. Not covered by this rejection: `skills/` (October 2026) holds curated execution skills, such as design craft, that a project uses on demand; the playbook's rules and domain chapters stay forced reading.
 
 ## Distinctive display font for headings
 

@@ -89,6 +89,31 @@ expect_no_file "$p" .agents/workflows
 expect_file "$p" .agents/rules/team.md
 grep -q "agent" "$p/.gitignore" && fail "legacy: .gitignore gained Antigravity entries"
 
+# skills: every playbook skill lands whole and gitignored; a project's own
+# skill survives a name clash; a skill the playbook dropped is removed
+p="$work/skills"
+mkdir -p "$p/.claude/skills/break-ui" "$p/.claude/skills/team-skill" "$p/.claude/skills/retired-skill"
+echo "mine" > "$p/.claude/skills/break-ui/SKILL.md"
+echo "team" > "$p/.claude/skills/team-skill/SKILL.md"
+echo "old" > "$p/.claude/skills/retired-skill/SKILL.md"
+echo "retired-skill" > "$p/.claude/skills/.playbook-skills"
+run_setup "$p"
+for dir in "$root"/skills/*/; do
+  name="$(basename "$dir")"
+  [ "$name" = "break-ui" ] && continue
+  diff -r "$dir" "$p/.claude/skills/$name" > /dev/null || fail "skills: .claude/skills/$name differs from skills/$name"
+  grep -qxF ".claude/skills/$name/" "$p/.gitignore" || fail "skills: $name not gitignored"
+done
+grep -qxF "mine" "$p/.claude/skills/break-ui/SKILL.md" || fail "skills: overwrote the project's own break-ui"
+grep -qxF "break-ui" "$p/.claude/skills/.playbook-skills" && fail "skills: manifest claims the project's own break-ui"
+expect_file "$p" .claude/skills/team-skill/SKILL.md
+expect_no_file "$p" .claude/skills/retired-skill
+grep -qF "kept your .claude/skills/break-ui" "$p.log" || fail "skills: name clash not reported"
+echo "stale" >> "$p/.claude/skills/emil-design-eng/SKILL.md"
+run_setup "$p"
+diff -r "$root/skills/emil-design-eng" "$p/.claude/skills/emil-design-eng" > /dev/null || fail "skills re-run: installed skill not refreshed"
+grep -qF "kept your .claude/skills/emil-design-eng" "$p.log" && fail "skills re-run: treated its own install as the project's"
+
 # the home folder is refused and left untouched
 h="$work/home"
 mkdir "$h"

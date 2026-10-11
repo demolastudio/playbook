@@ -196,6 +196,62 @@ if [ -d "$WORKFLOWS_SRC" ]; then
   echo "📂 Cursor       → .cursor/commands/"
 fi
 
+# ─── Skills ────────────────────────────────────────────────────────
+# skills/<name>/ (SKILL.md plus its files) installs to .claude/skills/<name>/,
+# which Claude Code and Cursor both read. Each run replaces the playbook's
+# copies whole and removes ones the playbook dropped, using a manifest of
+# what it installed; a project's own skill is never touched, even when it
+# shares a name with a playbook skill.
+SKILLS_SRC="$PLAYBOOK_DIR/skills"
+SKILLS_DEST="$PROJECT_DIR/.claude/skills"
+SKILLS_MANIFEST="$SKILLS_DEST/.playbook-skills"
+previous_skills=()
+if [ -f "$SKILLS_MANIFEST" ]; then
+  while IFS= read -r name; do
+    [ -n "$name" ] && previous_skills+=("$name")
+  done < "$SKILLS_MANIFEST"
+fi
+was_installed() {
+  local name="$1" old
+  for old in ${previous_skills[@]+"${previous_skills[@]}"}; do
+    [ "$old" = "$name" ] && return 0
+  done
+  return 1
+}
+
+installed_skills=()
+for dir in "$SKILLS_SRC"/*/; do
+  [ -f "$dir/SKILL.md" ] || continue
+  name="$(basename "$dir")"
+  if [ -e "$SKILLS_DEST/$name" ] && ! was_installed "$name"; then
+    echo "   ↷ kept your .claude/skills/$name — the playbook's $name skill is not installed"
+    continue
+  fi
+  mkdir -p "$SKILLS_DEST"
+  rm -rf "${SKILLS_DEST:?}/$name"
+  cp -R "${dir%/}" "$SKILLS_DEST/$name"
+  add_gitignore_entry "$GITIGNORE" ".claude/skills/$name/"
+  installed_skills+=("$name")
+done
+
+for old in ${previous_skills[@]+"${previous_skills[@]}"}; do
+  keep=false
+  for name in ${installed_skills[@]+"${installed_skills[@]}"}; do
+    [ "$name" = "$old" ] && keep=true
+  done
+  if [ "$keep" = false ] && [[ "$old" =~ ^[a-z0-9-]+$ ]]; then
+    rm -rf "${SKILLS_DEST:?}/$old"
+  fi
+done
+
+if [ ${#installed_skills[@]} -gt 0 ]; then
+  printf '%s\n' "${installed_skills[@]}" > "$SKILLS_MANIFEST"
+  add_gitignore_entry "$GITIGNORE" ".claude/skills/.playbook-skills"
+  echo "🧩 Skills       → .claude/skills/ (${installed_skills[*]})"
+elif [ -f "$SKILLS_MANIFEST" ]; then
+  rm "$SKILLS_MANIFEST"
+fi
+
 # ─── Always-loaded rules per tool ──────────────────────────────────
 # A Cursor always-apply rule rendered from rules/global-rules.md — one source
 # of truth, refreshed on every setup run. Earlier installs' Antigravity rule

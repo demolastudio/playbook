@@ -25,7 +25,7 @@
 | [responsive.md](./responsive.md) | Mobile-first breakpoints, touch targets, adaptive layouts | Building any user-facing page |
 | [dashboards.md](./dashboards.md) | Layout anatomy, data tables, filters, density, states | Building admin/dashboard UIs |
 
-Motion craft and worst-case UI testing come from Emil Kowalski's skills (`recommended-skills.md`), not a chapter.
+Motion craft and worst-case UI testing come from the playbook's skills (`skills/`: emil-design-eng, review-animations, break-ui, mobile-native), not a chapter.
 
 ## Planned Chapters
 
