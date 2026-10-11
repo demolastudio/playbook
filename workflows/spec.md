@@ -19,6 +19,7 @@ When triggered, do NOT plan or write code. Instead, interview the user.
 6. When an answer resolves a fuzzy or overloaded term, update `CONTEXT.md` inline per `.playbook/formats/context.md`; when a decision passes the three-question gate, offer an ADR per `.playbook/formats/adr.md`. Work the glossary actively: challenge terms that conflict with `CONTEXT.md` ("the glossary defines cancellation as X — you seem to mean Y"), stress-test relationships with edge-case scenarios, and when the code contradicts what the user says, surface the contradiction instead of picking a side
 7. Sketch the **seams under test** — which public boundaries the tests will exercise (see `core/testing.md`). Prefer existing seams; place any new seam as high as possible; fewer is better. Give each a one-line note on what it catches and what it misses, then confirm them with the user
 8. After answers, produce a short spec document
+9. **Builder check:** before presenting it, have a fresh subagent read the spec as the builder and list every question it would need answered (no subagent tool: read it as that builder yourself). Sort them: answered by the interview or the codebase → write the answer into the spec; minor (any sensible builder would settle it the same way) → decide, and mark it in the spec as your call; the user's (the answer changes what gets built) → one final round
 
 ## Spec Document Structure
 
@@ -29,10 +30,10 @@ When triggered, do NOT plan or write code. Instead, interview the user.
 One paragraph describing the feature.
 
 ## Requirements
-- Numbered list of specific, testable requirements
+- Numbered list of specific, testable requirements; each behavior as **Given** <state>, **When** <action>, **Then** <result> — the integration tests are written from these
 
 ## Out of Scope
-- What this feature does NOT include
+- What this feature does NOT include, plus anti-goals: what would make it a failure even if it technically works
 
 ## Technical Approach
 - Key technical decisions (which files, patterns, packages)

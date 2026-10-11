@@ -42,6 +42,9 @@ One sharpened paragraph.
 ## Decisions Made
 Each decision with the rejected branches named — so they don't get re-proposed.
 
+## Anti-Goals
+What would make this a failure even if it technically works.
+
 ## Open Questions
 The parked branches; anything that belongs to /spec.
 ```
