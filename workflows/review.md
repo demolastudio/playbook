@@ -45,7 +45,7 @@ Plus the smell baseline below — each is a judgment call ("possible feature env
 Compare the diff against what was actually asked:
 
 - **Missing** — requirements asked for but absent or partial
-- **Scope creep** — behavior in the diff nobody asked for
+- **Scope creep** — behavior in the diff nobody asked for, or work from a later phase than the current one
 - **Wrong** — requirements that look implemented but whose implementation looks incorrect
 
 Quote the spec line (or the user's words) for each finding.

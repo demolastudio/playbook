@@ -10,8 +10,8 @@ A map of the workflows and how they chain. Read the situation, route to the work
 
 0. **/grill** (when starting from a raw idea) — relentless interview in rounds — every question whose prerequisites are settled, each carrying a recommended answer — until the idea hardens into a brief. Works for any fuzzy idea — feature, package, post, business move. Skip when the work is already well-defined.
 1. **/spec** — interview the user until requirements are unambiguous. Facts come from the codebase, decisions from the user; resolves fuzzy terms into `CONTEXT.md`, records qualifying decisions as ADRs, agrees the seams under test.
-2. **Plan** — present the implementation plan, wait for approval (global rule 2).
-3. **Implement** — build under the approved plan; the stack profile and templates govern the code.
+2. **Plan** — present the plan as a checklist of phases, wait for approval (global rule 2).
+3. **Implement** — one phase at a time: build, run the checks, tick it, stop until the user says go; the stack profile and templates govern the code.
 4. **/review** — two-axis review of the diff: Standards and Spec.
 5. **/deploy-check** — production-only concerns, after definition-of-done already passes.
 6. **/learnings** — post-project capture that feeds the playbook.

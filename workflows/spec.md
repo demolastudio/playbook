@@ -41,6 +41,10 @@ One paragraph describing the feature.
 ## Seams Under Test
 - The agreed public boundaries the tests will exercise (existing seams preferred)
 
+## Phases
+- [ ] 1. <phase> — delivers requirements 1, 2
+- [ ] 2. <phase> — delivers requirement 3
+
 ## Open Questions
 - Anything still unclear after the interview
 ```
@@ -52,4 +56,5 @@ One paragraph describing the feature.
 - A round holds only questions whose prerequisites are settled — never batch a question that depends on an open answer
 - Requirements must be testable ("user can X" not "improve UX")
 - Seams are agreed in the spec, not improvised during implementation
+- Every phase names the requirements it delivers, and every requirement is in a phase; tick a phase in this file when it is built
 - Present the spec for approval before planning or coding
