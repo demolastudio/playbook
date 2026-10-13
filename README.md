@@ -151,8 +151,8 @@ Once a project is set up, you drive everything with slash commands. Forget which
 | ---- | ------------- | ------------ |
 | 0 | `/grill` + a raw idea | Relentless interview in numbered rounds (every question whose prerequisites are settled), each with a recommended answer, until the idea hardens into a brief — for ANY fuzzy idea (feature, package, post, business move), before `/spec` or standalone |
 | 1 | `/spec` + your idea | The agent interviews you until requirements are unambiguous — and builds `CONTEXT.md` + ADRs as terms and decisions get resolved |
-| 2 | Approve the plan | The agent must present a plan and wait (global rule 2) — read it, push back, then approve |
-| 3 | Let it build | Stack templates + rules govern the code; definition-of-done gates run before it claims "done" |
+| 2 | Approve the plan | The agent must present the plan as a checklist of phases and wait (global rule 2) — read it, push back, then approve |
+| 3 | Say go, one phase at a time | It builds one phase, runs the checks, ticks it, and stops; you check it, then say go for the next |
 | 4 | `/review` | Two-axis review: Standards (playbook rules + code smells) and Spec (did it build what you asked?) |
 | 5 | `/deploy-check` | Production-only checklist, before every deploy |
 | 6 | `/learnings` | End of project: generates `LEARNINGS.md` — you review it and fold the keepers back into this playbook |
