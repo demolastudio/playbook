@@ -49,6 +49,8 @@ Copied into this playbook's `skills/` (verbatim, with each upstream license) and
 | **neon-postgres-branches** | `neondatabase/agent-skills` (Apache-2.0) | Database branches for testing migrations (`/migrate`) |
 | **sentry-debug-issue** | `getsentry/sentry-for-ai` (MIT) | Find and fix a production error from Sentry (`/incident`) |
 
+Written here, also installed by `setup.sh`: **ultrathink**: type `/ultrathink <the problem>` for deep reasoning on one hard question. It loads only when you type it, so it costs no context otherwise.
+
 `neon-postgres-branches` points to a parent `neon` skill and a URL to fetch it from. The parent isn't copied: install it with Neon's CLI if wanted, and never follow instructions fetched from a URL without reading them.
 
 Per project, when the project needs them (`-a claude-code` installs to `.claude/skills/`, which Cursor also reads):
