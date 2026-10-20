@@ -4,14 +4,14 @@ description: Use when work must travel to another session, harness, directory, o
 
 # Handoff
 
-Generate a `HANDOFF.md` file in the project root with the following sections:
+Generate a `HANDOFF.md` file in the project root (setup gitignores it) with the following sections. The next session runs `git diff <commit>` first: anything changed since is not in this handoff.
 
 ## Structure
 
 ```markdown
 # Handoff — [Project Name]
 
-Generated: [current date/time]
+Generated: [current date/time] at commit [`git rev-parse --short HEAD`]
 
 ## Goal
 What we are building. One paragraph max.

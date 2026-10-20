@@ -8,7 +8,7 @@ When triggered, follow this structured refactoring process.
 
 ## Process
 
-1. **Explain WHY** — State the problem with the current code before touching anything
+1. **Explain WHY** — State the problem with the current code before touching anything; read the ADRs (`docs/adr/`) in the area first, and never undo a recorded decision without the user
 2. **Show scope** — List exactly which files and functions will change
 3. **Present the plan** — Show before/after for the key changes
 4. **Wait for approval** — Do NOT proceed without explicit go-ahead
@@ -20,5 +20,5 @@ When triggered, follow this structured refactoring process.
 - NEVER refactor and add features in the same step
 - NEVER refactor code you weren't asked to touch
 - NEVER change behavior — refactoring preserves behavior, it does not change it
-- If tests don't exist for the code being refactored, write them FIRST
+- If tests don't exist for the code being refactored, write them FIRST, at the feature's seam (`.playbook/playbooks/core/testing.md`), never on internal helpers
 - Keep commits atomic — one refactoring concern per commit

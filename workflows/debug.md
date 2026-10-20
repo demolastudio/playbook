@@ -13,7 +13,7 @@ A discipline for real bugs. The phases run in order — do NOT skip ahead.
 
 **This is the skill — everything after it is mechanical.** A tight loop is one command that goes red on THIS bug and green when it's fixed. With one, the bug is 90% solved; without one, no amount of reading code will save you.
 
-Ways to construct one, in rough order: a failing test at the nearest seam; a curl against the dev server; a CLI run diffed against known-good output; a headless browser script; replaying a captured payload through the code path in isolation; a bisection harness (`git bisect run`) when the bug appeared between two known states; a differential run (old version vs new, diff the outputs); a fuzz loop over random inputs when the symptom is "sometimes wrong".
+First read the ADRs (`docs/adr/`) in the area: they record choices that look like bugs but are deliberate. Ways to construct one, in rough order: a failing test at the nearest seam; a curl against the dev server; a CLI run diffed against known-good output; a headless browser script; replaying a captured payload through the code path in isolation; a bisection harness (`git bisect run`) when the bug appeared between two known states; a differential run (old version vs new, diff the outputs); a fuzz loop over random inputs when the symptom is "sometimes wrong".
 
 **Performance regressions:** logs are usually the wrong probe — establish a baseline measurement first (timing harness, profiler, query plan), then bisect. Measure before fixing.
 
@@ -24,7 +24,9 @@ The loop is tight when ALL four hold:
 - [ ] **Fast** — seconds, not minutes
 - [ ] **Agent-runnable** — you can run it unattended
 
-**No red-capable command, no Phase 2.** If you catch yourself reading code to build a theory before this command exists, stop — that is the exact failure this workflow prevents. If you genuinely cannot build a loop, say so, list what you tried, and ask the user for a repro environment or captured artifact.
+Show the command and its output from one real run (redacted) before Phase 2.
+
+**No red-capable command, no Phase 2.** If you catch yourself reading code to build a theory before this command exists, stop — that is the exact failure this workflow prevents. If you genuinely cannot build a loop, say so, list what you tried, and ask the user for a repro environment, a captured artifact, or permission to add temporary production logging.
 
 ## Phase 2: Reproduce and Minimise
 
@@ -53,6 +55,7 @@ Each probe maps to one prediction from Phase 3. Change one variable at a time. P
 - [ ] Original repro no longer reproduces
 - [ ] Regression test passes (or the missing seam is documented)
 - [ ] All `[DEBUG-...]` instrumentation removed — grep the prefix
+- [ ] Throwaway repro scripts and harnesses deleted
 - [ ] The winning hypothesis is stated in the commit message
 - [ ] Definition-of-done gates pass (`.playbook/rules/definition-of-done.md`)
 

@@ -136,6 +136,8 @@ Installs `rules/global-rules.md` into:
 | **Claude Code** | `~/.claude/CLAUDE.md` |
 | **Cursor** | Manual — paste `rules/global-rules.md` into Settings → Rules for AI |
 
+It also adds a **git guard** to `~/.claude/settings.json` (needs Node.js): a hook that stops Claude from running `git reset --hard`, `git clean -f`, `git branch -D`, `git checkout .`, or `git restore .`, which destroy unsaved work. You can still run them yourself. Source: `hooks/git-guard.mjs`.
+
 Re-running pulls the latest playbook without overwriting your files.
 
 ---
@@ -163,7 +165,8 @@ Once a project is set up, you drive everything with slash commands. Forget which
 | Something is broken | `/debug` — it must reproduce the bug with a failing check before touching code |
 | Health check on an active project | `/audit` — run every few days |
 | Restructure without behavior change | `/refactor` |
-| Session getting long / switching tasks | `/handoff` — then start a fresh session and say "read HANDOFF.md" |
+| Session getting long | Compact at the end of a phase (the harness's `/compact`), saying what the next phase needs |
+| Work moves to another tool, folder, or person | `/handoff` — then start a fresh session and say "read HANDOFF.md" |
 | Not sure which of these | `/flow` |
 
 ### Artifacts that appear in your projects
@@ -171,7 +174,7 @@ Once a project is set up, you drive everything with slash commands. Forget which
 - **`CONTEXT.md`** — the domain glossary. Commit it; it makes every future session cheaper and naming consistent.
 - **`docs/adr/`** — one-paragraph decision records. Commit them; they stop future sessions from "fixing" deliberate choices.
 - **`DESIGN.md`** — the design lock. Commit it with the generated theme; `scripts/check-design.sh` keeps the two in step.
-- **`HANDOFF.md`** — session bridge. Transient; commit optional.
+- **`HANDOFF.md`** — session bridge. Transient; setup gitignores it.
 - **`LEARNINGS.md`** — post-project. Review, harvest into the playbook, then delete.
 
 ### Optional: hard enforcement
