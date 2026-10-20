@@ -147,6 +147,17 @@ mkdir "$h"
 (cd "$h" && HOME="$h" bash "$root/setup.sh" . > "$h.log" 2>&1) && fail "home: setup.sh ran in the home folder"
 [ -z "$(ls -A "$h")" ] || fail "home: setup.sh wrote into the home folder"
 
+# --global adds the git guard once, keeps other settings, and the guard blocks
+g="$work/global-home"
+mkdir -p "$g/.claude"
+echo '{"model":"opus"}' > "$g/.claude/settings.json"
+HOME="$g" bash "$root/setup.sh" --global > "$g.log" 2>&1 || fail "global: setup.sh --global failed"
+HOME="$g" bash "$root/setup.sh" --global > "$g.log" 2>&1 || fail "global: second run failed"
+node -e 'const s=require(process.argv[1]); if (s.model !== "opus" || s.hooks.PreToolUse.length !== 1) process.exit(1)' "$g/.claude/settings.json" || fail "global: settings lost or guard registered twice"
+guard() { printf '{"tool_input":{"command":"%s"}}' "$1" | node "$g/.claude/hooks/playbook-git-guard.mjs" 2>/dev/null; }
+guard "git reset --hard" && fail "guard: git reset --hard not blocked"
+guard "git push origin main" || fail "guard: git push blocked"
+
 # a stack without shipped files gets none, and no next-step note
 p="$work/fastapi"
 mkdir "$p" && echo 'dependencies = ["fastapi"]' > "$p/pyproject.toml"

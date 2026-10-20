@@ -32,7 +32,7 @@ A test of an internal helper breaks on every refactor and proves nothing a seam 
 
 #### Test at Seams
 
-A **seam** is the public boundary you test at — a feature's use case, never its internals. Test **what** it does ("cancellation 12 hours before incurs a 100% fee"), not **how** (which query it ran). Decide the seams under test before writing tests — ideally during `/spec`. Never write **tautological tests**: expected values come from a known-good literal or a worked example, never from recomputing them the way the code does. Schema rules are tested through the use case that parses the input, not separately.
+A **seam** is the public boundary you test at — a feature's use case, never its internals. Test **what** it does ("cancellation 12 hours before incurs a 100% fee"), not **how** (which query it ran). Check results through the app's own use cases, not raw SQL: a `SELECT` in a test breaks when the schema changes. The exception is an invariant no use case exposes, such as the row count in a concurrency test. Decide the seams under test before writing tests — ideally during `/spec`. Never write **tautological tests**: expected values come from a known-good literal or a worked example, never from recomputing them the way the code does. Schema rules are tested through the use case that parses the input, not separately.
 
 #### The Red → Green Loop
 

@@ -72,6 +72,18 @@ install_global_rules() {
   cp "$rules_file" "$HOME/.claude/CLAUDE.md"
   echo "   ✅ Claude Code  → ~/.claude/CLAUDE.md"
 
+  if command -v node >/dev/null 2>&1; then
+    mkdir -p "$HOME/.claude/hooks"
+    cp "$SCRIPT_DIR/hooks/git-guard.mjs" "$HOME/.claude/hooks/playbook-git-guard.mjs"
+    if node "$SCRIPT_DIR/hooks/register-git-guard.mjs" "$HOME/.claude/settings.json" "$HOME/.claude/hooks/playbook-git-guard.mjs" 2>/dev/null; then
+      echo "   ✅ Git guard    → ~/.claude/settings.json (blocks reset --hard, clean -f, branch -D, checkout ., restore .)"
+    else
+      echo "   ⚠️  Git guard not added: ~/.claude/settings.json is not valid JSON — fix it, then run --global again"
+    fi
+  else
+    echo "   ⚠️  Git guard not added: install Node.js, then run --global again"
+  fi
+
   echo ""
   echo "   ⚠️  Cursor: paste rules/global-rules.md into Settings → Rules for AI"
 }
@@ -184,7 +196,7 @@ fi
 
 # ─── Gitignore playbook artifacts ──────────────────────────────────
 GITIGNORE="$PROJECT_DIR/.gitignore"
-for entry in ".playbook/" ".claude/commands/" ".cursor/commands/" ".cursor/rules/playbook.mdc"; do
+for entry in ".playbook/" ".claude/commands/" ".cursor/commands/" ".cursor/rules/playbook.mdc" "HANDOFF.md"; do
   add_gitignore_entry "$GITIGNORE" "$entry"
 done
 echo "📋 Ensured playbook artifacts are gitignored"

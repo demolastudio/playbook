@@ -17,6 +17,8 @@ When triggered, generate a `LEARNINGS.md` using the template at `.playbook/learn
 
 - **Patterns that worked** — architecture decisions worth repeating
 - **Mistakes made** — classify each first. A **mechanical** one (a banned API, an import shape, a file location, a deprecated call) becomes a deterministic check: a lint rule, a hook, or a CI job. Only a **judgement** call becomes a `.playbook/rules/mistakes.md` entry. A project with no guardrail at all (no hook, no CI running the gates) is itself a finding
+- **Checks that exist but don't run** — read the project's scripts and CI first: an unwired or broken check is the finding, not a new one
+- **Instructions that change nothing** — a line in AGENTS.md or the rules that no agent behavior depended on: propose deleting it
 - **Missing information** — what the agent couldn't see that it needed (dev-server logs, a read-only view of a third-party service)
 - **Missing playbook content** — gaps discovered during the project
 - **Tool/package insights** — gotchas, workarounds, version-specific issues

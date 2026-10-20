@@ -24,7 +24,7 @@ Interview the user relentlessly about an idea until shared understanding is reac
    ```
 
 4. Each round's answers reshape the tree: recompute the frontier and ask the next round.
-5. Facts vs decisions: if something can be looked up (a codebase, this playbook, online research), look it up — never ask. Run lookups in parallel where the harness allows; only questions downstream of a running lookup wait for it. Decisions belong to the user — put each one to them and wait. NEVER answer a decision yourself.
+5. Facts vs decisions: if something can be looked up (a codebase, this playbook, online research), look it up — never ask — and cite the primary source (official docs, source code) for each finding. Run lookups in parallel where the harness allows; only questions downstream of a running lookup wait for it. Decisions belong to the user — put each one to them and wait. NEVER answer a decision yourself.
 6. "I don't know yet" is a valid answer — park that branch in the brief's open questions; don't force it.
 7. **Grilling inside a project: work the docs inline.** As terms and decisions crystallize, resolve fuzzy terms into `CONTEXT.md` and offer an ADR when a decision passes the three-question gate (`.playbook/formats/`) — the same discipline as /spec, so nothing resolved here is lost if /spec runs in a fresh session. Non-code sessions skip this.
 8. **Stop-gate:** the session ends when the frontier is empty. Do NOT plan, spec, or build anything until the user confirms shared understanding has been reached.

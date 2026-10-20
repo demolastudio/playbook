@@ -12,7 +12,7 @@ When triggered, do NOT plan or write code. Instead, interview the user.
 1. Read the user's initial request (and `CONTEXT.md`, if the project has one)
 2. Identify ambiguities, missing requirements, and assumptions
 3. Split every open question into a **fact** or a **decision**:
-   - **Facts** (how the code/data works today) — look them up in the codebase; never ask the user something the repo can answer
+   - **Facts** (how the code/data works today) — look them up in the codebase; never ask the user something the repo can answer. A fact from outside the repo cites its primary source (official docs, source code)
    - **Decisions** (what the product should do, trade-offs, preferences) — put each one to the user with your recommended answer, and wait. NEVER answer a decision yourself, even when running autonomously — an unanswered decision is a blocker, not a license
 4. Ask the decision questions in **rounds**: every decision whose prerequisites are settled, numbered, each with your recommendation worded so "yes" accepts it (the `/grill` shape)
 5. Wait for the round's answers, then ask the next round — a question that depends on an open answer waits for it
@@ -36,10 +36,10 @@ One paragraph describing the feature.
 - What this feature does NOT include, plus anti-goals: what would make it a failure even if it technically works
 
 ## Technical Approach
-- Key technical decisions (which files, patterns, packages)
+- Key technical decisions: patterns, packages, module boundaries. No file paths: they go stale between phases. A reducer, state machine, or type shape proven in `/prototype` goes in as a snippet, marked as from the prototype
 
 ## Seams Under Test
-- The agreed public boundaries the tests will exercise (existing seams preferred)
+- The agreed public boundaries the tests will exercise (existing seams preferred), and an existing test to copy, if one exists
 
 ## Phases
 - [ ] 1. <phase> — delivers requirements 1, 2
@@ -57,4 +57,5 @@ One paragraph describing the feature.
 - Requirements must be testable ("user can X" not "improve UX")
 - Seams are agreed in the spec, not improvised during implementation
 - Every phase names the requirements it delivers, and every requirement is in a phase; tick a phase in this file when it is built
+- Each phase is a vertical slice: a thin path through every layer it needs (schema, server, UI, test) that the user can try on its own, never one layer for the whole feature. A refactor the feature needs is its own first phase
 - Present the spec for approval before planning or coding
