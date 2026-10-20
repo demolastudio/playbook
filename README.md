@@ -50,8 +50,7 @@ playbook/
 │   ├── code-style.md          ← Deep modules: seams, deletion test, injected deps
 │   ├── project-structure.md   ← Naming, feature folders, growth rules
 │   ├── mistakes.md            ← Known AI mistakes, each with the fix (living file)
-│   ├── cursor-rules.md        ← Pointer for Cursor's Settings → Rules for AI
-│   └── git-workflow.md        ← Git conventions (placeholder)
+│   └── git-workflow.md        ← Commit authorship: no AI attribution
 │
 ├── stacks/                    ← Stack profiles: decisions + gates + templates
 │   ├── vinext-cloudflare/     ← PRIMARY: vinext on Workers + Hyperdrive/Neon +

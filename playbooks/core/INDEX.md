@@ -7,16 +7,7 @@
 > the right reference for your current task. Do NOT read all files — only the
 > ones relevant to your task. Token discipline: INDEX + routed chapter(s) only.
 
-## Core Principles
-
-These principles govern every section. Every feature, every file, every decision:
-
-1. **Single Source of Truth (SSOT)** — One function per business rule. Defined in one place. Called from everywhere.
-2. **Database as Safety Net** — Application logic validates first, but DB constraints are the final defence.
-3. **Never Trust the Client** — All inputs are re-validated server-side. All mutations are authenticated.
-4. **Audit Everything** — Every state transition, every charge, every permission change gets logged. Append-only.
-5. **Idempotency by Default** — Every side effect uses a business-derived idempotency key.
-6. **Money Is Integer Minor Units** — Never floats. The currency travels with every amount. Rounding happens once, in one named function.
+The six Core Principles are in the project's `AGENTS.md`; they govern every chapter here.
 
 ## Routing Table
 
