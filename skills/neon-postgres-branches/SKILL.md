@@ -1,14 +1,6 @@
 ---
 name: neon-postgres-branches
-description: >-
-  Choose and create the right Neon branch type for testing and development.
-  Use when users ask about Neon branching, migration testing with real data,
-  isolated test environments, schema-only branch workflows for sensitive data,
-  resetting a branch from its parent, branch expiration and CI/CD branch
-  lifecycles, or branch creation via Neon CLI or Neon MCP. Triggers include
-  "Neon branch", "test migrations safely", "branch production data",
-  "schema-only branch", "reset branch", "branch per PR" and
-  "sensitive data testing".
+description: Choose and create the right Neon branch for testing — migration tests on real data, schema-only branches for sensitive data, reset from parent, expiry, and branch per PR. Use for any Neon branch question.
 metadata:
   parent: neon
   source: https://github.com/neondatabase/agent-skills/tree/main/skills/neon-postgres-branches

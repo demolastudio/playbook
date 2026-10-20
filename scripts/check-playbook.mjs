@@ -40,6 +40,7 @@ for (const p of workflows) {
   const description = frontmatter?.match(/^description: (.+)$/m)?.[1];
   if (!description || /^[>|]/.test(description)) fail(p, "frontmatter needs a single-line `description:`");
   else if (description.includes('"')) fail(p, "description contains a double quote");
+  else if (description.includes(": ")) fail(p, "description contains \": \", which breaks YAML");
   const effort = frontmatter?.match(/^effort: (.+)$/m)?.[1];
   if (effort && !["low", "medium", "high", "xhigh", "max"].includes(effort)) fail(p, `effort must be low, medium, high, xhigh, or max (got ${effort})`);
 }
@@ -53,6 +54,7 @@ for (const name of skillDirs) {
   if (!/^[a-z0-9-]+$/.test(name)) fail(p, "skill folder names are lowercase letters, digits, and hyphens");
   if (frontmatter?.match(/^name: (.+)$/m)?.[1] !== name) fail(p, `frontmatter needs \`name: ${name}\` (the folder name)`);
   if (!/^description: ([^>|\s].*|[>|][-+]?\n[ \t]+\S.*)$/m.test(frontmatter ?? "")) fail(p, "frontmatter needs a `description:`");
+  else if (/^description: [^>|].*: /m.test(frontmatter ?? "")) fail(p, "description contains \": \", which breaks YAML");
 }
 if (paths.includes("skills/sources.json")) {
   for (const source of JSON.parse(read("skills/sources.json")).sources ?? []) {

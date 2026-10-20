@@ -338,7 +338,7 @@ BLOCK_FILE="$(mktemp)"
 
 ## Required Reading, in Order
 
-1. `.playbook/rules/` — global-rules, code-style, project-structure, mistakes, definition-of-done
+1. `.playbook/rules/`: `code-style.md`, `project-structure.md`, `mistakes.md`, `definition-of-done.md`, `git-workflow.md` (the global rules are already loaded)
 2. `CONTEXT.md` at the project root, if it exists — the domain glossary; use its exact terms in all naming
 3. `DESIGN.md` at the project root, if it exists — the design lock; read it before any UI work
 EOF
