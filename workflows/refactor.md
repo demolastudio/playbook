@@ -1,5 +1,6 @@
 ---
 description: Use when restructuring existing code without changing its behavior
+effort: high
 ---
 
 # Refactor

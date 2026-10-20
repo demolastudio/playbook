@@ -1,5 +1,6 @@
 ---
 description: Use when a design question needs throwaway code to answer it - a clickable HTML demo for state/logic questions, or radically different UI variants on one route
+effort: high
 ---
 
 # Prototype

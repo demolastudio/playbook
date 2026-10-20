@@ -1,5 +1,6 @@
 ---
 description: Use before deploying to production to verify environment, database, and security requirements
+effort: high
 ---
 
 # Deploy Check
