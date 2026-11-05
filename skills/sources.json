@@ -2,7 +2,7 @@
   "sources": [
     {
       "repo": "emilkowalski/skills",
-      "commit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "commit": "c8a79627b59d72d764d6ab6f2c87c09a48169833",
       "skills": {
         "break-ui": "skills/break-ui",
         "emil-design-eng": "skills/emil-design-eng",
@@ -27,9 +27,9 @@
     },
     {
       "repo": "neondatabase/agent-skills",
-      "commit": "bfd013c352ed31b57a573e4f60263afc5fdd7f7a",
+      "commit": "65ee2bf7427b358e6fe1989d214065692bd01205",
       "skills": {
-        "neon-postgres-branches": "skills/neon-postgres-branches"
+        "neon-postgres-branches": "skills/neon-postgres/references/branching.md"
       }
     },
     {
