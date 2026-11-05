@@ -9,7 +9,7 @@ Read `.playbook/stacks/<stack>/STACK.md` first: it names the concrete tools each
 
 ## Method
 
-1. Send one read-only subagent per group below, in parallel. Without a subagent tool, check the groups one at a time. Subagents never edit.
+1. Send one read-only subagent per group below, in parallel, each with a fresh context, never a fork of this conversation. Without a subagent tool, check the groups one at a time. Subagents never edit.
 2. Each finding names its file and line, or the dashboard it is in. For a secret, report only where it is, never its value.
 3. Merge the findings into one list, Critical (security, money) → High → Medium, and show it to the user. Change nothing until the user confirms.
 4. After confirmation, make every fix yourself, so no two agents edit the same file.
