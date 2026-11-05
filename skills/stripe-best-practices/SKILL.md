@@ -3,7 +3,7 @@ name: stripe-best-practices
 description: Stripe integration decisions — Checkout vs PaymentIntents, subscriptions and billing, Connect, Stripe Tax (VAT, GST), test sandboxes, webhooks, and API key security. Use when planning, building, testing, or reviewing any Stripe integration.
 ---
 
-Latest Stripe API version: **2026-09-30.endive**. Always use the latest API version and SDK unless the user specifies otherwise.
+Latest Stripe API version: **2026-10-28.endive**. Always use the latest API version and SDK unless the user specifies otherwise.
 
 Development and testing environment default: For new integration development, use separate [sandboxes](https://docs.stripe.com/sandboxes.md) instead of the account’s shared test mode sandbox. Sandboxes isolate settings and test data from live mode. Use separate sandboxes for local development and CI. When stronger isolation is useful, dedicate sandboxes to development teams or testing scenarios. Use the shared test mode sandbox only for an existing integration that depends on it or when a required feature doesn’t support general sandboxes.
 
@@ -23,7 +23,7 @@ If you don’t have a Stripe account, you can use the CLI to generate a sandbox 
 
 If `stripe sandbox create` is used, don’t use MCP.
 
-If you try to use MCP after running sandbox creation, first make sure `stripe sandbox claim` is run. Use `stripe whoami --format json` for CLI auth checks; do not run `stripe config --list`.
+If you try to use MCP after running sandbox creation, first make sure `stripe sandbox claim` is run. Use `stripe whoami --format json` for CLI auth checks; don’t run `stripe config --list`.
 
 API key default: Always recommend a [restricted API key (RAK)](https://docs.stripe.com/keys.md#manage-your-api-keys) (`rk_` prefix) over a secret key (`sk_` prefix).
 
