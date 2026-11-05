@@ -25,7 +25,7 @@
 
 ## Wayfinder-style ticket-map planning
 
-**Rejected (July 2026).** mattpocock's wayfinder plans multi-session work as investigation tickets on an issue tracker — but it presupposes the issue-tracker machinery already declined above. `/handoff` + `/spec` cover the solo-developer version. Revisit together with the issue-tracker entry if collaborators arrive.
+**Rejected (July 2026).** mattpocock's wayfinder plans multi-session work as investigation tickets on an issue tracker — but it presupposes the issue-tracker machinery already declined above. `/handoff` + `/spec` cover the solo-developer version. Revisit together with the issue-tracker entry if collaborators arrive. Its `software-factory` skill (Nov 2026), unattended agent runs triggered from a ticket tracker, is rejected for the same reason and because it skips the user's test between phases.
 
 ## Fintech domain playbook
 
