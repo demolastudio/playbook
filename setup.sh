@@ -426,13 +426,18 @@ fi
 # stacks/<stack>/project-files/ mirrors project paths: lint config, the CI
 # gates workflow, Dependabot, pnpm supply-chain policy, Claude Code settings
 # and SessionStart hook, check scripts. The stack's own files win over the
-# files of the stack it inherits (stacks/<stack>/inherits).
+# files of the stack it inherits (stacks/<stack>/inherits). A path listed in
+# the project's .playbook-skip (one per line) is never copied.
+is_skipped() {
+  [ -f "$PROJECT_DIR/.playbook-skip" ] && grep -v '^[[:space:]]*#' "$PROJECT_DIR/.playbook-skip" | grep -qxF "$1"
+}
+
 copy_project_files() {
   local src="$1" overridden_by="${2:-}"
   [ -d "$src" ] || return 0
   while IFS= read -r rel; do
     rel="${rel#./}"
-    if [ -n "$overridden_by" ] && [ -e "$overridden_by/$rel" ]; then
+    if { [ -n "$overridden_by" ] && [ -e "$overridden_by/$rel" ]; } || is_skipped "$rel"; then
       continue
     elif [ ! -e "$PROJECT_DIR/$rel" ]; then
       mkdir -p "$(dirname "$PROJECT_DIR/$rel")"

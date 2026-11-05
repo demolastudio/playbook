@@ -158,6 +158,14 @@ guard() { printf '{"tool_input":{"command":"%s"}}' "$1" | node "$g/.claude/hooks
 guard "git reset --hard" && fail "guard: git reset --hard not blocked"
 guard "git push origin main" || fail "guard: git push blocked"
 
+# a path in .playbook-skip is never re-added
+p="$work/skip"
+mkdir "$p" && echo '{"dependencies":{"next":"16"}}' > "$p/package.json"
+printf '# no unit-test runner here\nvitest.config.mts\n' > "$p/.playbook-skip"
+run_setup "$p"
+expect_no_file "$p" vitest.config.mts
+expect_file "$p" .oxlintrc.json
+
 # a stack without shipped files gets none, and no next-step note
 p="$work/fastapi"
 mkdir "$p" && echo 'dependencies = ["fastapi"]' > "$p/pyproject.toml"
