@@ -12,7 +12,7 @@
     },
     {
       "repo": "stripe/ai",
-      "commit": "735b42d3952b59fa3d9c42b11e884d988c102c7c",
+      "commit": "7882018f33773950265a9613d12e963853cfb526",
       "skills": {
         "stripe-best-practices": "skills/stripe-best-practices",
         "upgrade-stripe": "skills/upgrade-stripe"
@@ -20,7 +20,7 @@
     },
     {
       "repo": "cloudflare/skills",
-      "commit": "c430dd965cea3a8faf0ef035e3b3d73b38518081",
+      "commit": "1f2cd0a19588e2c6197c91dd7c71729df1fb6156",
       "skills": {
         "workers-best-practices": "skills/workers-best-practices"
       }
@@ -34,7 +34,7 @@
     },
     {
       "repo": "getsentry/sentry-for-ai",
-      "commit": "c2313d3a826d56249e70623313bdc27ce5fca8b6",
+      "commit": "c198c986a526c7f4f35d11bf79a5f7b036c122ad",
       "skills": {
         "sentry-debug-issue": [
           "src/skills/sentry-debug-issue",
