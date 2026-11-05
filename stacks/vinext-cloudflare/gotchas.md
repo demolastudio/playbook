@@ -35,6 +35,7 @@
 - **A bare `.desc()` emits `DESC NULLS LAST`** (drizzle-kit source) while `ORDER BY … DESC` means `NULLS FIRST`, so Postgres ignores the index — write `.desc().nullsFirst()` (see `core/database-indexing.md`).
 - **`drizzle.config.ts` runs outside vinext**, which auto-loads `.env*` only for its own commands. `import "dotenv/config"` reads `.env` alone — load `.env.local` with `config({ path: ".env.local", quiet: true })`.
 - **No native `tsvector` column** — full-text search uses a GIN expression index. The expression lives in one shared function that both the index and the queries call, so they match exactly.
+- **Since rc.5, a relational `where` throws on an `undefined` value, and TypeScript doesn't catch it**: `{ serviceId: input.serviceId }` with an optional field compiles, then fails at runtime. Where an absent filter is intended, write `input.serviceId ?? EmptyFilter` (from `drizzle-orm`). An empty relation filter (`{ bookings: {} }`) now means no filter; `true` means "has related rows".
 
 ## Better Auth 1.7 + Drizzle 1.0
 

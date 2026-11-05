@@ -7,7 +7,7 @@
     { "name": "@cloudflare/vite-plugin", "tag": "latest", "verified": "1.63.0", "watch": "major", "affects": "stacks/vinext-cloudflare (v2 leaves beta)" },
     { "name": "miniflare", "tag": "latest", "verified": "4.20260730.0", "watch": "major", "affects": "stacks/vinext-cloudflare/gotchas.md (Miniflare 5 leaves beta; the stack runs the 5.x beta through the Vite plugin v2 beta)" },
     { "name": "drizzle-orm", "tag": "latest", "verified": "0.45.3", "watch": "major", "affects": "stacks/vinext-cloudflare (1.0 goes stable: drop the RC pin)" },
-    { "name": "drizzle-orm", "tag": "rc", "verified": "1.0.0-rc.4", "watch": "exact", "affects": "stacks/vinext-cloudflare/templates" },
+    { "name": "drizzle-orm", "tag": "rc", "verified": "1.0.0-rc.5", "watch": "exact", "affects": "stacks/vinext-cloudflare/templates" },
     { "name": "better-auth", "tag": "latest", "verified": "1.7.7", "watch": "minor", "affects": "stacks/nextjs/gotchas.md (Better Auth), both auth templates" },
     { "name": "@better-auth/drizzle-adapter", "tag": "latest", "verified": "1.7.7", "watch": "minor", "affects": "stacks/vinext-cloudflare/templates/auth-config.ts (relations-v2 entry point)" },
     { "name": "zod", "tag": "latest", "verified": "4.6.5", "watch": "minor", "affects": "stacks/nextjs/gotchas.md (Zod 4)" },
