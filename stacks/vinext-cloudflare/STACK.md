@@ -6,6 +6,10 @@
 > `node_modules/@vinext/cloudflare/README.md`, `cf --help`. This profile keeps
 > only decisions, their reasons, and the guardrails that enforce them.
 
+## Scaffold
+
+`pnpm create vinext-app <dir> --platform=cloudflare --cdn-cache=workers-cache --data-cache=none --no-prerender`, plus `--image-optimization` (`cloudflare-images` or `none`) — ask the user. In an agent session the scaffolder stops until every cache and image flag is given; these flags encode the decisions below.
+
 ## Inherits `stacks/nextjs`
 
 Folder layout, conventions, the action pipeline (`define-action.ts`,

@@ -5,9 +5,10 @@
 > it. Inherited traps: `stacks/nextjs/gotchas.md` (pnpm, App Router, React,
 > Zod 4, Better Auth, shadcn). Caching traps: [caching.md](./caching.md).
 
-## vinext 1.0
+## vinext 1.0–1.4
 
-- **Dev can fall back from port 3000 to Vite's 5173 after a restart** — auth that trusts a specific host then fails. Pin `server: { port: 3000, strictPort: true }`.
+- **Dev runs on Vite's port 5173** (vinext stopped defaulting to 3000 in 1.2.1) **and moves to the next free port when that one is taken** — auth that trusts one origin then fails. Pin `server: { port: 3000, strictPort: true }` in `vite.config.ts`.
+- **A project initialised before vinext 1.2 lacks the current `assets` block** in `cloudflare.config.ts` (`runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*"]`), so `public/` files skip `proxy.ts` and its security headers. Copy the block from a fresh scaffold, and delete any `resolve.alias` entry pointing at `empty-stub.js` (vinext 1.4 no longer stubs native modules).
 - **Never import app modules into `cloudflare.config.ts` or `vite.config.ts`.** Node loads the config as native ESM (`.ts` extensions required), and a file that becomes a config dependency stops loading for app code ("Failed to load url"). Shared infrastructure constants live in the config and reach the Worker as text bindings.
 - **Route handlers run in the React Server Components environment, where `react-dom/server` is blocked** — React Email's `render()` throws there. Pre-render templates at build time with placeholders and substitute at send time.
 
