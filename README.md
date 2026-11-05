@@ -164,6 +164,7 @@ Once a project is set up, you drive everything with slash commands. Forget which
 | --------- | ---- |
 | Something is broken | `/debug` — it must reproduce the bug with a failing check before touching code |
 | Health check on an active project | `/audit` — run every few days |
+| Pages slow on phones or weak internet | `/perf` — measures first, then fixes the biggest win, one phase at a time |
 | Restructure without behavior change | `/refactor` |
 | Session getting long | Compact at the end of a phase (the harness's `/compact`), saying what the next phase needs |
 | Work moves to another tool, folder, or person | `/handoff` — then start a fresh session and say "read HANDOFF.md" |
