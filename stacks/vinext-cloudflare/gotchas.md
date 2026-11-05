@@ -12,14 +12,14 @@
 - **Never import app modules into `cloudflare.config.ts` or `vite.config.ts`.** Node loads the config as native ESM (`.ts` extensions required), and a file that becomes a config dependency stops loading for app code ("Failed to load url"). Shared infrastructure constants live in the config and reach the Worker as text bindings.
 - **Route handlers run in the React Server Components environment, where `react-dom/server` is blocked** — React Email's `render()` throws there. Pre-render templates at build time with placeholders and substitute at send time.
 
-## Miniflare 5.x alpha (local dev)
+## Miniflare 5.x beta (local dev)
 
-- **The local Hyperdrive proxy crashes the dev server on a DNS blip** (`ENOTFOUND` on a socket with no `error` listener). Patch it with `pnpm patch` (`error` handlers on both proxy sockets, registered in `pnpm-workspace.yaml`); redo the patch when Miniflare updates and report upstream.
+- **The local Hyperdrive proxy's DNS-blip crash is fixed from `5.20261006.1-alpha`** (its sockets now have `error` handlers). A project that patched it with `pnpm patch` drops the patch from `pnpm-workspace.yaml` after upgrading.
 - **Bindings with `dev: { remote: true }`** (e.g. a shared R2 bucket) open a Cloudflare OAuth login on the first dev start.
 
 ## `cf` CLI beta + Workers Builds
 
-- **Editing a Worker's variables or secrets in the dashboard marks it `last_deployed_from: dash`**, and the next non-interactive CI deploy aborts on any config difference. Change secrets only with `cf workers secrets update`. To recover: build, then run `pnpm exec cf deploy --prebuilt` in a real terminal and confirm the prompt (`vinext-cloudflare deploy` pipes cf's output, so cf aborts instead of asking).
+- **Never edit a Worker's variables or secrets in the dashboard; use `cf workers secrets update`.** A dashboard edit marks the Worker `last_deployed_from: dash`, and the next `cf deploy` compares configs: in a terminal it asks, without one (CI, Workers Builds, or `vinext-cloudflare deploy`, which pipes cf's output) it overwrites the dashboard changes without asking, and with `--strict` it aborts (cf 1.0.0-beta.28 source).
 - **`cf workers secrets update` creates and deploys a new Worker version** — treat it as a deploy.
 - **`npx @vinext/cloudflare deploy` builds the app itself** — a separate Workers Builds build command builds twice.
 - **R2 is enabled once per account** (a $0 subscription); its free tier is account-wide, so projects separate by bucket name.

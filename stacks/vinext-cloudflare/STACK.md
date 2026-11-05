@@ -45,8 +45,8 @@ Where the two differ, this profile wins.
 
 ## Prerelease Toolchain
 
-vinext's default Cloudflare path runs on prerelease packages (Oct 2026: `cf` CLI
-beta, Cloudflare Vite plugin v2 beta, Drizzle 1.0 RC, Miniflare alpha). Pin each
+vinext's default Cloudflare path runs on prerelease packages (Nov 2026: `cf` CLI
+beta, Cloudflare Vite plugin v2 beta, Drizzle 1.0 RC, Miniflare 5 beta). Pin each
 prerelease exactly (`pnpm add -E`) and upgrade one at a time through the update
 PRs in `core/ci-cd.md`, so a regression has one suspect.
 
