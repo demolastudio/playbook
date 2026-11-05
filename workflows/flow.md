@@ -26,6 +26,7 @@ Situations that generate work, merging back into the main flow:
 - **Production is broken right now** → **/incident** — stop the damage, check the money, then `/debug` the cause and write it up.
 - **A risky database change** (rename, type change, drop, data move) → **/migrate** — expand → migrate → contract, each step tested on a branch first.
 - **Periodic health check** → **/audit** — read-only subagents sweep security, cost abuse, payments, failures, and performance; you confirm the list before anything changes. Run every few days on active projects and before launch.
+- **Pages are slow, or before launch** → **/perf** — measure first, then fix the biggest win, re-measuring each phase.
 - **Code needs restructuring without behavior change** → **/refactor**.
 - **A merge or rebase is stuck on conflicts** → **/merge-conflicts** — resolves by intent, never aborts.
 
